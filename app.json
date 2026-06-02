@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Krystal",
+    "slug": "krystal",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "krystal",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gigihsu.krystal"
+    },
+    "android": {
+      "package": "com.gigihsu.krystal"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset"
+    ]
+  }
+}
