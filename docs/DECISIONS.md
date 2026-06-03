@@ -56,6 +56,15 @@ The educational content for the chosen emotion (similar words, sensations, what-
 ### 2026-06-02 — Journal prompts reframed: sensation + meaning + helpfulness
 Original three prompts were cause / purpose / sensation. New prompts are: sensation (body), meaning (what it tells you), helpfulness (how it helps). The original "cause" prompt is dropped — it's largely subsumed by "what is it telling you" and the user can describe the trigger naturally within that.
 
+### 2026-06-02 — `daily_checkins` stores only the specific emotion (one FK, not three)
+Originally `daily_checkins` had `emotion_primary_id`, `emotion_secondary_id`, `emotion_specific_id` for fast filtering. Simplified to a single `emotion_id` FK to `emotion_details`. Primary and secondary derive via JOIN through the emotion hierarchy. Tradeoff: insights queries need a 3-table JOIN instead of a single column read — negligible at our scale. Eliminates the possibility of the three columns ever drifting out of sync. Migration `004_simplify_checkin_emotion.sql` applies this change.
+
+### 2026-06-02 — Ship-first strategy: v0.1 = Check-in + Picker + Save only
+Gigi's priority is a working mobile app friends can download, not a feature-complete one. v0.1 scope cut to: sign-in → home → mind/body/heart sliders → 3-level Plutchik picker → save. Cut from v0.1 (added in v0.2+): grounding breaths, Reflect screen (understanding + journaling), insights, grape companion polish, full Atlas-mapped emotion content. Distribution path: EAS Internal Distribution first (no Apple Developer needed, ~100-tester limit), TestFlight later.
+
+### 2026-06-02 — Emotion taxonomy seeded minimally for v0.1
+Migration `005_seed_plutchik_minimal.sql` seeds 8 primaries × 3 secondaries × 3 tertiaries = 72 emotion names. No Atlas content (similar_words, sensations, what-it-tells-you, how-it-helps-you) yet — those are backfilled in v0.2 when the Reflect screen exists to surface them.
+
 ---
 
 ## Template for future entries

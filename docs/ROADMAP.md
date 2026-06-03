@@ -1,8 +1,15 @@
 # Krystal — Build Roadmap
 
-**Status:** Living doc · v1.0 · 2026-06-02
+**Status:** Living doc · v1.1 · 2026-06-02
 
-A phased path from "scaffold" to "TestFlight-ready MVP." Each phase has clear deliverables and a definition of done so we know when to move on.
+A ship-first path. v0.1 gets a working app into friends' hands as fast as possible. v0.2+ adds the calmer/richer features. Each phase has clear deliverables and a definition of done so we know when to move on.
+
+## What we're shipping when
+
+- **v0.1 — friends-can-download.** Sign in → Mind/Body/Heart → Plutchik picker → Save. EAS Internal Distribution. **Target: 1 week of focused work.**
+- **v0.2 — the calmer one.** Add Grounding screen + Reflect screen (Understanding + Journaling) + full Atlas-mapped emotion content + the grape companion.
+- **v0.3 — the smarter one.** Add Insights screen with rule-based pattern observations. Settings (sign out, delete data).
+- **v1.0 — TestFlight.** Polish, real icon/splash, App Store submission via TestFlight.
 
 ---
 
@@ -46,8 +53,9 @@ Deliverables:
 - [x] `supabase/migrations/001_init.sql` — `profiles`, `daily_checkins`, `journal_entries`, `emotion_categories`, `emotion_subcategories`, `emotion_details`, auth-trigger
 - [x] `supabase/migrations/002_rls.sql` — RLS policies on every user-owned table
 - [x] `supabase/migrations/003_seed_smoke.sql` — Fear → Anxiety → Overwhelmed smoke test
+- [x] `supabase/migrations/004_simplify_checkin_emotion.sql` — collapse 3 emotion FKs to 1
 - [x] `supabase/migrations/README.md` — how to run them in the dashboard
-- [ ] **Gigi runs all three in Supabase SQL Editor**
+- [ ] **Gigi runs all four in Supabase SQL Editor**
 - [ ] Manual verification: tables visible in Table Editor, RLS confirmed by test query
 
 Definition of done:
@@ -59,46 +67,52 @@ Estimated work: ~1.5 hours
 
 ---
 
-## Phase 4 · Emotion taxonomy content
+## Phase 4 · Emotion taxonomy — minimal seed (v0.1 scope)
 
-**Goal:** A fully populated emotion database covering hybrid Plutchik + Atlas content.
+**Goal:** Enough emotion names to make the picker work. Atlas content is deferred to v0.2 when the Reflect screen exists to surface it.
 
 Deliverables:
-- [ ] `supabase/seed/emotions.ts` — TypeScript file producing INSERT statements
-- [ ] 8 primaries × ~4 secondaries × ~4 tertiaries ≈ **~120 emotion entries**
-- [ ] Every entry has: name, similar_words (3–5), sensations (3–5), what_it_tells_you, how_it_helps_you
-- [ ] All copy possibility-framed (no diagnostic claims)
-- [ ] Sources cited in comments (Plutchik, Atlas of Emotions, etc.)
-- [ ] **Gigi reviews 10 random entries for tone before bulk approval**
+- [x] `supabase/migrations/005_seed_plutchik_minimal.sql` — 8 × 3 × 3 = 72 emotions (names only)
+- [x] Adds `sort_order` column to `emotion_details` (lets the picker order tertiaries by intensity)
+- [ ] **Gigi runs `005` in Supabase SQL Editor**
 
 Definition of done:
-- Seed runs; all rows present in Supabase
-- Gigi has read a random 10 and approved
-- Copy passes the tone check: no "you should," no "always," no diagnostic language
+- `select count(*) from public.emotion_categories` returns 8
+- `select count(*) from public.emotion_subcategories` returns 24
+- `select count(*) from public.emotion_details` returns 72
 
-Estimated work: ~2–3 hours (mostly content, not code)
+### Phase 4b · Atlas content backfill (deferred to v0.2)
+
+For each tertiary, edit-in: similar_words, sensations, what_it_tells_you, how_it_helps_you. Done by Gigi after Plutchik mapping; Cowork drafts copy that Gigi refines for tone.
 
 ---
 
-## Phase 5 · Daily reflection screens
+## Phase 5 · v0.1 screens (ship-first)
 
-**Goal:** All six steps of the daily flow built, polished, and runnable end-to-end on device.
+**Goal:** A working daily flow that friends can use. Check-in → Picker → Save. No grounding screen, no Reflect screen, no insights — those come in v0.2.
 
-Built **one screen at a time**, each as its own focused work session. Each screen commits separately.
+Built **one screen at a time**, each as its own focused work session. Each commits separately.
 
-- [ ] **5.1 Grounding** — `app/(flow)/grounding.tsx` · breath animation · ~200 LOC · 1 hr
-- [ ] **5.2 Check-in** — `app/(flow)/check-in.tsx` · three sliders with anchor examples · 1 hr
-- [ ] **5.3 Emotion picker** — `app/(flow)/emotion/{primary,secondary,specific}.tsx` · 3 sub-screens · color-coded tiles · **2–3 hrs (the hardest screen)**
-- [ ] **5.4 Reflect** — `app/(flow)/reflect.tsx` · merged Understanding + Journaling · educational content paired with three journal prompts (sensation, meaning, helpfulness) · "Explore more" affordance · ~2 hrs
-- [ ] **5.5 Done / confirmation** — `app/(flow)/done.tsx` · save handler + one pattern preview · 1 hr
+- [ ] **5.1 Check-in** — `app/(flow)/check-in.tsx` · three sliders (Mind, Body, Heart) with anchor examples · ~1 hr
+- [ ] **5.2 Emotion picker** — `app/(flow)/emotion/{primary,secondary,specific}.tsx` · 3 sub-screens · color-coded tiles drawn from Plutchik seed · **2–3 hrs (the hardest screen)**
+- [ ] **5.3 Done / confirmation** — `app/(flow)/done.tsx` · save handler · simple "saved" message · ~45 min
+- [ ] **5.4 Home wired up** — Home's "Begin" button navigates into the flow · ~15 min
 
 Definition of done:
 - Full flow runs end-to-end in Expo Go
-- All state preserved across screen transitions via `useReflectionStore`
-- Visual pacing matches the calm philosophy (Gigi judges)
-- No network calls until the Done screen
+- All draft state preserved across screen transitions via `useReflectionStore`
+- A reflection saves successfully to Supabase
 
-Estimated work: ~7–8 hours, ideally spread across 2 weeks
+Estimated work: ~5 hours.
+
+## Phase 5.5 (v0.2) · The calmer screens
+
+After v0.1 ships, layered on:
+
+- [ ] **Grounding** — `app/(flow)/grounding.tsx` · three-breath animation · ~1 hr
+- [ ] **Reflect** — `app/(flow)/reflect.tsx` · Understanding + Journaling merged · ~2 hrs
+- [ ] **Atlas content backfill** for all 72 emotions
+- [ ] **Grape companion** — sketch, then implement
 
 ---
 
@@ -142,22 +156,33 @@ Estimated work: ~1.5–2 weeks part-time
 
 ---
 
-## Phase 7 · Ship to TestFlight
+## Phase 7 · Ship — EAS Internal Distribution (v0.1 finish line)
+
+**Prerequisite:** None. Free Expo account is enough.
+
+Deliverables:
+- [ ] `eas.json` configured for `internal` distribution
+- [ ] First successful `eas build --platform ios --profile preview`
+- [ ] Install link shared with at least 3 friends
+- [ ] At least 1 friend completes a real reflection on their own phone
+
+Definition of done:
+- Friend taps a link, gets the app on their phone, signs in, completes a reflection — without you helping.
+
+## Phase 8 · TestFlight (v1.0)
 
 **Prerequisite:** Apple Developer account ($99/yr) active.
 
 Deliverables:
 - [ ] App icon + splash (replace defaults)
 - [ ] Real app metadata (name, description, screenshots)
-- [ ] EAS Build configured (`eas.json`)
-- [ ] First successful `eas build --platform ios`
+- [ ] First successful `eas build --platform ios --profile production`
 - [ ] First TestFlight upload
-- [ ] At least 3 invited testers
 - [ ] PostHog wired up (post-launch — only after we know what we want to measure)
 
 Definition of done:
-- Krystal is installable from TestFlight on a tester's phone
-- One full reflection flow completed on a TestFlight build
+- Krystal is installable from TestFlight
+- A tester completes a full reflection on a TestFlight build
 
 ---
 

@@ -76,26 +76,26 @@ create index emotion_details_framework_idx
 -- One row per completed reflection.
 -- `occurred_at` is the user's local reflection time (matters for offline sync).
 -- `client_uuid` is the idempotency key for offline submission retries.
+-- Only the specific (tertiary) emotion is stored. Primary and secondary are
+-- derivable via JOIN through emotion_details → emotion_subcategories → emotion_categories.
 
 create table public.daily_checkins (
-  id                    uuid primary key default gen_random_uuid(),
-  user_id               uuid not null references auth.users(id) on delete cascade,
-  created_at            timestamptz not null default now(),
-  occurred_at           timestamptz not null default now(),
-  mind_score            smallint not null check (mind_score  between 1 and 10),
-  body_score            smallint not null check (body_score  between 1 and 10),
-  heart_score           smallint not null check (heart_score between 1 and 10),
-  emotion_primary_id    uuid not null references public.emotion_categories(id)    on delete restrict,
-  emotion_secondary_id  uuid not null references public.emotion_subcategories(id) on delete restrict,
-  emotion_specific_id   uuid not null references public.emotion_details(id)       on delete restrict,
-  client_uuid           uuid not null unique
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  created_at  timestamptz not null default now(),
+  occurred_at timestamptz not null default now(),
+  mind_score  smallint not null check (mind_score  between 1 and 10),
+  body_score  smallint not null check (body_score  between 1 and 10),
+  heart_score smallint not null check (heart_score between 1 and 10),
+  emotion_id  uuid not null references public.emotion_details(id) on delete restrict,
+  client_uuid uuid not null unique
 );
 
 create index daily_checkins_user_occurred_idx
   on public.daily_checkins(user_id, occurred_at desc);
 
-create index daily_checkins_user_primary_idx
-  on public.daily_checkins(user_id, emotion_primary_id);
+create index daily_checkins_user_emotion_idx
+  on public.daily_checkins(user_id, emotion_id);
 
 -- ─── Journal entries (optional, 1:1 with daily_checkins) ─────────────────────
 -- Three nullable text fields matching the three prompts on the merged
