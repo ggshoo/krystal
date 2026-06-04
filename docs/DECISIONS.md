@@ -65,6 +65,16 @@ Gigi's priority is a working mobile app friends can download, not a feature-comp
 ### 2026-06-02 — Emotion taxonomy seeded minimally for v0.1
 Migration `005_seed_plutchik_minimal.sql` seeds 8 primaries × 3 secondaries × 3 tertiaries = 72 emotion names. No Atlas content (similar_words, sensations, what-it-tells-you, how-it-helps-you) yet — those are backfilled in v0.2 when the Reflect screen exists to surface them.
 
+### 2026-06-02 — v0.2 design notes for Check-in screen
+For v0.2: split the Mind/Body/Heart prompts onto **one screen per dimension** (currently all three are stacked on one scrollable screen). The single-question pacing matches the calm aesthetic better than a "fill out this form" feel. Also: needs to be **prettier, smoother, more colorful** overall — current rendering is functional but minimal. Real design pass comes with the grape companion + the cartoon-game polish work.
+
+### 2026-06-02 — v0.2 design notes for Emotion picker
+Colors and structure work for v0.1. For v0.2:
+- **Calm motion** — tiles should fade in and out slowly when transitioning between screens (evokes calm, not snap)
+- **Title and copy rewrite** — current headers ("What's coming up for you?", "Which kind?", "Closer to…") are placeholders
+- **Tile sizing** — likely needs adjustment, TBD with design
+- **Eventually: the actual Plutchik wheel visualization** instead of a grid of tiles, so the user picks by selecting a wedge of the wheel. Grid-of-tiles is the ship-fast version; the wheel is the destination.
+
 ---
 
 ## Template for future entries
