@@ -6,11 +6,16 @@ A mobile app for cultivating emotional clarity through guided reflection.
 
 Krystal guides a daily emotional reflection practice: grounding → mind-body-heart check-in → emotion identification → emotion understanding → guided journaling → pattern discovery over time.
 
-Full product spec lives in [`docs/PRD.md`](./docs/PRD.md) (added in Phase 2).
+## Docs
+
+- [Product Requirements](./docs/PRD.md) — what we're building and why
+- [Architecture](./docs/ARCHITECTURE.md) — folder structure, data flow, schema
+- [Roadmap](./docs/ROADMAP.md) — phased build plan
+- [Decisions log](./docs/DECISIONS.md) — append-only record of choices
 
 ## Stack
 
-- **App:** Expo SDK 52 · React Native · TypeScript · Expo Router (file-based routing)
+- **App:** Expo SDK 54 · React Native · TypeScript · Expo Router (file-based routing)
 - **Styling:** NativeWind 4 (Tailwind for React Native)
 - **State:** Zustand
 - **Backend:** Supabase (Postgres + Auth + Row Level Security)
@@ -49,8 +54,8 @@ krystal/
 
 ## Build phases
 
-- [x] **Phase 1** — Bootstrap (you are here)
-- [ ] **Phase 2** — Architecture docs (PRD, ARCHITECTURE, ROADMAP)
+- [x] **Phase 1** — Bootstrap
+- [x] **Phase 2** — Architecture docs (PRD, ARCHITECTURE, ROADMAP)
 - [ ] **Phase 3** — Supabase schema + RLS
 - [ ] **Phase 4** — Emotion taxonomy
 - [ ] **Phase 5** — Daily reflection screens

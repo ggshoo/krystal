@@ -23,6 +23,9 @@ Daily reflections can be completed without internet; submissions queue in AsyncS
 ### 2026-06-02 — Auth: Email magic link only
 Passwordless via Supabase Auth `signInWithOtp`. Lowest UX surface, no password management, no social-login App Store mandates (Apple requires Sign in with Apple only if other social logins are present — we have none). Deep link `krystal://auth/callback` returns user to the app.
 
+### 2026-06-02 — Auth (revised for v0.1): anonymous sessions on first launch
+Reversed earlier decision for ship-first reasons. v0.1 silently creates an anonymous Supabase session on app launch — no sign-in screen, no email step, friends can use the app immediately. Data persists on-device. v0.2 will add an "upgrade to email" flow in settings that converts the anonymous session to a real one via `supabase.auth.linkIdentity`, preserving existing reflections. The original magic-link decision is the long-term destination — anonymous is the on-ramp.
+
 ### 2026-06-02 — Draft state: Zustand in memory, never persisted
 Intermediate steps of a reflection are not written to Supabase. The atomic unit is the submitted reflection. Keeps the DB clean, the flow fast, and avoids orphan rows.
 

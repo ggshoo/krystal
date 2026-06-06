@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Krystal",
+    "name": "krystal",
     "slug": "krystal",
     "version": "0.1.0",
     "orientation": "portrait",
@@ -16,7 +16,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static"
+      "output": "single"
     },
     "plugins": [
       "expo-router",

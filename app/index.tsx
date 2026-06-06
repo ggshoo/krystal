@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-cream">
       <View className="flex-1 items-center justify-center px-6">
-        <Text className="mb-3 text-4xl font-semibold text-ink">Krystal</Text>
+        <Text className="mb-3 text-4xl font-semibold text-ink">krystal</Text>
         <Text className="mb-12 max-w-xs text-center text-base text-muted">
           A daily practice for emotional clarity.
         </Text>
