@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FadeIn } from "@/components/FadeIn";
 import {
   findPrimary,
   findSecondary,
@@ -131,7 +132,7 @@ export default function Done() {
       <View className="flex-1 items-center justify-center px-8">
         {state === "saving" && (
           <>
-            <ActivityIndicator size="large" color={primary?.color ?? "#7B8FA1"} />
+            <ActivityIndicator size="large" color={primary?.color ?? "#C2876B"} />
             <Text className="mt-6 text-base text-muted">
               Saving your reflection…
             </Text>
@@ -141,53 +142,62 @@ export default function Done() {
         {state === "saved" && (
           <>
             {primary && (
-              <View className="mb-8 items-center">
-                <View
-                  className="mb-3 h-3 w-3 rounded-full"
-                  style={{ backgroundColor: primary.color }}
-                />
-                <Text className="text-xs font-semibold uppercase tracking-widest text-muted">
-                  {primary.name} · {secondary?.name}
-                </Text>
-                <Text className="mt-1 text-3xl font-semibold capitalize text-ink">
-                  {tertiary?.name}
-                </Text>
-              </View>
+              <FadeIn delay={0} duration={650}>
+                <View className="mb-10 items-center">
+                  <View
+                    className="mb-3 h-3 w-3 rounded-full"
+                    style={{ backgroundColor: primary.color }}
+                  />
+                  <Text className="text-xs font-semibold uppercase tracking-widest text-muted">
+                    {primary.name} · {secondary?.name}
+                  </Text>
+                  <Text className="mt-2 text-4xl font-semibold capitalize text-ink">
+                    {tertiary?.name}
+                  </Text>
+                </View>
+              </FadeIn>
             )}
 
-            <Text className="mb-2 text-2xl font-semibold text-ink">
-              Saved.
-            </Text>
-            <Text className="mb-12 text-center text-base text-muted">
-              See you tomorrow.
-            </Text>
-
-            <Pressable
-              accessibilityRole="button"
-              className="rounded-full bg-accent px-8 py-4 active:opacity-70"
-              onPress={handleReturnHome}
-            >
-              <Text className="text-base font-medium text-white">
-                Return home
+            <FadeIn delay={250} duration={650}>
+              <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                Saved.
               </Text>
-            </Pressable>
+            </FadeIn>
+
+            <FadeIn delay={400} duration={650}>
+              <Text className="mb-16 text-center text-base leading-relaxed text-muted">
+                See you tomorrow.
+              </Text>
+            </FadeIn>
+
+            <FadeIn delay={650} duration={500}>
+              <Pressable
+                accessibilityRole="button"
+                className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-200 hover:scale-110 hover:shadow-lg active:opacity-70"
+                onPress={handleReturnHome}
+              >
+                <Text className="text-base font-medium tracking-wide text-white">
+                  Return home
+                </Text>
+              </Pressable>
+            </FadeIn>
           </>
         )}
 
         {state === "error" && (
           <>
-            <Text className="mb-2 text-2xl font-semibold text-ink">
+            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
               Couldn't save.
             </Text>
-            <Text className="mb-8 text-center text-sm text-muted">
+            <Text className="mb-10 text-center text-sm leading-relaxed text-muted">
               {errorMsg}
             </Text>
             <Pressable
               accessibilityRole="button"
-              className="mb-3 rounded-full bg-accent px-8 py-4 active:opacity-70"
+              className="mb-4 rounded-full bg-accent px-10 py-5 shadow-sm active:opacity-70"
               onPress={handleRetry}
             >
-              <Text className="text-base font-medium text-white">
+              <Text className="text-base font-medium tracking-wide text-white">
                 Try again
               </Text>
             </Pressable>

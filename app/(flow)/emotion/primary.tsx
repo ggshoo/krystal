@@ -1,16 +1,13 @@
 import { useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { EMOTIONS } from "@/lib/emotions";
+import { EmotionWheel } from "@/components/EmotionWheel";
+import { FadeIn } from "@/components/FadeIn";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
- * Phase 5.2a — Pick primary emotion.
- *
- * 8 color-tinted tiles in a 2-column grid. Picking one stores the slug to
- * draft state, clears downstream emotion selections, and navigates to the
- * secondary picker.
+ * Phase 5.2a — Pick primary emotion (Plutchik wheel).
  */
 export default function PickPrimary() {
   const router = useRouter();
@@ -24,49 +21,25 @@ export default function PickPrimary() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 24,
-          paddingBottom: 48,
-        }}
-      >
-        <Text className="mb-2 px-1 text-2xl font-semibold text-ink">
-          What's coming up for you?
-        </Text>
-        <Text className="mb-8 px-1 text-base text-muted">
-          Start broad. We'll narrow down together.
-        </Text>
+      <View className="flex-1 items-center px-6 pt-12">
+        <FadeIn delay={0}>
+          <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+            What's coming up?
+          </Text>
+        </FadeIn>
 
-        <View className="-mx-2 flex-row flex-wrap">
-          {EMOTIONS.map((e) => {
-            const selected = e.slug === currentPrimary;
-            return (
-              <View key={e.slug} className="mb-4 w-1/2 px-2">
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={e.name}
-                  accessibilityState={{ selected }}
-                  onPress={() => pick(e.slug)}
-                  className="h-28 items-center justify-center rounded-3xl active:opacity-70"
-                  style={{
-                    backgroundColor: e.color + (selected ? "55" : "26"),
-                    borderWidth: selected ? 2 : 0,
-                    borderColor: e.color,
-                  }}
-                >
-                  <View
-                    className="mb-2 h-3 w-3 rounded-full"
-                    style={{ backgroundColor: e.color }}
-                  />
-                  <Text className="text-lg font-medium text-ink">{e.name}</Text>
-                </Pressable>
-              </View>
-            );
-          })}
-        </View>
-      </ScrollView>
+        <FadeIn delay={120}>
+          <Text className="mb-10 max-w-xs text-center text-base leading-relaxed text-muted">
+            Tap the closest emotion. We'll narrow down from there.
+          </Text>
+        </FadeIn>
+
+        <FadeIn delay={260}>
+          <View className="items-center justify-center">
+            <EmotionWheel onPick={pick} selected={currentPrimary} />
+          </View>
+        </FadeIn>
+      </View>
     </SafeAreaView>
   );
 }

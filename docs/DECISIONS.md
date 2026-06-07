@@ -78,6 +78,17 @@ Colors and structure work for v0.1. For v0.2:
 - **Tile sizing** — likely needs adjustment, TBD with design
 - **Eventually: the actual Plutchik wheel visualization** instead of a grid of tiles, so the user picks by selecting a wedge of the wheel. Grid-of-tiles is the ship-fast version; the wheel is the destination.
 
+### 2026-06-02 — Dark mode (v0.3+)
+Gigi wants dark mode eventually. Deferred to v0.3 after the v0.2 visual polish is done. Implementation: use NativeWind's `dark:` variants + React Native's `useColorScheme()`. Palette will need parallel dark tokens (cream → near-black warm brown, ink → cream, accent stays terracotta but lower opacity, emotion colors slightly desaturated).
+
+### 2026-06-02 — History view + analytics (v0.3)
+Gigi wants users to access their reflection history after "logging in" — see past entries, eventually analytics on patterns. Two-part build:
+- **History list** (v0.3 early): a `/history` route that lists the user's `daily_checkins` rows in reverse chronological order. Each row shows date, MBH scores, and the emotion path. Tap a row to see detail. Requires real auth (anonymous → email upgrade) so history persists across devices — otherwise it's per-browser only.
+- **Analytics / insights** (v0.3 later): the rule-based Insights screen from PRD §5. Pattern observations over the last 30 days. Already specced in the PRD; just defer build until after history works.
+
+### 2026-06-02 — Primary emotion picker → wheel format
+User-facing UX changes from an 8-tile grid to a Plutchik-style 8-wedge wheel (SVG). Opposite emotions sit across from each other (joy↔sadness, trust↔disgust, fear↔anger, surprise↔anticipation). Tap a wedge to select. Built in `components/EmotionWheel.tsx`. Secondary and specific pickers stay as tiles for now — they'll get a wheel-or-list treatment in a later pass.
+
 ---
 
 ## Template for future entries
