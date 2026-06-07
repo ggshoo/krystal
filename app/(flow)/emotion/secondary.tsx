@@ -65,7 +65,7 @@ export default function PickSecondary() {
                 accessibilityLabel={s.name}
                 accessibilityState={{ selected }}
                 onPress={() => pick(s.slug)}
-                className="mb-4 h-24 items-center justify-center rounded-tile transition-all duration-200 hover:scale-[1.05] hover:shadow-lg active:scale-[0.98] active:opacity-70"
+                className="mb-4 h-24 items-center justify-center rounded-tile transition-all duration-300 hover:scale-[1.08] hover:shadow-2xl active:scale-[0.98] active:opacity-70"
                 style={{
                   backgroundColor: primary.color + (selected ? "55" : "26"),
                   borderWidth: selected ? 2 : 0,

@@ -7,8 +7,8 @@ export default function MindStep() {
       dimensionKey="mind_score"
       label="Mind"
       question="How are your thoughts today?"
-      low="worried · racing · foggy"
-      high="focused · clear · present"
+      low="Worried. Racing thoughts. Foggy brain. Cluttered. Distracted."
+      high="Focused. Thinking clearly."
       nextRoute="/check-in/body"
     />
   );

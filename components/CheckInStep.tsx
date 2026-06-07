@@ -50,7 +50,7 @@ export function CheckInStep({
   const handleSelect = (n: number) => {
     setField(dimensionKey, n);
     setPending(n);
-    const t = setTimeout(() => router.push(nextRoute), 280);
+    const t = setTimeout(() => router.push(nextRoute), 500);
     return () => clearTimeout(t);
   };
 
@@ -93,10 +93,10 @@ export function CheckInStep({
                   accessibilityLabel={`${label} ${n} of 10`}
                   accessibilityState={{ selected }}
                   onPress={() => handleSelect(n)}
-                  className={`h-11 w-11 items-center justify-center rounded-full border transition-all duration-200 ${
+                  className={`h-11 w-11 items-center justify-center rounded-full border transition-all duration-300 ${
                     selected
-                      ? "scale-110 border-accent bg-accent"
-                      : "border-ink/15 bg-cream hover:scale-110 hover:border-accent/40 hover:bg-accent/5 active:scale-95 active:bg-ink/5"
+                      ? "scale-125 border-accent bg-accent shadow-lg"
+                      : "border-ink/15 bg-cream hover:scale-125 hover:border-accent/60 hover:bg-accent/10 hover:shadow-md active:scale-95 active:bg-ink/5"
                   }`}
                 >
                   <Text
@@ -115,9 +115,21 @@ export function CheckInStep({
         </FadeIn>
 
         <FadeIn delay={400}>
-          <View className="flex-row justify-between">
-            <Text className="flex-1 text-xs text-muted">{low}</Text>
-            <Text className="flex-1 text-right text-xs text-muted">{high}</Text>
+          <View className="mt-4 flex-row justify-between gap-6">
+            <View className="flex-1">
+              <Text className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted">
+                Low
+              </Text>
+              <Text className="text-sm leading-relaxed text-muted">{low}</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="mb-1 text-right text-[10px] font-semibold uppercase tracking-widest text-muted">
+                High
+              </Text>
+              <Text className="text-right text-sm leading-relaxed text-muted">
+                {high}
+              </Text>
+            </View>
           </View>
         </FadeIn>
       </View>

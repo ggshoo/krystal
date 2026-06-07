@@ -25,7 +25,7 @@ const INNER_R = 30;
 const LABEL_R = 105;
 
 // How far a hovered wedge translates outward from center
-const HOVER_OFFSET = 8;
+const HOVER_OFFSET = 16;
 
 function wedgePath(startAngle: number, endAngle: number): string {
   const sR = (startAngle * Math.PI) / 180;
@@ -101,7 +101,7 @@ export function EmotionWheel({ onPick, selected }: Props) {
               onPressIn={() => setHovered(e.slug)}
               onPressOut={() => setHovered(null)}
               {...hoverHandlers}
-              style={{ cursor: "pointer", transition: "all 200ms ease-out" } as object}
+              style={{ cursor: "pointer", transition: "all 300ms ease-out" } as object}
             />
             <SvgText
               x={labelX}
@@ -112,7 +112,7 @@ export function EmotionWheel({ onPick, selected }: Props) {
               textAnchor="middle"
               alignmentBaseline="central"
               pointerEvents="none"
-              style={{ transition: "all 200ms ease-out" } as object}
+              style={{ transition: "all 300ms ease-out" } as object}
             >
               {e.name}
             </SvgText>

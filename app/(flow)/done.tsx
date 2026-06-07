@@ -173,7 +173,7 @@ export default function Done() {
             <FadeIn delay={650} duration={500}>
               <Pressable
                 accessibilityRole="button"
-                className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-200 hover:scale-110 hover:shadow-lg active:opacity-70"
+                className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
                 onPress={handleReturnHome}
               >
                 <Text className="text-base font-medium tracking-wide text-white">

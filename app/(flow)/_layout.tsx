@@ -14,7 +14,7 @@ export default function FlowLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: "#F7F0E5" },
         animation: "fade",
-        animationDuration: 350,
+        animationDuration: 700,
       }}
     />
   );

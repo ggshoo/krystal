@@ -21,7 +21,7 @@ type Props = {
 export function FadeIn({
   children,
   delay = 0,
-  duration = 500,
+  duration = 800,
   noSpring = false,
   className,
 }: Props) {
