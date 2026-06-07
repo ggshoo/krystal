@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -13,21 +13,19 @@ type Props = {
   step: 1 | 2 | 3;
   /** Field on the reflection draft to write to. */
   dimensionKey: DimensionKey;
+  /** Big hero word — "Mind" / "Body" / "Heart". */
   label: string;
-  question: string;
+  /**
+   * Sub-question prose. Pass JSX to bold the key emotional word, e.g.
+   * `<>How are your <Text className="font-semibold text-ink">thoughts</Text> today?</>`
+   */
+  question: ReactNode;
   low: string;
   high: string;
   /** Where to go after the user makes a selection. */
   nextRoute: string;
 };
 
-/**
- * Shared one-question check-in screen. Renders a single dimension
- * (Mind / Body / Heart) with 1–10 tap-to-select circles.
- *
- * Soft staggered fade-in on mount. Auto-advances ~280ms after selection
- * so the user sees their tap register before the fade to the next step.
- */
 export function CheckInStep({
   step,
   dimensionKey,
@@ -58,7 +56,7 @@ export function CheckInStep({
     <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
       <View className="flex-1 px-6 pt-10">
         <FadeIn delay={0}>
-          <View className="mb-16 flex-row justify-center gap-2">
+          <View className="mb-12 flex-row justify-center gap-2">
             {[1, 2, 3].map((i) => (
               <View
                 key={i}
@@ -70,19 +68,21 @@ export function CheckInStep({
           </View>
         </FadeIn>
 
-        <FadeIn delay={100}>
-          <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
+        {/* HERO label — Mind / Body / Heart */}
+        <FadeIn delay={150}>
+          <Text className="mb-5 text-center text-6xl font-semibold tracking-tight text-ink">
             {label}
           </Text>
         </FadeIn>
 
-        <FadeIn delay={180}>
-          <Text className="mb-16 text-3xl font-semibold leading-snug tracking-tight text-ink">
+        {/* Sub-question with bolded key word passed as JSX */}
+        <FadeIn delay={350}>
+          <Text className="mb-16 text-center text-xl leading-relaxed text-muted">
             {question}
           </Text>
         </FadeIn>
 
-        <FadeIn delay={300}>
+        <FadeIn delay={550}>
           <View className="mb-4 flex-row items-center justify-between">
             {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
               const selected = pending === n;
@@ -114,7 +114,7 @@ export function CheckInStep({
           </View>
         </FadeIn>
 
-        <FadeIn delay={400}>
+        <FadeIn delay={700}>
           <View className="mt-4 flex-row justify-between gap-6">
             <View className="flex-1">
               <Text className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted">

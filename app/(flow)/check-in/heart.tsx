@@ -1,3 +1,5 @@
+import { Text } from "react-native";
+
 import { CheckInStep } from "@/components/CheckInStep";
 
 export default function HeartStep() {
@@ -6,9 +8,15 @@ export default function HeartStep() {
       step={3}
       dimensionKey="heart_score"
       label="Heart"
-      question="How emotionally connected do you feel?"
-      low="numb · closed off"
-      high="open · connected"
+      question={
+        <>
+          How{" "}
+          <Text className="font-semibold text-ink">emotionally</Text>{" "}
+          connected do you feel?
+        </>
+      }
+      low="Numb. Closed off. Disconnected."
+      high="Open. Connected. Warm."
       nextRoute="/emotion/primary"
     />
   );

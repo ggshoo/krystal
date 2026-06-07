@@ -1,3 +1,5 @@
+import { Text } from "react-native";
+
 import { CheckInStep } from "@/components/CheckInStep";
 
 export default function BodyStep() {
@@ -6,9 +8,14 @@ export default function BodyStep() {
       step={2}
       dimensionKey="body_score"
       label="Body"
-      question="How does your body feel right now?"
-      low="fatigue · pain · tension"
-      high="relaxed · alive · active"
+      question={
+        <>
+          How does your{" "}
+          <Text className="font-semibold text-ink">body</Text> feel right now?
+        </>
+      }
+      low="Fatigued. In pain. Tense. Stiff. Heavy."
+      high="Relaxed. Strong. Alive."
       nextRoute="/check-in/heart"
     />
   );

@@ -159,8 +159,8 @@ export default function Done() {
             )}
 
             <FadeIn delay={250} duration={650}>
-              <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
-                Saved.
+              <Text className="mb-3 text-center text-lg font-normal tracking-wide text-muted/70">
+                saved.
               </Text>
             </FadeIn>
 

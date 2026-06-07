@@ -12,20 +12,19 @@ import { EMOTIONS } from "@/lib/emotions";
 /**
  * Plutchik-style 8-wedge wheel for picking a primary emotion.
  *
- * - Wedges arranged in Plutchik's order, starting top (12 o'clock) clockwise:
- *   joy, trust, fear, surprise, sadness, disgust, anger, anticipation.
- * - Hovered wedge "pops" outward from the wheel center, brightens, gains
- *   a colored stroke. Selected wedge stays bright + bordered.
+ * Dramatic hover: the hovered wedge translates outward, scales bigger around
+ * its own center, fills to near-solid color, gains a thick colored stroke,
+ * and its label jumps up in size and weight.
  */
 
 const SIZE = 340;
 const CENTER = SIZE / 2;
-const OUTER_R = 158;
+const OUTER_R = 152;
 const INNER_R = 30;
-const LABEL_R = 105;
+const LABEL_R = 102;
 
-// How far a hovered wedge translates outward from center
-const HOVER_OFFSET = 16;
+const HOVER_OFFSET = 24; // pixels outward from center on hover
+const HOVER_SCALE = 1.12; // size multiplier on hover
 
 function wedgePath(startAngle: number, endAngle: number): string {
   const sR = (startAngle * Math.PI) / 180;
@@ -67,20 +66,28 @@ export function EmotionWheel({ onPick, selected }: Props) {
 
         const isSelected = e.slug === selected;
         const isHovered = e.slug === hovered;
+        const lit = isSelected || isHovered;
 
-        const fillAlpha = isSelected ? "CC" : isHovered ? "88" : "40";
-        const strokeColor =
-          isSelected || isHovered ? e.color : "#F7F0E5";
-        const strokeWidth = isSelected ? 4 : isHovered ? 4 : 3;
+        // Wedge geometric center (where to scale around)
+        const wedgeCx = CENTER + ((INNER_R + OUTER_R) / 2) * Math.cos(midRad);
+        const wedgeCy = CENTER + ((INNER_R + OUTER_R) / 2) * Math.sin(midRad);
 
-        // Pop the wedge outward from center on hover
-        const offsetDist = isHovered ? HOVER_OFFSET : 0;
-        const offsetX = offsetDist * Math.cos(midRad);
-        const offsetY = offsetDist * Math.sin(midRad);
+        // Pop the wedge outward + scale around its own center on hover
+        const offsetX = isHovered ? HOVER_OFFSET * Math.cos(midRad) : 0;
+        const offsetY = isHovered ? HOVER_OFFSET * Math.sin(midRad) : 0;
+        const scale = isHovered ? HOVER_SCALE : 1;
 
-        // Slightly bigger label on hover too
-        const labelSize = isHovered ? 16 : 15;
-        const labelWeight = isHovered ? "600" : "500";
+        // Combine: translate outward, scale around wedge center
+        const transform = isHovered
+          ? `translate(${offsetX} ${offsetY}) translate(${wedgeCx} ${wedgeCy}) scale(${scale}) translate(${-wedgeCx} ${-wedgeCy})`
+          : "translate(0 0)";
+
+        const fillAlpha = isSelected ? "DD" : isHovered ? "CC" : "40";
+        const strokeColor = lit ? e.color : "#F7F0E5";
+        const strokeWidth = isHovered ? 6 : isSelected ? 4 : 3;
+
+        const labelSize = isHovered ? 20 : 15;
+        const labelWeight = isHovered ? "700" : isSelected ? "600" : "500";
 
         const hoverHandlers = {
           onMouseEnter: () => setHovered(e.slug),
@@ -90,7 +97,8 @@ export function EmotionWheel({ onPick, selected }: Props) {
         return (
           <G
             key={e.slug}
-            transform={`translate(${offsetX} ${offsetY})`}
+            transform={transform}
+            style={{ transition: "transform 280ms ease-out" } as object}
           >
             <Path
               d={wedgePath(startAngle, endAngle)}
@@ -101,7 +109,10 @@ export function EmotionWheel({ onPick, selected }: Props) {
               onPressIn={() => setHovered(e.slug)}
               onPressOut={() => setHovered(null)}
               {...hoverHandlers}
-              style={{ cursor: "pointer", transition: "all 300ms ease-out" } as object}
+              style={{
+                cursor: "pointer",
+                transition: "fill 280ms ease-out, stroke 280ms ease-out, stroke-width 280ms ease-out",
+              } as object}
             />
             <SvgText
               x={labelX}
@@ -112,14 +123,13 @@ export function EmotionWheel({ onPick, selected }: Props) {
               textAnchor="middle"
               alignmentBaseline="central"
               pointerEvents="none"
-              style={{ transition: "all 300ms ease-out" } as object}
+              style={{ transition: "all 280ms ease-out" } as object}
             >
               {e.name}
             </SvgText>
           </G>
         );
       })}
-      {/* Soft center hole */}
       <Circle cx={CENTER} cy={CENTER} r={INNER_R - 1.5} fill="#F7F0E5" />
     </Svg>
   );

@@ -1,3 +1,5 @@
+import { Text } from "react-native";
+
 import { CheckInStep } from "@/components/CheckInStep";
 
 export default function MindStep() {
@@ -6,7 +8,12 @@ export default function MindStep() {
       step={1}
       dimensionKey="mind_score"
       label="Mind"
-      question="How are your thoughts today?"
+      question={
+        <>
+          How are your{" "}
+          <Text className="font-semibold text-ink">thoughts</Text> today?
+        </>
+      }
       low="Worried. Racing thoughts. Foggy brain. Cluttered. Distracted."
       high="Focused. Thinking clearly."
       nextRoute="/check-in/body"
