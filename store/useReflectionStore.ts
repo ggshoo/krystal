@@ -2,12 +2,16 @@ import { create } from "zustand";
 
 /**
  * Draft state for one in-progress daily reflection.
- * Cleared after the user submits the entry to Supabase (Phase 5.3).
+ * Cleared after the user submits the entry to Supabase.
  *
  * Emotion fields hold slugs from `lib/emotions.ts` — converted to a
  * Supabase `emotion_details.id` at save time.
+ *
+ * Journal fields are optional and only filled if the user continues to
+ * the Journal screen after the Done screen.
  */
 export type ReflectionDraft = {
+  // Check-in scores
   mind_score?: number;
   body_score?: number;
   heart_score?: number;
@@ -15,9 +19,18 @@ export type ReflectionDraft = {
   emotion_primary?: string;
   emotion_secondary?: string;
   emotion_specific?: string;
-  // Plutchik intensity ladder selection (added after specific)
+  // Plutchik intensity ladder selection
   plutchik_emotion?: string;
-  // Journal fields land in v0.2 with the Reflect screen.
+  // Set after the daily_checkins row is inserted on the Done screen.
+  // Used by the Journal screen to link the journal_entries row.
+  daily_checkin_id?: string;
+  // Journal prompts (filled on the Journal screen)
+  journal_reflection?: string;
+  journal_why_feeling?: string;
+  journal_body_sensations?: string;
+  journal_what_is_hard?: string;
+  journal_what_is_life_giving?: string;
+  journal_what_do_you_need?: string;
 };
 
 type ReflectionState = {

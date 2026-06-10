@@ -96,7 +96,7 @@ export default function Done() {
         const emotionId = rows?.[0]?.id;
         if (!emotionId) throw new Error("Emotion not found in database.");
 
-        const { error: insertError } = await supabase
+        const { data: inserted, error: insertError } = await supabase
           .from("daily_checkins")
           .insert({
             user_id: user!.id,
@@ -106,9 +106,16 @@ export default function Done() {
             emotion_id: emotionId,
             plutchik_emotion: draft.plutchik_emotion ?? null,
             client_uuid: uuid(),
-          });
+          })
+          .select()
+          .single();
 
         if (insertError) throw new Error(insertError.message);
+        if (inserted) {
+          // Store the row id so the Journal screen can link a journal_entries
+          // row back to this check-in.
+          useReflectionStore.getState().setField("daily_checkin_id", inserted.id);
+        }
 
         setState("saved");
       } catch (e) {
@@ -185,10 +192,22 @@ export default function Done() {
             <FadeIn delay={650} duration={500}>
               <Pressable
                 accessibilityRole="button"
-                className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
-                onPress={handleReturnHome}
+                className="mb-3 rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+                onPress={() => router.push("/journal")}
               >
                 <Text className="text-base font-medium tracking-wide text-white">
+                  Continue to journal
+                </Text>
+              </Pressable>
+            </FadeIn>
+
+            <FadeIn delay={800} duration={500}>
+              <Pressable
+                accessibilityRole="button"
+                className="px-4 py-2 transition-all duration-300 hover:opacity-70"
+                onPress={handleReturnHome}
+              >
+                <Text className="text-sm text-muted underline">
                   Return home
                 </Text>
               </Pressable>

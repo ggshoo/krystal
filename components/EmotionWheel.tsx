@@ -11,22 +11,32 @@ import { EMOTIONS } from "@/lib/emotions";
 
 /**
  * Geoffrey Roberts wheel — 7 primary emotion wedges (Happy, Surprised, Bad,
- * Fearful, Angry, Disgusted, Sad). 7 wedges → each is 360/7 ≈ 51.43°.
+ * Fearful, Angry, Disgusted, Sad). Each wedge is 360/7 ≈ 51.43°.
  *
- * Dramatic hover: hovered wedge translates outward, scales bigger around its
- * own center, fills to near-solid color, gains a thick colored stroke, and
- * its label jumps up in size and weight.
+ * On hover: gentle outward translate + small scale-up + brighter fill +
+ * colored stroke. Motion is intentionally subtle and smooth.
+ *
+ * Canvas has padding (CANVAS_SIZE > 2 * (CENTER + OUTER_R)) so popped
+ * wedges aren't clipped at the SVG edge.
  */
 
-const SIZE = 340;
-const CENTER = SIZE / 2;
 const OUTER_R = 152;
 const INNER_R = 30;
 const LABEL_R = 102;
 
+// Pad the canvas around the wheel so hovered wedges have room to expand
+// without being clipped at the SVG edge.
+const CANVAS_PAD = 28;
+const CANVAS_SIZE = 2 * (OUTER_R + CANVAS_PAD); // 360
+const CENTER = CANVAS_SIZE / 2;
+
 const WEDGE_DEG = 360 / 7;
-const HOVER_OFFSET = 24; // pixels outward from center on hover
-const HOVER_SCALE = 1.12;
+
+// Calm hover motion
+const HOVER_OFFSET = 12; // pixels outward from center on hover (was 24)
+const HOVER_SCALE = 1.06; // size multiplier on hover (was 1.12)
+const HOVER_DURATION_MS = 450; // smoother (was 280)
+const EASING = "cubic-bezier(0.22, 1, 0.36, 1)"; // gentle "ease-out-quart"
 
 function wedgePath(startAngle: number, endAngle: number): string {
   const sR = (startAngle * Math.PI) / 180;
@@ -57,7 +67,14 @@ export function EmotionWheel({ onPick, selected }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
-    <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
+    <Svg
+      width={CANVAS_SIZE}
+      height={CANVAS_SIZE}
+      viewBox={`0 0 ${CANVAS_SIZE} ${CANVAS_SIZE}`}
+      // Allow elements that extend beyond the viewBox during hover-pop
+      // to still render rather than being clipped.
+      style={{ overflow: "visible" } as object}
+    >
       {EMOTIONS.map((e, i) => {
         const startAngle = -90 + i * WEDGE_DEG;
         const endAngle = -90 + (i + 1) * WEDGE_DEG;
@@ -83,11 +100,11 @@ export function EmotionWheel({ onPick, selected }: Props) {
           ? `translate(${offsetX} ${offsetY}) translate(${wedgeCx} ${wedgeCy}) scale(${scale}) translate(${-wedgeCx} ${-wedgeCy})`
           : "translate(0 0)";
 
-        const fillAlpha = isSelected ? "DD" : isHovered ? "CC" : "40";
+        const fillAlpha = isSelected ? "DD" : isHovered ? "BB" : "40";
         const strokeColor = lit ? e.color : "#F7F0E5";
-        const strokeWidth = isHovered ? 6 : isSelected ? 4 : 3;
+        const strokeWidth = isHovered ? 4 : isSelected ? 4 : 3;
 
-        const labelSize = isHovered ? 20 : 14;
+        const labelSize = isHovered ? 17 : 14;
         const labelWeight = isHovered ? "700" : isSelected ? "600" : "500";
 
         const hoverHandlers = {
@@ -99,7 +116,11 @@ export function EmotionWheel({ onPick, selected }: Props) {
           <G
             key={e.slug}
             transform={transform}
-            style={{ transition: "transform 280ms ease-out" } as object}
+            style={
+              {
+                transition: `transform ${HOVER_DURATION_MS}ms ${EASING}`,
+              } as object
+            }
           >
             <Path
               d={wedgePath(startAngle, endAngle)}
@@ -110,11 +131,12 @@ export function EmotionWheel({ onPick, selected }: Props) {
               onPressIn={() => setHovered(e.slug)}
               onPressOut={() => setHovered(null)}
               {...hoverHandlers}
-              style={{
-                cursor: "pointer",
-                transition:
-                  "fill 280ms ease-out, stroke 280ms ease-out, stroke-width 280ms ease-out",
-              } as object}
+              style={
+                {
+                  cursor: "pointer",
+                  transition: `fill ${HOVER_DURATION_MS}ms ${EASING}, stroke ${HOVER_DURATION_MS}ms ${EASING}, stroke-width ${HOVER_DURATION_MS}ms ${EASING}`,
+                } as object
+              }
             />
             <SvgText
               x={labelX}
@@ -125,13 +147,18 @@ export function EmotionWheel({ onPick, selected }: Props) {
               textAnchor="middle"
               alignmentBaseline="central"
               pointerEvents="none"
-              style={{ transition: "all 280ms ease-out" } as object}
+              style={
+                {
+                  transition: `all ${HOVER_DURATION_MS}ms ${EASING}`,
+                } as object
+              }
             >
               {e.name}
             </SvgText>
           </G>
         );
       })}
+      {/* Soft center hole */}
       <Circle cx={CENTER} cy={CENTER} r={INNER_R - 1.5} fill="#F7F0E5" />
     </Svg>
   );
