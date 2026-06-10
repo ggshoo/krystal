@@ -1,18 +1,14 @@
 #!/bin/bash
 #
-# krystal — one-command deploy
+# krystal — manual one-command deploy
 #
 # Usage:
-#   ./deploy.sh                  # uses a default commit message
+#   ./deploy.sh                  # default commit message
 #   ./deploy.sh "what changed"   # custom commit message
 #
-# Does all of:
-#   1. git add . && git commit (if there are changes)
-#   2. git push
-#   3. npx expo export --platform web
-#   4. vercel deploy --prod from dist/
-#
-# Exits on first failure so you'll see the actual error.
+# This is the local fallback. Normally GitHub Actions handles deploys on
+# every push to main — use `./ship.sh` instead. This script forces a local
+# build + manual Vercel upload (slower, but works if Actions is broken).
 
 set -e
 
@@ -33,13 +29,18 @@ fi
 echo "→ Pushing to GitHub…"
 git push
 
-echo "→ Building production web bundle…"
-npx expo export --platform web
+# Use the official Vercel CLI pattern: pull → build → deploy --prebuilt.
+# This pattern automatically links to the correct krystal project rather
+# than creating one named after the working directory.
 
-echo "→ Deploying to Vercel…"
-cd dist
-vercel deploy --prod --yes
-cd ..
+echo "→ Pulling Vercel project config…"
+vercel pull --yes --environment=production
+
+echo "→ Building with Vercel (uses vercel.json buildCommand)…"
+vercel build --prod
+
+echo "→ Deploying pre-built output…"
+vercel deploy --prebuilt --prod
 
 echo ""
 echo "✓ Done. Hard-reload krystal-one.vercel.app to see the new build."
