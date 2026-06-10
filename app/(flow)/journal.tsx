@@ -430,6 +430,11 @@ export default function JournalScreen() {
 }
 
 // ── Reusable prompt block ─────────────────────────────────────────────────
+// When a hint is provided (dynamic follow-up question), it becomes the
+// VISUALLY DOMINANT line: larger and bold ink. The static base question
+// ("What's coming up?") gets demoted to a smaller muted label above it.
+//
+// When no hint is provided, the base label is the headline as usual.
 function Prompt({
   delay,
   label,
@@ -446,9 +451,15 @@ function Prompt({
   return (
     <FadeIn delay={delay}>
       <View className="mb-6">
-        <Text className="mb-1 text-base font-medium text-ink">{label}</Text>
-        {hint && (
-          <Text className="mb-2 text-xs text-muted">{hint}</Text>
+        {hint ? (
+          // Hint present → flip hierarchy: base label small/muted, hint big/bold
+          <>
+            <Text className="mb-1 text-sm text-muted">{label}</Text>
+            <Text className="mb-3 text-lg font-semibold text-ink">{hint}</Text>
+          </>
+        ) : (
+          // No hint → base label is the headline
+          <Text className="mb-2 text-base font-medium text-ink">{label}</Text>
         )}
         <TextInput
           multiline

@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -9,18 +9,33 @@ import {
   fetchAllEntries,
   HistoryEntry,
 } from "@/lib/history";
+import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
+
+const GREETINGS = [
+  "Hi",
+  "Hello",
+  "Hey there",
+  "Hi again",
+  "Welcome back",
+  "Good to see you",
+];
+
+function pickGreeting(): string {
+  return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+}
 
 /**
  * Home screen.
  *
- * Shows today's status + streak count + sign-in/upgrade affordance.
+ * - **First-time visit (no entries)** → big "krystal" wordmark + tagline +
+ *   "Begin reflection" CTA. This is the only place the full logo appears.
  *
- * - No check-in today → "Begin reflection"
- * - Check-in done → "Edit today's journal" (primary) + "Change today's emotions"
- * - Journal done → also adds "View history" link
- * - Anonymous account → "Save your reflections" link
- * - Signed-in account → email shown subtly
+ * - **Returning user** → smaller personalized greeting ("Hi, Gigi" with
+ *   rotating phrasing) + streak count + same CTA stack.
+ *
+ * The randomized greeting is computed once per mount via useMemo so it
+ * doesn't flicker on re-renders.
  */
 export default function Home() {
   const router = useRouter();
@@ -28,7 +43,11 @@ export default function Home() {
   const authInitialized = useAuthStore((s) => s.initialized);
 
   const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Pick one greeting for this mount so it doesn't reshuffle on re-render
+  const greeting = useMemo(() => pickGreeting(), []);
 
   useEffect(() => {
     if (!authInitialized) return;
@@ -38,9 +57,17 @@ export default function Home() {
     }
     let cancelled = false;
     (async () => {
-      const all = await fetchAllEntries(user.id);
+      const [all, profileRes] = await Promise.all([
+        fetchAllEntries(user.id),
+        supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", user.id)
+          .single(),
+      ]);
       if (!cancelled) {
         setEntries(all);
+        setDisplayName(profileRes.data?.display_name ?? null);
         setLoading(false);
       }
     })();
@@ -50,6 +77,8 @@ export default function Home() {
   }, [authInitialized, user]);
 
   const streak = entries ? computeStreak(entries) : 0;
+  const isReturning = (entries?.length ?? 0) > 0;
+
   const todaysEntry = entries?.[0];
   const isTodaysEntry = (() => {
     if (!todaysEntry) return false;
@@ -78,38 +107,48 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-cream">
       <View className="flex-1 items-center justify-center px-6">
-        <FadeIn delay={0} duration={650}>
-          <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink">
-            krystal
-          </Text>
-        </FadeIn>
-
-        <FadeIn delay={250} duration={650}>
-          <Text className="mb-6 max-w-xs text-center text-base leading-relaxed text-muted">
-            A daily practice for emotional clarity.
-          </Text>
-        </FadeIn>
-
-        {/* Streak — gentle, no pressure framing */}
-        {streak > 0 && (
-          <FadeIn delay={400} duration={650}>
-            <Text className="mb-10 text-sm text-muted">
-              <Text className="font-semibold text-ink">{streak}</Text>{" "}
-              {streak === 1 ? "day" : "days"} in a row
-            </Text>
-          </FadeIn>
+        {/* ── First-time splash: big krystal wordmark + tagline ── */}
+        {!loading && !isReturning && (
+          <>
+            <FadeIn delay={0} duration={900}>
+              <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink">
+                krystal
+              </Text>
+            </FadeIn>
+            <FadeIn delay={500} duration={900}>
+              <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted">
+                A daily practice for emotional clarity.
+              </Text>
+            </FadeIn>
+          </>
         )}
 
-        {streak === 0 && (
-          // Keep the spacing consistent
-          <View className="mb-10" />
+        {/* ── Returning user: personalized greeting + streak ── */}
+        {!loading && isReturning && (
+          <>
+            <FadeIn delay={0} duration={650}>
+              <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                {greeting}
+                {displayName ? `, ${displayName}` : ""}.
+              </Text>
+            </FadeIn>
+            {streak > 0 && (
+              <FadeIn delay={250} duration={650}>
+                <Text className="mb-12 text-sm text-muted">
+                  <Text className="font-semibold text-ink">{streak}</Text>{" "}
+                  {streak === 1 ? "day" : "days"} in a row
+                </Text>
+              </FadeIn>
+            )}
+            {streak === 0 && <View className="mb-12" />}
+          </>
         )}
 
         {loading ? (
           <ActivityIndicator color="#C2876B" />
         ) : (
           <>
-            <FadeIn delay={550} duration={500}>
+            <FadeIn delay={isReturning ? 450 : 850} duration={500}>
               <Pressable
                 accessibilityRole="button"
                 className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
@@ -122,7 +161,7 @@ export default function Home() {
             </FadeIn>
 
             {hasCheckinToday && todaysEntry?.emotion && (
-              <FadeIn delay={680} duration={500}>
+              <FadeIn delay={600} duration={500}>
                 <View className="mt-6 flex-row items-center">
                   <View
                     className="mr-2 h-2 w-2 rounded-full"
@@ -149,7 +188,7 @@ export default function Home() {
             )}
 
             {hasCheckinToday && (
-              <FadeIn delay={760} duration={500}>
+              <FadeIn delay={700} duration={500}>
                 <Pressable
                   accessibilityRole="button"
                   className="mt-5 px-4 py-2 transition-all duration-300 hover:opacity-70"
@@ -163,7 +202,7 @@ export default function Home() {
             )}
 
             {hasJournaledToday && (
-              <FadeIn delay={830} duration={500}>
+              <FadeIn delay={780} duration={500}>
                 <Pressable
                   accessibilityRole="button"
                   className="mt-2 px-4 py-2 transition-all duration-300 hover:opacity-70"
@@ -176,10 +215,9 @@ export default function Home() {
               </FadeIn>
             )}
 
-            {/* Sign-in / account status — bottom of screen, subtle */}
             <View className="mt-10">
               {isAnonymous ? (
-                <FadeIn delay={900} duration={500}>
+                <FadeIn delay={860} duration={500}>
                   <Pressable
                     accessibilityRole="button"
                     className="px-4 py-2 transition-all duration-300 hover:opacity-70"
@@ -191,7 +229,7 @@ export default function Home() {
                   </Pressable>
                 </FadeIn>
               ) : (
-                <FadeIn delay={900} duration={500}>
+                <FadeIn delay={860} duration={500}>
                   <Text className="text-xs text-muted">
                     Signed in as{" "}
                     <Text className="text-ink">{user?.email}</Text>
