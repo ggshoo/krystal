@@ -10,13 +10,15 @@ import { useAuthStore } from "@/store/useAuthStore";
 /**
  * Home screen.
  *
- * Two states based on whether today's daily reflection has been done:
+ * Three states based on what's been done today:
  *
- * - **No entry yet today** → only "Begin reflection" is shown.
- *   History stays hidden until the user has completed today's journal.
+ * - No daily_checkin yet → "Begin reflection"
+ * - daily_checkin exists, no journal_entries → "Continue today's journal"
+ * - Both exist → "Edit today's journal" + "View history" link
  *
- * - **Today's entry exists** → shows "View history" link.
- *   (Edit flow comes in a later iteration.)
+ * Once the check-in is saved, the wheel/intensity picker can NOT be re-done
+ * today. The user's only post-check-in entry point is the journal, which
+ * remains editable. This enforces "one reflection per day".
  */
 export default function Home() {
   const router = useRouter();
@@ -26,7 +28,6 @@ export default function Home() {
   const [todaysEntry, setTodaysEntry] = useState<HistoryEntry | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount (and when auth finishes), check for today's entry.
   useEffect(() => {
     if (!authInitialized) return;
     if (!user) {
@@ -46,7 +47,18 @@ export default function Home() {
     };
   }, [authInitialized, user]);
 
+  const hasCheckinToday = !!todaysEntry;
   const hasJournaledToday = !!todaysEntry?.journal;
+
+  const primaryButtonLabel = !hasCheckinToday
+    ? "Begin reflection"
+    : hasJournaledToday
+      ? "Edit today's journal"
+      : "Continue today's journal";
+
+  const primaryButtonOnPress = !hasCheckinToday
+    ? () => router.push("/welcome")
+    : () => router.push("/journal");
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
@@ -71,39 +83,50 @@ export default function Home() {
               <Pressable
                 accessibilityRole="button"
                 className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
-                onPress={() => router.push("/welcome")}
+                onPress={primaryButtonOnPress}
               >
                 <Text className="text-base font-medium tracking-wide text-white">
-                  {todaysEntry ? "Reflect again" : "Begin reflection"}
+                  {primaryButtonLabel}
                 </Text>
               </Pressable>
             </FadeIn>
 
+            {/* Gentle reminder of today's emotion path if check-in done */}
+            {hasCheckinToday && todaysEntry?.emotion && (
+              <FadeIn delay={700} duration={500}>
+                <View className="mt-6 flex-row items-center">
+                  <View
+                    className="mr-2 h-2 w-2 rounded-full"
+                    style={{ backgroundColor: todaysEntry.emotion.primary_color }}
+                  />
+                  <Text className="text-xs capitalize text-muted">
+                    Today:{" "}
+                    <Text className="font-semibold text-ink">
+                      {todaysEntry.emotion.specific_name}
+                    </Text>
+                    {todaysEntry.plutchik_emotion && (
+                      <>
+                        {" · "}
+                        <Text className="font-semibold text-ink">
+                          {todaysEntry.plutchik_emotion}
+                        </Text>
+                      </>
+                    )}
+                  </Text>
+                </View>
+              </FadeIn>
+            )}
+
             {/* History link — only after today's journal is done */}
             {hasJournaledToday && (
-              <FadeIn delay={700} duration={500}>
+              <FadeIn delay={800} duration={500}>
                 <Pressable
                   accessibilityRole="button"
-                  className="mt-6 px-4 py-2 transition-all duration-300 hover:opacity-70"
+                  className="mt-4 px-4 py-2 transition-all duration-300 hover:opacity-70"
                   onPress={() => router.push("/history")}
                 >
                   <Text className="text-sm text-muted underline">
                     View history
-                  </Text>
-                </Pressable>
-              </FadeIn>
-            )}
-
-            {/* Friendly nudge if check-in exists but journal doesn't */}
-            {todaysEntry && !hasJournaledToday && (
-              <FadeIn delay={700} duration={500}>
-                <Pressable
-                  accessibilityRole="button"
-                  className="mt-6 px-4 py-2 transition-all duration-300 hover:opacity-70"
-                  onPress={() => router.push("/journal")}
-                >
-                  <Text className="text-sm text-muted underline">
-                    Continue today's journal
                   </Text>
                 </Pressable>
               </FadeIn>
