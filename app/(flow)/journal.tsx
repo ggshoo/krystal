@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
 import { findPrimary, findSecondary, findTertiary } from "@/lib/emotions";
+import { fetchTodaysEntry } from "@/lib/history";
 import { getPlutchikLadder } from "@/lib/plutchik";
 import { getPlutchikContent } from "@/lib/plutchikContent";
 import { supabase } from "@/lib/supabase";
@@ -41,9 +42,55 @@ export default function JournalScreen() {
 
   const [state, setState] = useState<SaveState>("editing");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [resumeChecked, setResumeChecked] = useState(false);
 
-  // Guards — we need the saved daily_checkin_id to link the journal entry
-  if (!draft.daily_checkin_id) return <Redirect href="/" />;
+  // If the user lands here in a fresh session (draft is empty) but has
+  // already completed today's check-in, hydrate the draft from Supabase
+  // so the journal can be completed without redoing the flow.
+  useEffect(() => {
+    if (draft.daily_checkin_id) {
+      setResumeChecked(true);
+      return;
+    }
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const entry = await fetchTodaysEntry(user.id);
+      if (cancelled) return;
+      if (entry) {
+        setField("daily_checkin_id", entry.id);
+        setField("mind_score", entry.mind_score);
+        setField("body_score", entry.body_score);
+        setField("heart_score", entry.heart_score);
+        if (entry.emotion) {
+          // Use the names as slugs — taxonomy slugs are lowercase names.
+          setField(
+            "emotion_primary",
+            entry.emotion.primary_name.toLowerCase()
+          );
+          setField(
+            "emotion_secondary",
+            entry.emotion.secondary_name.toLowerCase()
+          );
+          setField(
+            "emotion_specific",
+            entry.emotion.specific_name.toLowerCase()
+          );
+        }
+        if (entry.plutchik_emotion) {
+          setField("plutchik_emotion", entry.plutchik_emotion);
+        }
+      }
+      setResumeChecked(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [draft.daily_checkin_id, user, setField]);
+
+  // Wait for the hydration attempt before deciding to redirect
+  if (!resumeChecked && !draft.daily_checkin_id) return null;
+  if (resumeChecked && !draft.daily_checkin_id) return <Redirect href="/" />;
 
   const primary = findPrimary(draft.emotion_primary);
   const secondary = findSecondary(draft.emotion_primary, draft.emotion_secondary);

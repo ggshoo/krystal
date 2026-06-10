@@ -92,12 +92,8 @@ User-facing UX changes from an 8-tile grid to a Plutchik-style 8-wedge wheel (SV
 ### 2026-06-02 — Emotion framework changed: Plutchik → Geoffrey Roberts
 The Plutchik 8-primary wheel was replaced with the Geoffrey Roberts feelings wheel (7 primaries: Happy, Surprised, Bad, Fearful, Angry, Disgusted, Sad). Roberts' taxonomy is richer (variable secondaries per primary, 4–9 each; 80+ tertiaries total) and matches the wheel Gigi prefers conceptually. The change is destructive: migration `006_replace_taxonomy.sql` wipes the old Plutchik data + any daily_checkins that referenced it and reseeds. The `emotion_details.framework` column is now set to `'roberts'`. Secondary picker dropped the intensity-ordering UI (Roberts wheel isn't intensity-based, it's thematic).
 
-### 2026-06-09 — History view + one-entry-per-day + edit (next-session work)
-Gigi wants users to be able to (a) view their daily history of reflections, (b) only respond once per day, and (c) edit today's response. Three pieces:
-- **History view** (`/history`): list past entries by date, tap to expand and see full detail (scores + Roberts path + Plutchik + journal answers).
-- **One-per-day**: on flow start, query daily_checkins for today (in user's timezone). If present, navigate to edit mode with existing data loaded. Probably enforce via app logic rather than a DB unique constraint (which would fight against timezone math).
-- **Edit mode**: reuse the same flow screens, pre-populate state from the existing row, save with UPDATE not INSERT.
-Deferred — next session's work.
+### 2026-06-09 — History view + journal-gating (this session)
+Built `/history` route that lists past daily_checkins with inline-expandable journal answers. Today's entry sits at top. Home screen detects today's entry via `lib/history.fetchTodaysEntry` and shows a **"View history" link only after today's journal_entries row exists** (per Gigi's gating rule). If daily_checkin exists but journal doesn't, Home shows "Continue today's journal" instead. Journal screen now hydrates from Supabase if a user returns mid-flow in a fresh session (draft state empty but daily_checkin row exists). **Edit mode for today's entry is still pending** — deferred to next iteration.
 
 ### 2026-06-09 — Journal screen + Plutchik educational content
 After Done, user can "Continue to journal". New `/journal` screen surfaces six write prompts (reflection, why-feeling, body sensations, what-is-hard, what-is-life-giving, what-do-you-need) alongside read-only Plutchik educational content (similar words, sensations, what-it-tells-you, how-it-helps-you, from `lib/plutchikContent.ts` — 8 primary entries). Journal entries link to the just-saved daily_checkin via `daily_checkin_id`. SQL migration `008_journal_fields.sql` adds the new columns. All journal fields optional.
