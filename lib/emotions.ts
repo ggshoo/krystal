@@ -1,11 +1,14 @@
 /**
- * Krystal — emotion taxonomy (hardcoded for v0.1).
+ * Krystal — emotion taxonomy (Geoffrey Roberts emotion wheel).
  *
- * Mirrors the data seeded by supabase/migrations/005_seed_plutchik_minimal.sql.
- * If you change one, change the other.
+ * 7 primaries (happy, surprised, bad, fearful, angry, disgusted, sad).
+ * Each primary has a variable number of secondaries (4–9).
+ * Each secondary has 2 tertiaries.
  *
- * In v0.2 we'll fetch from Supabase instead and drop this file. For now this
- * lets the picker work without auth.
+ * Sourced from the wheel image at https://feelingswheel.com/ (Geoffrey Roberts).
+ *
+ * If you edit this, mirror the change to the SQL seed migration
+ * (supabase/migrations/006_replace_taxonomy.sql) so the database stays in sync.
  */
 
 export type EmotionTertiary = {
@@ -55,89 +58,103 @@ export const findTertiary = (
 
 // ─── The taxonomy ─────────────────────────────────────────────────────────────
 
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const cap = (s: string) =>
+  s
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 const tier = (slugs: string[]): EmotionTertiary[] =>
   slugs.map((slug) => ({ slug, name: cap(slug) }));
 
 export const EMOTIONS: EmotionPrimary[] = [
   {
-    slug: "joy",
-    name: "Joy",
-    color: "#E8C547",
+    slug: "happy",
+    name: "Happy",
+    color: "#F5D547",
     secondaries: [
-      { slug: "serenity", name: "Serenity", tertiaries: tier(["content", "peaceful", "at ease"]) },
-      { slug: "joy", name: "Joy", tertiaries: tier(["happy", "delighted", "grateful"]) },
-      { slug: "ecstasy", name: "Ecstasy", tertiaries: tier(["elated", "overjoyed", "euphoric"]) },
+      { slug: "playful", name: "Playful", tertiaries: tier(["aroused", "cheeky"]) },
+      { slug: "content", name: "Content", tertiaries: tier(["free", "joyful"]) },
+      { slug: "interested", name: "Interested", tertiaries: tier(["curious", "inquisitive"]) },
+      { slug: "proud", name: "Proud", tertiaries: tier(["successful", "confident"]) },
+      { slug: "accepted", name: "Accepted", tertiaries: tier(["respected", "valued"]) },
+      { slug: "powerful", name: "Powerful", tertiaries: tier(["courageous", "creative"]) },
+      { slug: "peaceful", name: "Peaceful", tertiaries: tier(["loving", "thankful"]) },
+      { slug: "trusting", name: "Trusting", tertiaries: tier(["sensitive", "intimate"]) },
+      { slug: "optimistic", name: "Optimistic", tertiaries: tier(["hopeful", "inspired"]) },
     ],
   },
   {
-    slug: "trust",
-    name: "Trust",
-    color: "#6FAE8E",
+    slug: "surprised",
+    name: "Surprised",
+    color: "#B19CD9",
     secondaries: [
-      { slug: "acceptance", name: "Acceptance", tertiaries: tier(["safe", "open", "accepting"]) },
-      { slug: "trust", name: "Trust", tertiaries: tier(["connected", "secure", "supported"]) },
-      { slug: "admiration", name: "Admiration", tertiaries: tier(["inspired", "reverent", "awed"]) },
+      { slug: "excited", name: "Excited", tertiaries: tier(["energetic", "eager"]) },
+      { slug: "amazed", name: "Amazed", tertiaries: tier(["awe", "astonished"]) },
+      { slug: "confused", name: "Confused", tertiaries: tier(["perplexed", "disillusioned"]) },
+      { slug: "startled", name: "Startled", tertiaries: tier(["dismayed", "shocked"]) },
     ],
   },
   {
-    slug: "fear",
-    name: "Fear",
-    color: "#8E6FB5",
+    slug: "bad",
+    name: "Bad",
+    color: "#88B894",
     secondaries: [
-      { slug: "apprehension", name: "Apprehension", tertiaries: tier(["cautious", "uneasy", "worried"]) },
-      { slug: "anxiety", name: "Anxiety", tertiaries: tier(["anxious", "overwhelmed", "on edge"]) },
-      { slug: "terror", name: "Terror", tertiaries: tier(["afraid", "panicked", "frozen"]) },
+      { slug: "bored", name: "Bored", tertiaries: tier(["indifferent", "apathetic"]) },
+      { slug: "busy", name: "Busy", tertiaries: tier(["pressured", "rushed"]) },
+      { slug: "stressed", name: "Stressed", tertiaries: tier(["overwhelmed", "out of control"]) },
+      { slug: "tired", name: "Tired", tertiaries: tier(["sleepy", "unfocused"]) },
     ],
   },
   {
-    slug: "surprise",
-    name: "Surprise",
-    color: "#6FB5AE",
+    slug: "fearful",
+    name: "Fearful",
+    color: "#F0B58D",
     secondaries: [
-      { slug: "distraction", name: "Distraction", tertiaries: tier(["distracted", "unfocused", "scattered"]) },
-      { slug: "surprise", name: "Surprise", tertiaries: tier(["surprised", "startled", "caught off guard"]) },
-      { slug: "amazement", name: "Amazement", tertiaries: tier(["astonished", "stunned", "speechless"]) },
+      { slug: "scared", name: "Scared", tertiaries: tier(["helpless", "frightened"]) },
+      { slug: "anxious", name: "Anxious", tertiaries: tier(["overwhelmed", "worried"]) },
+      { slug: "insecure", name: "Insecure", tertiaries: tier(["inadequate", "inferior"]) },
+      { slug: "weak", name: "Weak", tertiaries: tier(["worthless", "insignificant"]) },
+      { slug: "rejected", name: "Rejected", tertiaries: tier(["excluded", "persecuted"]) },
+      { slug: "threatened", name: "Threatened", tertiaries: tier(["nervous", "exposed"]) },
     ],
   },
   {
-    slug: "sadness",
-    name: "Sadness",
-    color: "#5B7CC4",
+    slug: "angry",
+    name: "Angry",
+    color: "#E27B7B",
     secondaries: [
-      { slug: "pensiveness", name: "Pensiveness", tertiaries: tier(["pensive", "wistful", "reflective"]) },
-      { slug: "sadness", name: "Sadness", tertiaries: tier(["sad", "lonely", "disappointed"]) },
-      { slug: "grief", name: "Grief", tertiaries: tier(["grieving", "heartbroken", "despairing"]) },
+      { slug: "let down", name: "Let Down", tertiaries: tier(["betrayed", "resentful"]) },
+      { slug: "humiliated", name: "Humiliated", tertiaries: tier(["disrespected", "ridiculed"]) },
+      { slug: "bitter", name: "Bitter", tertiaries: tier(["indignant", "violated"]) },
+      { slug: "mad", name: "Mad", tertiaries: tier(["furious", "jealous"]) },
+      { slug: "aggressive", name: "Aggressive", tertiaries: tier(["provoked", "hostile"]) },
+      { slug: "frustrated", name: "Frustrated", tertiaries: tier(["infuriated", "annoyed"]) },
+      { slug: "distant", name: "Distant", tertiaries: tier(["withdrawn", "numb"]) },
+      { slug: "critical", name: "Critical", tertiaries: tier(["sceptical", "dismissive"]) },
     ],
   },
   {
-    slug: "disgust",
-    name: "Disgust",
-    color: "#A48069",
+    slug: "disgusted",
+    name: "Disgusted",
+    color: "#A8A8A8",
     secondaries: [
-      { slug: "boredom", name: "Boredom", tertiaries: tier(["bored", "disinterested", "flat"]) },
-      { slug: "disgust", name: "Disgust", tertiaries: tier(["repulsed", "put off", "uncomfortable"]) },
-      { slug: "loathing", name: "Loathing", tertiaries: tier(["revolted", "contemptuous", "disgusted"]) },
+      { slug: "disapproving", name: "Disapproving", tertiaries: tier(["judgmental", "embarrassed"]) },
+      { slug: "disappointed", name: "Disappointed", tertiaries: tier(["appalled", "revolted"]) },
+      { slug: "awful", name: "Awful", tertiaries: tier(["nauseated", "detestable"]) },
+      { slug: "repelled", name: "Repelled", tertiaries: tier(["horrified", "hesitant"]) },
     ],
   },
   {
-    slug: "anger",
-    name: "Anger",
-    color: "#C45B5B",
+    slug: "sad",
+    name: "Sad",
+    color: "#7A9BC7",
     secondaries: [
-      { slug: "annoyance", name: "Annoyance", tertiaries: tier(["annoyed", "irritated", "impatient"]) },
-      { slug: "anger", name: "Anger", tertiaries: tier(["angry", "frustrated", "resentful"]) },
-      { slug: "rage", name: "Rage", tertiaries: tier(["furious", "enraged", "seething"]) },
-    ],
-  },
-  {
-    slug: "anticipation",
-    name: "Anticipation",
-    color: "#D9985A",
-    secondaries: [
-      { slug: "interest", name: "Interest", tertiaries: tier(["curious", "intrigued", "attentive"]) },
-      { slug: "anticipation", name: "Anticipation", tertiaries: tier(["anticipating", "eager", "hopeful"]) },
-      { slug: "vigilance", name: "Vigilance", tertiaries: tier(["focused", "watchful", "intent"]) },
+      { slug: "hurt", name: "Hurt", tertiaries: tier(["embarrassed", "disappointed"]) },
+      { slug: "depressed", name: "Depressed", tertiaries: tier(["inferior", "empty"]) },
+      { slug: "guilty", name: "Guilty", tertiaries: tier(["remorseful", "ashamed"]) },
+      { slug: "despair", name: "Despair", tertiaries: tier(["powerless", "grief"]) },
+      { slug: "vulnerable", name: "Vulnerable", tertiaries: tier(["fragile", "victimised"]) },
+      { slug: "lonely", name: "Lonely", tertiaries: tier(["isolated", "abandoned"]) },
     ],
   },
 ];

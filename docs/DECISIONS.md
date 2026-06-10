@@ -89,6 +89,24 @@ Gigi wants users to access their reflection history after "logging in" — see p
 ### 2026-06-02 — Primary emotion picker → wheel format
 User-facing UX changes from an 8-tile grid to a Plutchik-style 8-wedge wheel (SVG). Opposite emotions sit across from each other (joy↔sadness, trust↔disgust, fear↔anger, surprise↔anticipation). Tap a wedge to select. Built in `components/EmotionWheel.tsx`. Secondary and specific pickers stay as tiles for now — they'll get a wheel-or-list treatment in a later pass.
 
+### 2026-06-02 — Emotion framework changed: Plutchik → Geoffrey Roberts
+The Plutchik 8-primary wheel was replaced with the Geoffrey Roberts feelings wheel (7 primaries: Happy, Surprised, Bad, Fearful, Angry, Disgusted, Sad). Roberts' taxonomy is richer (variable secondaries per primary, 4–9 each; 80+ tertiaries total) and matches the wheel Gigi prefers conceptually. The change is destructive: migration `006_replace_taxonomy.sql` wipes the old Plutchik data + any daily_checkins that referenced it and reseeds. The `emotion_details.framework` column is now set to `'roberts'`. Secondary picker dropped the intensity-ordering UI (Roberts wheel isn't intensity-based, it's thematic).
+
+### 2026-06-02 — Second emotion layer: Plutchik intensity ladder
+After picking a Roberts tertiary, the user picks an intensity level on a Plutchik ladder (low / mid / high). Each ladder is the standard Plutchik intensity gradient (e.g. Sadness: Pensiveness → Sadness → Grief). Roberts-to-Plutchik mapping with subcategory overrides on Happy:
+- Sad → Sadness ladder
+- Bad → Disgust ladder
+- Disgusted → Disgust ladder
+- Angry → Anger ladder
+- Fearful → Fear ladder
+- Surprised → Surprise ladder
+- Happy → Joy ladder (default)
+- Happy / Trusting → Trust ladder (override)
+- Happy / Proud → Trust ladder (override)
+- Happy / Interested → Anticipation ladder (override)
+
+Stored in `daily_checkins.plutchik_emotion` (text, nullable). New screen `app/(flow)/emotion/intensity.tsx`. Mapping logic in `lib/plutchik.ts`. SQL migration `007_add_plutchik_emotion.sql` adds the column. The done screen shows both labels: the Roberts tertiary (large) and the Plutchik emotion in smaller subtitle below.
+
 ---
 
 ## Template for future entries

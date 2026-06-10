@@ -11,9 +11,12 @@ export type ReflectionDraft = {
   mind_score?: number;
   body_score?: number;
   heart_score?: number;
+  // Roberts wheel selection
   emotion_primary?: string;
   emotion_secondary?: string;
   emotion_specific?: string;
+  // Plutchik intensity ladder selection (added after specific)
+  plutchik_emotion?: string;
   // Journal fields land in v0.2 with the Reflect screen.
 };
 

@@ -10,11 +10,12 @@ import {
 import { EMOTIONS } from "@/lib/emotions";
 
 /**
- * Plutchik-style 8-wedge wheel for picking a primary emotion.
+ * Geoffrey Roberts wheel — 7 primary emotion wedges (Happy, Surprised, Bad,
+ * Fearful, Angry, Disgusted, Sad). 7 wedges → each is 360/7 ≈ 51.43°.
  *
- * Dramatic hover: the hovered wedge translates outward, scales bigger around
- * its own center, fills to near-solid color, gains a thick colored stroke,
- * and its label jumps up in size and weight.
+ * Dramatic hover: hovered wedge translates outward, scales bigger around its
+ * own center, fills to near-solid color, gains a thick colored stroke, and
+ * its label jumps up in size and weight.
  */
 
 const SIZE = 340;
@@ -23,8 +24,9 @@ const OUTER_R = 152;
 const INNER_R = 30;
 const LABEL_R = 102;
 
+const WEDGE_DEG = 360 / 7;
 const HOVER_OFFSET = 24; // pixels outward from center on hover
-const HOVER_SCALE = 1.12; // size multiplier on hover
+const HOVER_SCALE = 1.12;
 
 function wedgePath(startAngle: number, endAngle: number): string {
   const sR = (startAngle * Math.PI) / 180;
@@ -57,8 +59,8 @@ export function EmotionWheel({ onPick, selected }: Props) {
   return (
     <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
       {EMOTIONS.map((e, i) => {
-        const startAngle = -90 + i * 45;
-        const endAngle = -90 + (i + 1) * 45;
+        const startAngle = -90 + i * WEDGE_DEG;
+        const endAngle = -90 + (i + 1) * WEDGE_DEG;
         const midAngle = (startAngle + endAngle) / 2;
         const midRad = (midAngle * Math.PI) / 180;
         const labelX = CENTER + LABEL_R * Math.cos(midRad);
@@ -77,7 +79,6 @@ export function EmotionWheel({ onPick, selected }: Props) {
         const offsetY = isHovered ? HOVER_OFFSET * Math.sin(midRad) : 0;
         const scale = isHovered ? HOVER_SCALE : 1;
 
-        // Combine: translate outward, scale around wedge center
         const transform = isHovered
           ? `translate(${offsetX} ${offsetY}) translate(${wedgeCx} ${wedgeCy}) scale(${scale}) translate(${-wedgeCx} ${-wedgeCy})`
           : "translate(0 0)";
@@ -86,7 +87,7 @@ export function EmotionWheel({ onPick, selected }: Props) {
         const strokeColor = lit ? e.color : "#F7F0E5";
         const strokeWidth = isHovered ? 6 : isSelected ? 4 : 3;
 
-        const labelSize = isHovered ? 20 : 15;
+        const labelSize = isHovered ? 20 : 14;
         const labelWeight = isHovered ? "700" : isSelected ? "600" : "500";
 
         const hoverHandlers = {
@@ -111,7 +112,8 @@ export function EmotionWheel({ onPick, selected }: Props) {
               {...hoverHandlers}
               style={{
                 cursor: "pointer",
-                transition: "fill 280ms ease-out, stroke 280ms ease-out, stroke-width 280ms ease-out",
+                transition:
+                  "fill 280ms ease-out, stroke 280ms ease-out, stroke-width 280ms ease-out",
               } as object}
             />
             <SvgText

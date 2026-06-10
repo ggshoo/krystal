@@ -36,14 +36,18 @@ export default function Done() {
   // Prevent double-submission if the effect re-runs (auth state arrives later)
   const submittedRef = useRef(false);
 
-  // Guards — if any required field is missing, route the user back to start
-  const incomplete =
+  // Guards — if any required field is missing, route the user back to start.
+  // Split so we can redirect to the right step instead of always to check-in.
+  const missingCheckIn =
     draft.mind_score === undefined ||
     draft.body_score === undefined ||
-    draft.heart_score === undefined ||
+    draft.heart_score === undefined;
+  const missingEmotionPath =
     !draft.emotion_primary ||
     !draft.emotion_secondary ||
     !draft.emotion_specific;
+  const missingIntensity = !draft.plutchik_emotion;
+  const incomplete = missingCheckIn || missingEmotionPath || missingIntensity;
 
   const primary = findPrimary(draft.emotion_primary);
   const secondary = findSecondary(
@@ -100,6 +104,7 @@ export default function Done() {
             body_score: draft.body_score!,
             heart_score: draft.heart_score!,
             emotion_id: emotionId,
+            plutchik_emotion: draft.plutchik_emotion ?? null,
             client_uuid: uuid(),
           });
 
@@ -114,7 +119,9 @@ export default function Done() {
     }
   }, [incomplete, authInitialized, user, authError, draft]);
 
-  if (incomplete) return <Redirect href="/check-in" />;
+  if (missingCheckIn) return <Redirect href="/check-in" />;
+  if (missingEmotionPath) return <Redirect href="/emotion/primary" />;
+  if (missingIntensity) return <Redirect href="/emotion/intensity" />;
 
   const handleReturnHome = () => {
     reset();
@@ -154,6 +161,11 @@ export default function Done() {
                   <Text className="mt-2 text-4xl font-semibold capitalize text-ink">
                     {tertiary?.name}
                   </Text>
+                  {draft.plutchik_emotion && (
+                    <Text className="mt-3 text-base capitalize text-muted">
+                      a feeling of {draft.plutchik_emotion}
+                    </Text>
+                  )}
                 </View>
               </FadeIn>
             )}
