@@ -53,11 +53,19 @@ export default function JournalScreen() {
     draft.emotion_specific
   );
 
+  // Pull educational content keyed off the SPECIFIC intensity word the user
+  // picked (e.g. "grief"), not the parent Plutchik primary. Falls back to
+  // the primary's content if the intensity slug doesn't have its own entry.
   const ladder =
     primary && secondary
       ? getPlutchikLadder(primary.slug, secondary.slug)
       : null;
-  const content = getPlutchikContent(ladder?.primary);
+  const content =
+    getPlutchikContent(draft.plutchik_emotion) ??
+    getPlutchikContent(ladder?.primary);
+  // The label shown in "About X" — the specific intensity word the user
+  // chose, falling back to the ladder's primary name.
+  const aboutLabel = draft.plutchik_emotion ?? ladder?.primary ?? "";
   const themeColor = primary?.color ?? "#C2876B";
 
   const handleSave = async () => {
@@ -171,10 +179,16 @@ export default function JournalScreen() {
                   className="mr-2 h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: themeColor }}
                 />
-                <Text className="text-sm capitalize text-ink">
-                  {primary?.name} → {secondary?.name} → {tertiary?.name}
+                <Text className="text-sm capitalize text-muted">
+                  {primary?.name} → {secondary?.name} →{" "}
+                  <Text className="font-bold text-ink">{tertiary?.name}</Text>
                   {draft.plutchik_emotion && (
-                    <Text className="text-muted">; {draft.plutchik_emotion}</Text>
+                    <>
+                      <Text className="text-muted">; </Text>
+                      <Text className="font-bold text-ink">
+                        {draft.plutchik_emotion}
+                      </Text>
+                    </>
                   )}
                 </Text>
               </View>
@@ -202,8 +216,8 @@ export default function JournalScreen() {
             onChange={(v) => setField("journal_reflection", v)}
           />
 
-          {/* ── Educational box ── */}
-          {content && ladder && (
+          {/* ── Educational box (about the specific intensity word) ── */}
+          {content && (
             <FadeIn delay={400}>
               <View
                 className="mb-8 rounded-tile p-5"
@@ -214,30 +228,30 @@ export default function JournalScreen() {
                 }}
               >
                 <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
-                  About {ladder.primary}
+                  About <Text className="text-ink">{aboutLabel}</Text>
                 </Text>
 
                 <View className="mb-3">
                   <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
                     Similar words
                   </Text>
-                  <Text className="text-sm capitalize leading-relaxed text-ink">
-                    {content.similar_words.join(" · ")}
+                  <Text className="text-sm leading-relaxed text-ink">
+                    {content.similar_words.join(", ")}
                   </Text>
                 </View>
 
                 <View className="mb-3">
                   <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
-                    Common sensations
+                    Sensations
                   </Text>
                   <Text className="text-sm leading-relaxed text-ink">
-                    {content.sensations.join(" · ")}
+                    {content.sensations}
                   </Text>
                 </View>
 
                 <View className="mb-3">
                   <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
-                    What it may be telling you
+                    What does it tell you?
                   </Text>
                   <Text className="text-sm leading-relaxed text-ink">
                     {content.what_it_tells_you}
@@ -246,7 +260,7 @@ export default function JournalScreen() {
 
                 <View>
                   <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
-                    How it can help you
+                    How does it help you?
                   </Text>
                   <Text className="text-sm leading-relaxed text-ink">
                     {content.how_it_helps_you}
