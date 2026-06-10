@@ -195,30 +195,10 @@ export default function JournalScreen() {
             </View>
           </FadeIn>
 
-          {/* ── Header ── */}
-          <FadeIn delay={120}>
-            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
-              Reflect on it
-            </Text>
-          </FadeIn>
-          <FadeIn delay={200}>
-            <Text className="mb-8 text-base leading-relaxed text-muted">
-              Write as much or as little as you'd like. Any field can be left blank.
-            </Text>
-          </FadeIn>
-
-          {/* ── Prompt 1: reflection sentence ── */}
-          <Prompt
-            delay={280}
-            label="What's coming up?"
-            hint="A sentence or two on what you're noticing."
-            value={draft.journal_reflection}
-            onChange={(v) => setField("journal_reflection", v)}
-          />
-
           {/* ── Educational box (about the specific intensity word) ── */}
+          {/* Sits ABOVE the reflection section so users read context before writing. */}
           {content && (
-            <FadeIn delay={400}>
+            <FadeIn delay={120}>
               <View
                 className="mb-8 rounded-tile p-5"
                 style={{
@@ -270,18 +250,39 @@ export default function JournalScreen() {
             </FadeIn>
           )}
 
-          {/* ── Prompt 2: why feeling this way ── */}
+          {/* ── Header ── */}
+          <FadeIn delay={240}>
+            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
+              Reflect on it
+            </Text>
+          </FadeIn>
+          <FadeIn delay={320}>
+            <Text className="mb-8 text-base leading-relaxed text-muted">
+              Write as much or as little as you'd like. Any field can be left blank.
+            </Text>
+          </FadeIn>
+
+          {/* ── Prompt 1: reflection — dynamic follow-up from "What does it tell you" ── */}
           <Prompt
-            delay={500}
+            delay={400}
+            label="What's coming up?"
+            hint={content?.reflection_prompt ?? "A sentence or two on what you're noticing."}
+            value={draft.journal_reflection}
+            onChange={(v) => setField("journal_reflection", v)}
+          />
+
+          {/* ── Prompt 2: why — dynamic follow-up from "How does it help you" ── */}
+          <Prompt
+            delay={480}
             label="Why are you feeling this way?"
-            hint="What's contributing to this?"
+            hint={content?.why_prompt ?? "What's contributing to this?"}
             value={draft.journal_why_feeling}
             onChange={(v) => setField("journal_why_feeling", v)}
           />
 
           {/* ── Prompt 3: body sensations (personal) ── */}
           <Prompt
-            delay={580}
+            delay={560}
             label="How are you experiencing this in your body?"
             hint="Your own sensations — not the list above."
             value={draft.journal_body_sensations}
@@ -290,21 +291,21 @@ export default function JournalScreen() {
 
           {/* ── Three deeper prompts ── */}
           <Prompt
-            delay={660}
+            delay={640}
             label="What is hard right now?"
             value={draft.journal_what_is_hard}
             onChange={(v) => setField("journal_what_is_hard", v)}
           />
 
           <Prompt
-            delay={740}
+            delay={720}
             label="What is life-giving right now?"
             value={draft.journal_what_is_life_giving}
             onChange={(v) => setField("journal_what_is_life_giving", v)}
           />
 
           <Prompt
-            delay={820}
+            delay={800}
             label="What do you need?"
             value={draft.journal_what_do_you_need}
             onChange={(v) => setField("journal_what_do_you_need", v)}

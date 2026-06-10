@@ -32,11 +32,11 @@ const CENTER = CANVAS_SIZE / 2;
 
 const WEDGE_DEG = 360 / 7;
 
-// Calm hover motion
-const HOVER_OFFSET = 12; // pixels outward from center on hover (was 24)
-const HOVER_SCALE = 1.06; // size multiplier on hover (was 1.12)
-const HOVER_DURATION_MS = 450; // smoother (was 280)
-const EASING = "cubic-bezier(0.22, 1, 0.36, 1)"; // gentle "ease-out-quart"
+// Calm hover motion — gentle and slow
+const HOVER_OFFSET = 7; // pixels outward from center on hover
+const HOVER_SCALE = 1.035; // size multiplier on hover
+const HOVER_DURATION_MS = 650; // smoother
+const EASING = "cubic-bezier(0.16, 1, 0.3, 1)"; // ease-out-expo, very soft
 
 function wedgePath(startAngle: number, endAngle: number): string {
   const sR = (startAngle * Math.PI) / 180;
@@ -102,7 +102,9 @@ export function EmotionWheel({ onPick, selected }: Props) {
 
         const fillAlpha = isSelected ? "DD" : isHovered ? "BB" : "40";
         const strokeColor = lit ? e.color : "#F7F0E5";
-        const strokeWidth = isHovered ? 4 : isSelected ? 4 : 3;
+        // Thicker stroke gives the rounded line joins more visual weight,
+        // which softens the otherwise-sharp wedge corners.
+        const strokeWidth = isHovered ? 7 : isSelected ? 7 : 6;
 
         const labelSize = isHovered ? 17 : 14;
         const labelWeight = isHovered ? "700" : isSelected ? "600" : "500";
@@ -127,6 +129,8 @@ export function EmotionWheel({ onPick, selected }: Props) {
               fill={`${e.color}${fillAlpha}`}
               stroke={strokeColor}
               strokeWidth={strokeWidth}
+              strokeLinejoin="round"
+              strokeLinecap="round"
               onPress={() => onPick(e.slug)}
               onPressIn={() => setHovered(e.slug)}
               onPressOut={() => setHovered(null)}
