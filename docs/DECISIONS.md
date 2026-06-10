@@ -92,6 +92,14 @@ User-facing UX changes from an 8-tile grid to a Plutchik-style 8-wedge wheel (SV
 ### 2026-06-02 — Emotion framework changed: Plutchik → Geoffrey Roberts
 The Plutchik 8-primary wheel was replaced with the Geoffrey Roberts feelings wheel (7 primaries: Happy, Surprised, Bad, Fearful, Angry, Disgusted, Sad). Roberts' taxonomy is richer (variable secondaries per primary, 4–9 each; 80+ tertiaries total) and matches the wheel Gigi prefers conceptually. The change is destructive: migration `006_replace_taxonomy.sql` wipes the old Plutchik data + any daily_checkins that referenced it and reseeds. The `emotion_details.framework` column is now set to `'roberts'`. Secondary picker dropped the intensity-ordering UI (Roberts wheel isn't intensity-based, it's thematic).
 
+### 2026-06-09 — Streaks back IN scope (reversing original anti-pattern)
+Original PRD §3 listed "No streak pressure" as an anti-pattern. Gigi reversed this — she wants streaks to incentivize daily engagement. Implementation: `lib/history.computeStreak` counts consecutive local-days with a daily_checkin (including today). Displayed subtly on Home as "N days in a row" with no fire emoji, no "you broke it" framing if it lapses. The philosophy update: streaks as gentle reinforcement, not pressure.
+
+### 2026-06-09 — Email upgrade flow (anonymous → linked account)
+Added `/sign-in` route that takes the user's anonymous Supabase session and attaches an email via `supabase.auth.updateUser({ email })`. Supabase sends a confirmation link; on click the user lands back at the app where `detectSessionInUrl` (enabled on web) auto-processes the verification. The `user_id` stays the same throughout, so all the user's existing reflections remain attached. Home shows "Save your reflections across devices" link while anonymous, and "Signed in as [email]" once linked.
+
+**Supabase config required (manual):** dashboard → Authentication → URL Configuration → set Site URL to `https://krystal-one.vercel.app`. Email change is enabled by default. (Optional: customize the email template under Authentication → Email Templates.)
+
 ### 2026-06-09 — History view + journal-gating (this session)
 Built `/history` route that lists past daily_checkins with inline-expandable journal answers. Today's entry sits at top. Home screen detects today's entry via `lib/history.fetchTodaysEntry` and shows a **"View history" link only after today's journal_entries row exists** (per Gigi's gating rule). If daily_checkin exists but journal doesn't, Home shows "Continue today's journal" instead. Journal screen now hydrates from Supabase if a user returns mid-flow in a fresh session (draft state empty but daily_checkin row exists). **Edit mode for today's entry is still pending** — deferred to next iteration.
 

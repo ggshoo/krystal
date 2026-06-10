@@ -164,6 +164,31 @@ function shapeRow(row: any): HistoryEntry {
   };
 }
 
+/**
+ * Counts consecutive days (including today) with at least one daily_checkin.
+ * Stops at the first gap. Returns 0 if today has no entry yet.
+ */
+export function computeStreak(entries: HistoryEntry[]): number {
+  if (entries.length === 0) return 0;
+
+  // Local-day strings for fast set lookup
+  const dayKey = (d: Date) =>
+    `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+  const days = new Set(entries.map((e) => dayKey(new Date(e.occurred_at))));
+
+  let count = 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+
+  while (days.has(dayKey(cursor))) {
+    count++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return count;
+}
+
 /** Friendly date label like "Today", "Yesterday", or "Mon, Jun 9". */
 export function formatEntryDate(iso: string): string {
   const d = new Date(iso);

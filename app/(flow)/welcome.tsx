@@ -12,8 +12,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
+import { fetchTodaysEntry } from "@/lib/history";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
  * Welcome screen.
@@ -34,18 +36,51 @@ export default function Welcome() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Fetch profile once auth has initialized
+  // Fetch profile once auth has initialized AND hydrate the reflection
+  // draft from today's existing check-in if one exists. This way when the
+  // user re-enters the flow to "Change today's emotions", the Mind/Body/
+  // Heart screens and the emotion picker pre-fill with current values.
   useEffect(() => {
     if (!authInitialized || !user) return;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("display_name")
-        .eq("id", user.id)
-        .single();
+      const [profileRes, todaysEntry] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("id", user.id)
+          .single(),
+        fetchTodaysEntry(user.id),
+      ]);
       if (cancelled) return;
-      setDisplayName(data?.display_name ?? null);
+
+      setDisplayName(profileRes.data?.display_name ?? null);
+
+      if (todaysEntry) {
+        const setField = useReflectionStore.getState().setField;
+        setField("daily_checkin_id", todaysEntry.id);
+        setField("mind_score", todaysEntry.mind_score);
+        setField("body_score", todaysEntry.body_score);
+        setField("heart_score", todaysEntry.heart_score);
+        if (todaysEntry.emotion) {
+          setField(
+            "emotion_primary",
+            todaysEntry.emotion.primary_name.toLowerCase()
+          );
+          setField(
+            "emotion_secondary",
+            todaysEntry.emotion.secondary_name.toLowerCase()
+          );
+          setField(
+            "emotion_specific",
+            todaysEntry.emotion.specific_name.toLowerCase()
+          );
+        }
+        if (todaysEntry.plutchik_emotion) {
+          setField("plutchik_emotion", todaysEntry.plutchik_emotion);
+        }
+      }
+
       setLoading(false);
     })();
     return () => {

@@ -4,28 +4,30 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
-import { fetchTodaysEntry, HistoryEntry } from "@/lib/history";
+import {
+  computeStreak,
+  fetchAllEntries,
+  HistoryEntry,
+} from "@/lib/history";
 import { useAuthStore } from "@/store/useAuthStore";
 
 /**
  * Home screen.
  *
- * Three states based on what's been done today:
+ * Shows today's status + streak count + sign-in/upgrade affordance.
  *
- * - No daily_checkin yet → "Begin reflection"
- * - daily_checkin exists, no journal_entries → "Continue today's journal"
- * - Both exist → "Edit today's journal" + "View history" link
- *
- * Once the check-in is saved, the wheel/intensity picker can NOT be re-done
- * today. The user's only post-check-in entry point is the journal, which
- * remains editable. This enforces "one reflection per day".
+ * - No check-in today → "Begin reflection"
+ * - Check-in done → "Edit today's journal" (primary) + "Change today's emotions"
+ * - Journal done → also adds "View history" link
+ * - Anonymous account → "Save your reflections" link
+ * - Signed-in account → email shown subtly
  */
 export default function Home() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const authInitialized = useAuthStore((s) => s.initialized);
 
-  const [todaysEntry, setTodaysEntry] = useState<HistoryEntry | null>(null);
+  const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,9 +38,9 @@ export default function Home() {
     }
     let cancelled = false;
     (async () => {
-      const entry = await fetchTodaysEntry(user.id);
+      const all = await fetchAllEntries(user.id);
       if (!cancelled) {
-        setTodaysEntry(entry);
+        setEntries(all);
         setLoading(false);
       }
     })();
@@ -47,16 +49,29 @@ export default function Home() {
     };
   }, [authInitialized, user]);
 
-  const hasCheckinToday = !!todaysEntry;
-  const hasJournaledToday = !!todaysEntry?.journal;
+  const streak = entries ? computeStreak(entries) : 0;
+  const todaysEntry = entries?.[0];
+  const isTodaysEntry = (() => {
+    if (!todaysEntry) return false;
+    const d = new Date(todaysEntry.occurred_at);
+    const today = new Date();
+    return (
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate()
+    );
+  })();
+  const hasCheckinToday = isTodaysEntry;
+  const hasJournaledToday = hasCheckinToday && !!todaysEntry?.journal;
+  const isAnonymous = !user?.email;
 
-  const primaryButtonLabel = !hasCheckinToday
+  const primaryLabel = !hasCheckinToday
     ? "Begin reflection"
     : hasJournaledToday
       ? "Edit today's journal"
       : "Continue today's journal";
 
-  const primaryButtonOnPress = !hasCheckinToday
+  const primaryOnPress = !hasCheckinToday
     ? () => router.push("/welcome")
     : () => router.push("/journal");
 
@@ -70,10 +85,25 @@ export default function Home() {
         </FadeIn>
 
         <FadeIn delay={250} duration={650}>
-          <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted">
+          <Text className="mb-6 max-w-xs text-center text-base leading-relaxed text-muted">
             A daily practice for emotional clarity.
           </Text>
         </FadeIn>
+
+        {/* Streak — gentle, no pressure framing */}
+        {streak > 0 && (
+          <FadeIn delay={400} duration={650}>
+            <Text className="mb-10 text-sm text-muted">
+              <Text className="font-semibold text-ink">{streak}</Text>{" "}
+              {streak === 1 ? "day" : "days"} in a row
+            </Text>
+          </FadeIn>
+        )}
+
+        {streak === 0 && (
+          // Keep the spacing consistent
+          <View className="mb-10" />
+        )}
 
         {loading ? (
           <ActivityIndicator color="#C2876B" />
@@ -83,21 +113,22 @@ export default function Home() {
               <Pressable
                 accessibilityRole="button"
                 className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
-                onPress={primaryButtonOnPress}
+                onPress={primaryOnPress}
               >
                 <Text className="text-base font-medium tracking-wide text-white">
-                  {primaryButtonLabel}
+                  {primaryLabel}
                 </Text>
               </Pressable>
             </FadeIn>
 
-            {/* Gentle reminder of today's emotion path if check-in done */}
             {hasCheckinToday && todaysEntry?.emotion && (
-              <FadeIn delay={700} duration={500}>
+              <FadeIn delay={680} duration={500}>
                 <View className="mt-6 flex-row items-center">
                   <View
                     className="mr-2 h-2 w-2 rounded-full"
-                    style={{ backgroundColor: todaysEntry.emotion.primary_color }}
+                    style={{
+                      backgroundColor: todaysEntry.emotion.primary_color,
+                    }}
                   />
                   <Text className="text-xs capitalize text-muted">
                     Today:{" "}
@@ -117,12 +148,25 @@ export default function Home() {
               </FadeIn>
             )}
 
-            {/* History link — only after today's journal is done */}
-            {hasJournaledToday && (
-              <FadeIn delay={800} duration={500}>
+            {hasCheckinToday && (
+              <FadeIn delay={760} duration={500}>
                 <Pressable
                   accessibilityRole="button"
-                  className="mt-4 px-4 py-2 transition-all duration-300 hover:opacity-70"
+                  className="mt-5 px-4 py-2 transition-all duration-300 hover:opacity-70"
+                  onPress={() => router.push("/welcome")}
+                >
+                  <Text className="text-sm text-muted underline">
+                    Change today's emotions
+                  </Text>
+                </Pressable>
+              </FadeIn>
+            )}
+
+            {hasJournaledToday && (
+              <FadeIn delay={830} duration={500}>
+                <Pressable
+                  accessibilityRole="button"
+                  className="mt-2 px-4 py-2 transition-all duration-300 hover:opacity-70"
                   onPress={() => router.push("/history")}
                 >
                   <Text className="text-sm text-muted underline">
@@ -131,6 +175,30 @@ export default function Home() {
                 </Pressable>
               </FadeIn>
             )}
+
+            {/* Sign-in / account status — bottom of screen, subtle */}
+            <View className="mt-10">
+              {isAnonymous ? (
+                <FadeIn delay={900} duration={500}>
+                  <Pressable
+                    accessibilityRole="button"
+                    className="px-4 py-2 transition-all duration-300 hover:opacity-70"
+                    onPress={() => router.push("/sign-in")}
+                  >
+                    <Text className="text-xs text-muted underline">
+                      Save your reflections across devices
+                    </Text>
+                  </Pressable>
+                </FadeIn>
+              ) : (
+                <FadeIn delay={900} duration={500}>
+                  <Text className="text-xs text-muted">
+                    Signed in as{" "}
+                    <Text className="text-ink">{user?.email}</Text>
+                  </Text>
+                </FadeIn>
+              )}
+            </View>
           </>
         )}
       </View>
