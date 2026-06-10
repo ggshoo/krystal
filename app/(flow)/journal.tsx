@@ -46,7 +46,7 @@ export default function JournalScreen() {
 
   // If the user lands here in a fresh session (draft is empty) but has
   // already completed today's check-in, hydrate the draft from Supabase
-  // so the journal can be completed without redoing the flow.
+  // so the journal can be completed (or edited) without redoing the flow.
   useEffect(() => {
     if (draft.daily_checkin_id) {
       setResumeChecked(true);
@@ -63,7 +63,6 @@ export default function JournalScreen() {
         setField("body_score", entry.body_score);
         setField("heart_score", entry.heart_score);
         if (entry.emotion) {
-          // Use the names as slugs — taxonomy slugs are lowercase names.
           setField(
             "emotion_primary",
             entry.emotion.primary_name.toLowerCase()
@@ -79,6 +78,24 @@ export default function JournalScreen() {
         }
         if (entry.plutchik_emotion) {
           setField("plutchik_emotion", entry.plutchik_emotion);
+        }
+        // Pre-fill journal answers if they already exist (edit mode)
+        if (entry.journal) {
+          if (entry.journal.reflection != null)
+            setField("journal_reflection", entry.journal.reflection);
+          if (entry.journal.why_feeling != null)
+            setField("journal_why_feeling", entry.journal.why_feeling);
+          if (entry.journal.body_sensations != null)
+            setField("journal_body_sensations", entry.journal.body_sensations);
+          if (entry.journal.what_is_hard != null)
+            setField("journal_what_is_hard", entry.journal.what_is_hard);
+          if (entry.journal.what_is_life_giving != null)
+            setField(
+              "journal_what_is_life_giving",
+              entry.journal.what_is_life_giving
+            );
+          if (entry.journal.what_do_you_need != null)
+            setField("journal_what_do_you_need", entry.journal.what_do_you_need);
         }
       }
       setResumeChecked(true);
@@ -124,7 +141,7 @@ export default function JournalScreen() {
     setState("saving");
     setErrorMsg(null);
 
-    const { error } = await supabase.from("journal_entries").insert({
+    const payload = {
       daily_checkin_id: draft.daily_checkin_id!,
       user_id: user.id,
       reflection: draft.journal_reflection ?? null,
@@ -133,7 +150,22 @@ export default function JournalScreen() {
       what_is_hard: draft.journal_what_is_hard ?? null,
       what_is_life_giving: draft.journal_what_is_life_giving ?? null,
       what_do_you_need: draft.journal_what_do_you_need ?? null,
-    });
+    };
+
+    // One journal per daily_checkin. If a row already exists, update it
+    // (so the user can edit their journal entry); otherwise insert.
+    const { data: existing } = await supabase
+      .from("journal_entries")
+      .select("id")
+      .eq("daily_checkin_id", draft.daily_checkin_id!)
+      .maybeSingle();
+
+    const { error } = existing
+      ? await supabase
+          .from("journal_entries")
+          .update(payload)
+          .eq("id", existing.id)
+      : await supabase.from("journal_entries").insert(payload);
 
     if (error) {
       setState("error");

@@ -9,6 +9,7 @@ import {
   findSecondary,
   findTertiary,
 } from "@/lib/emotions";
+import { fetchTodaysEntry } from "@/lib/history";
 import { supabase } from "@/lib/supabase";
 import { uuid } from "@/lib/uuid";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -96,26 +97,50 @@ export default function Done() {
         const emotionId = rows?.[0]?.id;
         if (!emotionId) throw new Error("Emotion not found in database.");
 
-        const { data: inserted, error: insertError } = await supabase
-          .from("daily_checkins")
-          .insert({
-            user_id: user!.id,
-            mind_score: draft.mind_score!,
-            body_score: draft.body_score!,
-            heart_score: draft.heart_score!,
-            emotion_id: emotionId,
-            plutchik_emotion: draft.plutchik_emotion ?? null,
-            client_uuid: uuid(),
-          })
-          .select()
-          .single();
+        // One reflection per day per user. If today's row already exists,
+        // UPDATE it; otherwise INSERT a new one.
+        const existingTodaysEntry = await fetchTodaysEntry(user!.id);
 
-        if (insertError) throw new Error(insertError.message);
-        if (inserted) {
-          // Store the row id so the Journal screen can link a journal_entries
-          // row back to this check-in.
-          useReflectionStore.getState().setField("daily_checkin_id", inserted.id);
+        let dailyCheckinId: string;
+
+        if (existingTodaysEntry) {
+          const { error: updateError } = await supabase
+            .from("daily_checkins")
+            .update({
+              mind_score: draft.mind_score!,
+              body_score: draft.body_score!,
+              heart_score: draft.heart_score!,
+              emotion_id: emotionId,
+              plutchik_emotion: draft.plutchik_emotion ?? null,
+              occurred_at: new Date().toISOString(),
+            })
+            .eq("id", existingTodaysEntry.id);
+          if (updateError) throw new Error(updateError.message);
+          dailyCheckinId = existingTodaysEntry.id;
+        } else {
+          const { data: inserted, error: insertError } = await supabase
+            .from("daily_checkins")
+            .insert({
+              user_id: user!.id,
+              mind_score: draft.mind_score!,
+              body_score: draft.body_score!,
+              heart_score: draft.heart_score!,
+              emotion_id: emotionId,
+              plutchik_emotion: draft.plutchik_emotion ?? null,
+              client_uuid: uuid(),
+            })
+            .select()
+            .single();
+          if (insertError) throw new Error(insertError.message);
+          if (!inserted) throw new Error("Insert returned no row.");
+          dailyCheckinId = inserted.id;
         }
+
+        // Store the row id so the Journal screen can link a journal_entries
+        // row back to this check-in.
+        useReflectionStore
+          .getState()
+          .setField("daily_checkin_id", dailyCheckinId);
 
         setState("saved");
       } catch (e) {
