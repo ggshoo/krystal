@@ -26,18 +26,12 @@ function pickGreeting(): string {
   return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
 }
 
-/**
- * Decides whether the grape should "speak" today. Most days it stays quiet.
- * Returns a string only on milestones; otherwise undefined → grape just sits.
- */
 function specialGrapeMessage(
   streak: number,
   isReturning: boolean,
   hasCheckinToday: boolean
 ): string | undefined {
-  // First-time visit, just landed on the app
   if (!isReturning) return "hi!";
-  // Milestone streaks (today's reflection done)
   if (hasCheckinToday) {
     if (streak === 3) return "three days. nice.";
     if (streak === 7) return "a whole week!";
@@ -49,24 +43,12 @@ function specialGrapeMessage(
 }
 
 /**
- * Home screen — minimal, focused.
+ * Home screen.
  *
- * Layout:
- *   ┌──────────────────────────────────────────┐
- *   │  [⌚ history]              [👤 account]  │
- *   │                                          │
- *   │            Greeting                      │
- *   │            N days in a row               │
- *   │                                          │
- *   │            [Primary CTA]                 │
- *   │            change today's emotions       │
- *   │                                          │
- *   │                                  🍇     │
- *   └──────────────────────────────────────────┘
+ * Grape sits ABOVE the title, centered. First-time users see the krystal
+ * wordmark; returning users see the personalized greeting.
  *
- * Corner icons handle navigation (history + account) so the center stays
- * focused on the primary action. The grape companion sits in the bottom-right
- * corner and mirrors today's emotion (color + face).
+ * Top corners hold navigation (history left, account right).
  */
 export default function Home() {
   const router = useRouter();
@@ -133,7 +115,6 @@ export default function Home() {
     ? () => router.push("/welcome")
     : () => router.push("/journal");
 
-  // Avatar initial (first letter of name) or generic
   const avatarLetter =
     displayName?.trim()[0]?.toUpperCase() ??
     user?.email?.trim()[0]?.toUpperCase() ??
@@ -141,9 +122,8 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
-      {/* ── Top corners: history (left) + account (right) ── */}
+      {/* ── Top corners ── */}
       <View className="absolute left-0 right-0 top-0 z-10 flex-row justify-between px-5 pt-3">
-        {/* History — only visible once today's journal is done */}
         <View className="w-10">
           {hasJournaledToday && (
             <FadeIn delay={600} duration={500}>
@@ -159,7 +139,6 @@ export default function Home() {
           )}
         </View>
 
-        {/* Account — always visible */}
         <FadeIn delay={500} duration={500}>
           <Pressable
             accessibilityRole="button"
@@ -183,56 +162,63 @@ export default function Home() {
 
       {/* ── Center column ── */}
       <View className="flex-1 items-center justify-center px-6">
-        {!loading && !isReturning && (
-          <>
-            <FadeIn delay={0} duration={900}>
-              <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink">
-                krystal
-              </Text>
-            </FadeIn>
-            <FadeIn delay={500} duration={900}>
-              <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted">
-                A daily practice for emotional clarity.
-              </Text>
-            </FadeIn>
-          </>
-        )}
-
-        {!loading && isReturning && (
-          <>
-            {/* Grape sits to the left of the greeting */}
-            <FadeIn delay={0} duration={650}>
-              <View className="mb-3 flex-row items-center">
-                <View className="mr-4">
-                  <GrapeCompanion
-                    emotionPrimary={todaysEntry?.emotion?.primary_name?.toLowerCase()}
-                    size={68}
-                    message={specialGrapeMessage(streak, isReturning, hasCheckinToday)}
-                  />
-                </View>
-                <Text className="text-3xl font-semibold tracking-tight text-ink">
-                  {greeting}
-                  {displayName ? `, ${displayName}` : ""}.
-                </Text>
-              </View>
-            </FadeIn>
-            {streak > 0 && (
-              <FadeIn delay={250} duration={650}>
-                <Text className="mb-12 text-sm text-muted">
-                  <Text className="font-semibold text-ink">{streak}</Text>{" "}
-                  {streak === 1 ? "day" : "days"} in a row
-                </Text>
-              </FadeIn>
-            )}
-            {streak === 0 && <View className="mb-12" />}
-          </>
-        )}
-
         {loading ? (
           <ActivityIndicator color="#C2876B" />
         ) : (
           <>
-            <FadeIn delay={isReturning ? 450 : 850} duration={500}>
+            {/* Grape above the title, centered */}
+            <FadeIn delay={0} duration={900}>
+              <View className="mb-6">
+                <GrapeCompanion
+                  emotionPrimary={todaysEntry?.emotion?.primary_name?.toLowerCase()}
+                  plutchikEmotion={todaysEntry?.plutchik_emotion ?? undefined}
+                  size={isReturning ? 78 : 96}
+                  message={specialGrapeMessage(
+                    streak,
+                    isReturning,
+                    hasCheckinToday
+                  )}
+                />
+              </View>
+            </FadeIn>
+
+            {/* Title: krystal for first-time, greeting for returning */}
+            {!isReturning ? (
+              <>
+                <FadeIn delay={350} duration={900}>
+                  <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink">
+                    krystal
+                  </Text>
+                </FadeIn>
+                <FadeIn delay={650} duration={900}>
+                  <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted">
+                    A daily practice for emotional clarity.
+                  </Text>
+                </FadeIn>
+              </>
+            ) : (
+              <>
+                <FadeIn delay={300} duration={650}>
+                  <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                    {greeting}
+                    {displayName ? `, ${displayName}` : ""}.
+                  </Text>
+                </FadeIn>
+                {streak > 0 ? (
+                  <FadeIn delay={500} duration={650}>
+                    <Text className="mb-12 text-sm text-muted">
+                      <Text className="font-semibold text-ink">{streak}</Text>{" "}
+                      {streak === 1 ? "day" : "days"} in a row
+                    </Text>
+                  </FadeIn>
+                ) : (
+                  <View className="mb-12" />
+                )}
+              </>
+            )}
+
+            {/* Primary CTA */}
+            <FadeIn delay={isReturning ? 700 : 1000} duration={500}>
               <Pressable
                 accessibilityRole="button"
                 className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
@@ -244,8 +230,9 @@ export default function Home() {
               </Pressable>
             </FadeIn>
 
+            {/* Secondary: change today's emotions */}
             {hasCheckinToday && (
-              <FadeIn delay={700} duration={500}>
+              <FadeIn delay={850} duration={500}>
                 <Pressable
                   accessibilityRole="button"
                   className="mt-5 px-4 py-2 transition-all duration-300 hover:opacity-70"
@@ -260,19 +247,6 @@ export default function Home() {
           </>
         )}
       </View>
-
-      {/* For first-time visitors (no entries yet), show grape under the
-          krystal wordmark as a small introduction. */}
-      {!loading && !isReturning && (
-        <View className="absolute" style={{ bottom: "20%", left: "10%" }}>
-          <FadeIn delay={1100} duration={900}>
-            <GrapeCompanion
-              size={68}
-              message={specialGrapeMessage(streak, isReturning, hasCheckinToday)}
-            />
-          </FadeIn>
-        </View>
-      )}
     </SafeAreaView>
   );
 }

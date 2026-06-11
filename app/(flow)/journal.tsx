@@ -238,6 +238,7 @@ export default function JournalScreen() {
                 <View className="mr-4 mt-1">
                   <GrapeCompanion
                     emotionPrimary={primary.slug}
+                    plutchikEmotion={draft.plutchik_emotion ?? undefined}
                     size={64}
                   />
                 </View>

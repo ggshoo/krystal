@@ -186,7 +186,11 @@ export default function Done() {
                 <View className="mb-10 items-center">
                   {/* Grape mirrors today's chosen emotion via color */}
                   <View className="mb-6">
-                    <GrapeCompanion emotionPrimary={primary.slug} size={88} />
+                    <GrapeCompanion
+                      emotionPrimary={primary.slug}
+                      plutchikEmotion={draft.plutchik_emotion ?? undefined}
+                      size={88}
+                    />
                   </View>
                   <View
                     className="mb-3 h-3 w-3 rounded-full"
