@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
+import { GrapeCompanion } from "@/components/GrapeCompanion";
 import { findPrimary, findSecondary, findTertiary } from "@/lib/emotions";
 import { fetchTodaysEntry } from "@/lib/history";
 import { getPlutchikLadder } from "@/lib/plutchik";
@@ -228,20 +229,31 @@ export default function JournalScreen() {
           }}
           keyboardShouldPersistTaps="handled"
         >
-          {/* ── Overview card ── */}
+          {/* ── Overview card with grape ── */}
           <FadeIn delay={0}>
-            <View
-              className="mb-8 rounded-tile bg-surface p-5"
-              style={{
-                shadowColor: "#2D2520",
-                shadowOpacity: 0.04,
-                shadowRadius: 16,
-                shadowOffset: { width: 0, height: 4 },
-              }}
-            >
-              <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
-                Today's reflection
-              </Text>
+            <View className="mb-5 flex-row items-start">
+              {/* Grape mirrors the chosen emotion. Only renders when the
+                  user has actually picked an emotion (primary exists). */}
+              {primary && (
+                <View className="mr-4 mt-1">
+                  <GrapeCompanion
+                    emotionPrimary={primary.slug}
+                    size={64}
+                  />
+                </View>
+              )}
+              <View
+                className="flex-1 rounded-tile bg-surface p-5"
+                style={{
+                  shadowColor: "#2D2520",
+                  shadowOpacity: 0.04,
+                  shadowRadius: 16,
+                  shadowOffset: { width: 0, height: 4 },
+                }}
+              >
+                <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
+                  Today's reflection
+                </Text>
               <View className="mb-3 flex-row gap-5">
                 <Text className="text-sm text-ink">
                   <Text className="font-semibold">Mind</Text> {draft.mind_score}
@@ -272,6 +284,7 @@ export default function JournalScreen() {
                 </Text>
               </View>
             </View>
+          </View>
           </FadeIn>
 
           {/* ── Educational box (about the specific intensity word) ── */}

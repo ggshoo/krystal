@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
+import { GrapeCompanion } from "@/components/GrapeCompanion";
 import {
   findPrimary,
   findSecondary,
@@ -183,6 +184,10 @@ export default function Done() {
             {primary && (
               <FadeIn delay={0} duration={650}>
                 <View className="mb-10 items-center">
+                  {/* Grape mirrors today's chosen emotion via color */}
+                  <View className="mb-6">
+                    <GrapeCompanion emotionPrimary={primary.slug} size={88} />
+                  </View>
                   <View
                     className="mb-3 h-3 w-3 rounded-full"
                     style={{ backgroundColor: primary.color }}

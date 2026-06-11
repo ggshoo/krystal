@@ -200,11 +200,21 @@ export default function Home() {
 
         {!loading && isReturning && (
           <>
+            {/* Grape sits to the left of the greeting */}
             <FadeIn delay={0} duration={650}>
-              <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
-                {greeting}
-                {displayName ? `, ${displayName}` : ""}.
-              </Text>
+              <View className="mb-3 flex-row items-center">
+                <View className="mr-4">
+                  <GrapeCompanion
+                    emotionPrimary={todaysEntry?.emotion?.primary_name?.toLowerCase()}
+                    size={68}
+                    message={specialGrapeMessage(streak, isReturning, hasCheckinToday)}
+                  />
+                </View>
+                <Text className="text-3xl font-semibold tracking-tight text-ink">
+                  {greeting}
+                  {displayName ? `, ${displayName}` : ""}.
+                </Text>
+              </View>
             </FadeIn>
             {streak > 0 && (
               <FadeIn delay={250} duration={650}>
@@ -251,12 +261,13 @@ export default function Home() {
         )}
       </View>
 
-      {/* ── Grape companion bottom-right ── */}
-      {!loading && (
-        <View className="absolute bottom-8 right-8">
-          <FadeIn delay={1000} duration={900}>
+      {/* For first-time visitors (no entries yet), show grape under the
+          krystal wordmark as a small introduction. */}
+      {!loading && !isReturning && (
+        <View className="absolute" style={{ bottom: "20%", left: "10%" }}>
+          <FadeIn delay={1100} duration={900}>
             <GrapeCompanion
-              emotionPrimary={todaysEntry?.emotion?.primary_name?.toLowerCase()}
+              size={68}
               message={specialGrapeMessage(streak, isReturning, hasCheckinToday)}
             />
           </FadeIn>

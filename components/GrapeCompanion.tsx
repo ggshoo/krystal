@@ -4,13 +4,9 @@ import { Circle, Ellipse, Path, Svg } from "react-native-svg";
 /**
  * Krystal — the grape companion.
  *
- * A cute purple grape with big sparkly eyes, rosy cheeks, and a tiny smile.
- * Reflects the user's chosen emotion via:
- *   1. Body color tint (30% blend toward the emotion's primary color)
- *   2. Facial expression (mouth + eye changes)
- *
- * No stem/leaf — Gigi prefers the leafless version. Egg-shaped body, flat
- * illustration style (no photoreal gradients).
+ * A cute purple grape with a curly stem and small leaf, big sparkly eyes,
+ * rosy cheeks, and a soft smile. Reflects emotion via body color tint and
+ * facial expression. Subtle occasional float via CSS keyframes (see global.css).
  */
 
 const BASE_COLOR = "#9D7BC4";
@@ -58,14 +54,14 @@ function mix(c1: string, c2: string, ratio: number): string {
 }
 
 type Props = {
-  /** The Roberts primary slug (e.g. "happy", "sad"). Controls tint + face. */
+  /** Roberts primary slug (e.g. "happy", "sad"). Controls tint + face. */
   emotionPrimary?: string;
   /** Width in px. Default 80. Height auto-derived. */
   size?: number;
   /**
-   * Optional message rendered as a small bubble above the grape — only set
-   * this for "special times" (streak milestones, first reflection, etc.).
-   * Leave undefined for everyday quiet presence.
+   * Optional message bubble above the grape. Set only for "special times"
+   * (streak milestones, first reflection, etc.). Leave undefined for the
+   * default quiet presence.
    */
   message?: string;
 };
@@ -122,9 +118,11 @@ export function GrapeCompanion({
   const bodyColor = tint ? mix(BASE_COLOR, tint, 0.3) : BASE_COLOR;
 
   // Derived shades
-  const bodyDeep = mix(bodyColor, "#000000", 0.18);
-  const highlight = mix(bodyColor, "#FFFFFF", 0.5);
-  const cheek = "#F5A8B3";
+  const highlight = mix(bodyColor, "#FFFFFF", 0.55);
+  const cheek = "#F5A0A8";
+  const stemColor = "#5C6F4F";
+  const leafColor = "#7BAE7E";
+  const leafVein = "#5C8D5F";
 
   const mood = moodFromPrimary(emotionPrimary);
 
@@ -149,30 +147,97 @@ export function GrapeCompanion({
 
       {/* ── The grape itself, gently floating ─────────────────────────── */}
       <View className="grape-float">
-        <Svg width={size} height={size * 1.15} viewBox="0 0 100 115">
-      {/* ── Body — soft egg/teardrop shape ───────────────────────────────── */}
-      <Path
-        d="M 50 8 C 76 8, 94 32, 94 68 C 94 94, 76 110, 50 110 C 24 110, 6 94, 6 68 C 6 32, 24 8, 50 8 Z"
-        fill={bodyColor}
-      />
+        <Svg width={size} height={size * 1.3} viewBox="0 0 100 130">
+          {/* ── Curly stem ──────────────────────────────────────────── */}
+          <Path
+            d="M 50 18 Q 52 8 58 10"
+            stroke={stemColor}
+            strokeWidth={2.8}
+            fill="none"
+            strokeLinecap="round"
+          />
 
-      {/* Big soft highlight on upper-left for that "lit" feel */}
-      <Ellipse cx="34" cy="38" rx="14" ry="10" fill={highlight} opacity={0.55} />
-      {/* Tiny extra sparkle on the right shoulder */}
-      <Ellipse cx="72" cy="32" rx="4" ry="3" fill={highlight} opacity={0.7} />
+          {/* ── Single small leaf ───────────────────────────────────── */}
+          <Path
+            d="M 58 10 Q 70 4 76 14 Q 68 18 58 10 Z"
+            fill={leafColor}
+          />
+          {/* Leaf vein */}
+          <Path
+            d="M 60 11 Q 67 12 73 14"
+            stroke={leafVein}
+            strokeWidth={1.2}
+            fill="none"
+            strokeLinecap="round"
+          />
 
-      {/* ── Eyes ─────────────────────────────────────────────────────────── */}
-      {renderEyes(mood)}
+          {/* ── Body — soft rounded teardrop ────────────────────────── */}
+          <Path
+            d="M 50 22 C 78 22, 96 46, 96 82 C 96 108, 78 124, 50 124 C 22 124, 4 108, 4 82 C 4 46, 22 22, 50 22 Z"
+            fill={bodyColor}
+          />
 
-      {/* ── Rosy cheeks ──────────────────────────────────────────────────── */}
-      <Ellipse cx="26" cy="82" rx="7" ry="3.5" fill={cheek} opacity={0.75} />
-      <Ellipse cx="74" cy="82" rx="7" ry="3.5" fill={cheek} opacity={0.75} />
+          {/* ── Multiple glossy highlights for that real-grape look ── */}
+          {/* Main upper-left highlight */}
+          <Ellipse
+            cx="33"
+            cy="48"
+            rx="11"
+            ry="14"
+            fill={highlight}
+            opacity={0.55}
+          />
+          {/* Right shoulder shine */}
+          <Ellipse
+            cx="70"
+            cy="42"
+            rx="6"
+            ry="5"
+            fill={highlight}
+            opacity={0.65}
+          />
+          {/* Small left mid-body */}
+          <Ellipse
+            cx="20"
+            cy="85"
+            rx="5"
+            ry="6"
+            fill={highlight}
+            opacity={0.35}
+          />
+          {/* Lower-right glow */}
+          <Ellipse
+            cx="78"
+            cy="98"
+            rx="8"
+            ry="5"
+            fill={highlight}
+            opacity={0.3}
+          />
 
-      {/* ── Mouth ────────────────────────────────────────────────────────── */}
-      {renderMouth(mood)}
+          {/* ── Eyes ────────────────────────────────────────────────── */}
+          {renderEyes(mood)}
 
-      {/* Subtle deeper shadow on bottom-right for grape roundness */}
-      <Ellipse cx="68" cy="98" rx="14" ry="5" fill={bodyDeep} opacity={0.25} />
+          {/* ── Rosy cheeks ─────────────────────────────────────────── */}
+          <Ellipse
+            cx="26"
+            cy="92"
+            rx="7"
+            ry="3.8"
+            fill={cheek}
+            opacity={0.72}
+          />
+          <Ellipse
+            cx="74"
+            cy="92"
+            rx="7"
+            ry="3.8"
+            fill={cheek}
+            opacity={0.72}
+          />
+
+          {/* ── Mouth ───────────────────────────────────────────────── */}
+          {renderMouth(mood)}
         </Svg>
       </View>
     </View>
@@ -181,160 +246,72 @@ export function GrapeCompanion({
 
 // ── Face parts ──────────────────────────────────────────────────────────────
 
-function renderEyes(mood: Mood) {
-  // Pupil + white sparkle highlight inside each eye
-  const eye = (cx: number, cy: number, r = 7) => (
+// Eyes stay consistent across all moods — big kind sparkly eyes. The grape
+// listens the same way whether the user is grieving or elated. Empathy is
+// in the eyes; the mood difference is only in the mouth.
+function renderEyes(_mood: Mood) {
+  const eye = (cx: number, cy: number) => (
     <>
-      <Circle cx={cx} cy={cy} r={r} fill="#2D2520" />
-      {/* Big sparkle highlight */}
-      <Circle cx={cx + 1.6} cy={cy - 2} r={r * 0.4} fill="#FFFFFF" />
-      {/* Tiny secondary sparkle */}
-      <Circle cx={cx - 2} cy={cy + 2} r={r * 0.18} fill="#FFFFFF" />
+      <Ellipse cx={cx} cy={cy} rx={8} ry={9.5} fill="#2D2520" />
+      <Circle cx={cx + 2.5} cy={cy - 3} r={3} fill="#FFFFFF" />
+      <Circle cx={cx - 2.5} cy={cy + 3} r={1.4} fill="#FFFFFF" />
     </>
   );
-
-  if (mood === "joy") {
-    // Closed/smiling arc eyes
-    return (
-      <>
-        <Path
-          d="M 30 64 Q 36 58 42 64"
-          stroke="#2D2520"
-          strokeWidth={3.5}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Path
-          d="M 58 64 Q 64 58 70 64"
-          stroke="#2D2520"
-          strokeWidth={3.5}
-          fill="none"
-          strokeLinecap="round"
-        />
-      </>
-    );
-  }
-
-  if (mood === "surprise") {
-    // Wider eyes with white around the pupil
-    return (
-      <>
-        <Circle cx={36} cy={64} r={9} fill="#FFFFFF" stroke="#2D2520" strokeWidth={2} />
-        <Circle cx={36} cy={64} r={4} fill="#2D2520" />
-        <Circle cx={37} cy={62} r={1.6} fill="#FFFFFF" />
-        <Circle cx={64} cy={64} r={9} fill="#FFFFFF" stroke="#2D2520" strokeWidth={2} />
-        <Circle cx={64} cy={64} r={4} fill="#2D2520" />
-        <Circle cx={65} cy={62} r={1.6} fill="#FFFFFF" />
-      </>
-    );
-  }
-
-  if (mood === "anger") {
-    // Big eyes + angled "brows" above
-    return (
-      <>
-        <Path
-          d="M 28 56 L 42 60"
-          stroke="#2D2520"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-        />
-        <Path
-          d="M 72 56 L 58 60"
-          stroke="#2D2520"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-        />
-        {eye(36, 66)}
-        {eye(64, 66)}
-      </>
-    );
-  }
-
-  // Default sparkly eyes (sadness, fear, disgust, trust, bad, anticipation, default)
   return (
     <>
-      {eye(36, 64)}
-      {eye(64, 64)}
+      {eye(36, 72)}
+      {eye(64, 72)}
     </>
   );
 }
 
+// Mouth — VERY subtle differences per mood. Mostly the gentle baseline smile
+// with small shifts in curve. Never frowning hard, never wide-open shock.
+// The grape stays warm; the mood is just a quiet acknowledgment.
 function renderMouth(mood: Mood) {
   const STROKE = "#2D2520";
   const W = 2.8;
 
-  switch (mood) {
-    case "joy":
-      return (
-        <Path
-          d="M 40 90 Q 50 100 60 90"
-          stroke={STROKE}
-          strokeWidth={W}
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-    case "sadness":
-      return (
-        <Path
-          d="M 40 94 Q 50 86 60 94"
-          stroke={STROKE}
-          strokeWidth={W}
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-    case "surprise":
-      return <Ellipse cx={50} cy={92} rx={4} ry={5.5} fill={STROKE} />;
-    case "anger":
-      return (
-        <Path
-          d="M 40 92 L 60 92"
-          stroke={STROKE}
-          strokeWidth={W}
-          strokeLinecap="round"
-        />
-      );
-    case "disgust":
-      return (
-        <Path
-          d="M 40 92 Q 47 88 53 92 Q 58 95 60 91"
-          stroke={STROKE}
-          strokeWidth={W}
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-    case "fear":
-      return (
-        <Path
-          d="M 43 92 Q 50 89 57 92"
-          stroke={STROKE}
-          strokeWidth={W}
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-    case "bad":
-      return (
-        <Path
-          d="M 42 92 L 58 92"
-          stroke={STROKE}
-          strokeWidth={W}
-          strokeLinecap="round"
-        />
-      );
-    default:
-      // Gentle default smile
-      return (
-        <Path
-          d="M 42 91 Q 50 95 58 91"
-          stroke={STROKE}
-          strokeWidth={W}
-          fill="none"
-          strokeLinecap="round"
-        />
-      );
-  }
+  // All paths share the same baseline anchors so the mouth size stays
+  // consistent — only the middle control point shifts a few px.
+  const path = (() => {
+    switch (mood) {
+      case "joy":
+        // Slightly more curved smile
+        return "M 41 100 Q 50 108 59 100";
+      case "trust":
+      case "anticipation":
+        return "M 42 101 Q 50 106 58 101";
+      case "sadness":
+        // Very gentle softening — almost flat with a tiny downturn
+        return "M 42 103 Q 50 101 58 103";
+      case "fear":
+        // Slight uneven softening
+        return "M 43 102 Q 50 100 57 102";
+      case "anger":
+        // Flatter, less curve
+        return "M 42 102 Q 50 103 58 102";
+      case "disgust":
+        // Tiny asymmetric wave
+        return "M 42 102 Q 47 100 52 102 Q 56 103 58 101";
+      case "bad":
+        // Mostly flat baseline
+        return "M 42 102 Q 50 103 58 102";
+      case "surprise":
+        // Slightly parted, but not "O" shape — just smaller curve
+        return "M 44 101 Q 50 105 56 101";
+      default:
+        return "M 42 101 Q 50 106 58 101";
+    }
+  })();
+
+  return (
+    <Path
+      d={path}
+      stroke={STROKE}
+      strokeWidth={W}
+      fill="none"
+      strokeLinecap="round"
+    />
+  );
 }
