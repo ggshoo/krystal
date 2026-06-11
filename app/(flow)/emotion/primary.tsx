@@ -20,16 +20,16 @@ export default function PickPrimary() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <View className="flex-1 items-center px-6 pt-12">
         <FadeIn delay={0}>
-          <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+          <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
             What's coming up?
           </Text>
         </FadeIn>
 
         <FadeIn delay={120}>
-          <Text className="mb-10 max-w-xs text-center text-base leading-relaxed text-muted">
+          <Text className="mb-10 max-w-xs text-center text-base leading-relaxed text-muted dark:text-muted-dark">
             Tap the closest emotion. We'll narrow down from there.
           </Text>
         </FadeIn>

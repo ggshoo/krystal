@@ -47,7 +47,7 @@ export default function PickIntensity() {
         : "In between";
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -62,20 +62,20 @@ export default function PickIntensity() {
               className="mr-2 h-3 w-3 rounded-full"
               style={{ backgroundColor: primary.color }}
             />
-            <Text className="text-xs font-semibold uppercase tracking-widest text-muted">
+            <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
               {primary.name} · {secondary.name} · {tertiary.name}
             </Text>
           </View>
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
+          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
             How intense?
           </Text>
         </FadeIn>
 
         <FadeIn delay={160}>
-          <Text className="mb-8 text-base leading-relaxed text-muted">
+          <Text className="mb-8 text-base leading-relaxed text-muted dark:text-muted-dark">
             From the {ladder.primary} family, which feels closest? Listed from
             most to least intense.
           </Text>
@@ -101,10 +101,10 @@ export default function PickIntensity() {
                   shadowOffset: { width: 0, height: 4 },
                 }}
               >
-                <Text className="text-2xl font-medium capitalize text-ink">
+                <Text className="text-2xl font-medium capitalize text-ink dark:text-ink-dark">
                   {l.name}
                 </Text>
-                <Text className="mt-1 text-xs uppercase tracking-widest text-muted">
+                <Text className="mt-1 text-xs uppercase tracking-widest text-muted dark:text-muted-dark">
                   {intensityLabel(l.level)}
                 </Text>
               </Pressable>

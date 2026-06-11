@@ -121,7 +121,7 @@ export default function Home() {
     "?";
 
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark">
       {/* ── Top corners ── */}
       <View className="absolute left-0 right-0 top-0 z-10 flex-row justify-between px-5 pt-3">
         <View className="w-10">
@@ -131,7 +131,7 @@ export default function Home() {
                 accessibilityRole="button"
                 accessibilityLabel="View history"
                 onPress={() => router.push("/history")}
-                className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5"
+                className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5 dark:hover:bg-ink-dark/10"
               >
                 <Text className="text-xl">⌚</Text>
               </Pressable>
@@ -151,7 +151,7 @@ export default function Home() {
           >
             <Text
               className={`text-sm font-semibold ${
-                isAnonymous ? "text-muted" : "text-white"
+                isAnonymous ? "text-muted dark:text-muted-dark" : "text-white"
               }`}
             >
               {isAnonymous ? "?" : avatarLetter}
@@ -166,12 +166,15 @@ export default function Home() {
           <ActivityIndicator color="#C2876B" />
         ) : (
           <>
-            {/* Grape above the title, centered */}
+            {/* Grape above the title, centered.
+                Home is the friendly "welcome back" surface — the grape ALWAYS
+                shows its pleasant default face here, regardless of whether
+                today's check-in is done. Emotion-mirroring happens inside the
+                flow (Welcome → Check-in → Wheel) and on Done/Journal, not on
+                Home. The grape is a consistent companion at the door. */}
             <FadeIn delay={0} duration={900}>
               <View className="mb-6">
                 <GrapeCompanion
-                  emotionPrimary={todaysEntry?.emotion?.primary_name?.toLowerCase()}
-                  plutchikEmotion={todaysEntry?.plutchik_emotion ?? undefined}
                   size={isReturning ? 78 : 96}
                   message={specialGrapeMessage(
                     streak,
@@ -186,12 +189,12 @@ export default function Home() {
             {!isReturning ? (
               <>
                 <FadeIn delay={350} duration={900}>
-                  <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink">
+                  <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink dark:text-ink-dark">
                     krystal
                   </Text>
                 </FadeIn>
                 <FadeIn delay={650} duration={900}>
-                  <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted">
+                  <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted dark:text-muted-dark">
                     A daily practice for emotional clarity.
                   </Text>
                 </FadeIn>
@@ -199,15 +202,15 @@ export default function Home() {
             ) : (
               <>
                 <FadeIn delay={300} duration={650}>
-                  <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                  <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
                     {greeting}
                     {displayName ? `, ${displayName}` : ""}.
                   </Text>
                 </FadeIn>
                 {streak > 0 ? (
                   <FadeIn delay={500} duration={650}>
-                    <Text className="mb-12 text-sm text-muted">
-                      <Text className="font-semibold text-ink">{streak}</Text>{" "}
+                    <Text className="mb-12 text-sm text-muted dark:text-muted-dark">
+                      <Text className="font-semibold text-ink dark:text-ink-dark">{streak}</Text>{" "}
                       {streak === 1 ? "day" : "days"} in a row
                     </Text>
                   </FadeIn>
@@ -221,7 +224,7 @@ export default function Home() {
             <FadeIn delay={isReturning ? 700 : 1000} duration={500}>
               <Pressable
                 accessibilityRole="button"
-                className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+                className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
                 onPress={primaryOnPress}
               >
                 <Text className="text-base font-medium tracking-wide text-white">
@@ -238,7 +241,7 @@ export default function Home() {
                   className="mt-5 px-4 py-2 transition-all duration-300 hover:opacity-70"
                   onPress={() => router.push("/welcome")}
                 >
-                  <Text className="text-sm text-muted underline">
+                  <Text className="text-sm text-muted dark:text-muted-dark underline">
                     Change today's emotions
                   </Text>
                 </Pressable>

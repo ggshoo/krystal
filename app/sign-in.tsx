@@ -58,7 +58,7 @@ export default function SignIn() {
   const valid = email.trim().includes("@");
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -68,7 +68,7 @@ export default function SignIn() {
             onPress={() => router.push("/")}
             className="px-2 py-2 transition-all duration-300 hover:opacity-70"
           >
-            <Text className="text-sm text-muted">← Home</Text>
+            <Text className="text-sm text-muted dark:text-muted-dark">← Home</Text>
           </Pressable>
         </View>
 
@@ -76,20 +76,20 @@ export default function SignIn() {
           {alreadyLinked ? (
             <>
               <FadeIn delay={0} duration={650}>
-                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
                   You're signed in.
                 </Text>
               </FadeIn>
               <FadeIn delay={250} duration={650}>
-                <Text className="mb-12 max-w-sm text-center text-base leading-relaxed text-muted">
+                <Text className="mb-12 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
                   Your reflections are saved to{" "}
-                  <Text className="font-semibold text-ink">{user?.email}</Text>.
+                  <Text className="font-semibold text-ink dark:text-ink-dark">{user?.email}</Text>.
                   You can open krystal on any device and they'll be here.
                 </Text>
               </FadeIn>
               <FadeIn delay={500} duration={500}>
                 <Pressable
-                  className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl"
+                  className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl"
                   onPress={() => router.push("/")}
                 >
                   <Text className="text-base font-medium tracking-wide text-white">
@@ -101,21 +101,21 @@ export default function SignIn() {
           ) : sent ? (
             <>
               <FadeIn delay={0} duration={650}>
-                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
                   Check your inbox.
                 </Text>
               </FadeIn>
               <FadeIn delay={250} duration={650}>
-                <Text className="mb-12 max-w-sm text-center text-base leading-relaxed text-muted">
+                <Text className="mb-12 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
                   We sent a confirmation link to{" "}
-                  <Text className="font-semibold text-ink">{email}</Text>. Open
+                  <Text className="font-semibold text-ink dark:text-ink-dark">{email}</Text>. Open
                   the email and tap the link to finish signing in. Your existing
                   reflections will stay attached.
                 </Text>
               </FadeIn>
               <FadeIn delay={500} duration={500}>
                 <Pressable
-                  className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl"
+                  className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl"
                   onPress={() => router.push("/")}
                 >
                   <Text className="text-base font-medium tracking-wide text-white">
@@ -127,12 +127,12 @@ export default function SignIn() {
           ) : (
             <>
               <FadeIn delay={0} duration={650}>
-                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
                   Save your reflections
                 </Text>
               </FadeIn>
               <FadeIn delay={250} duration={650}>
-                <Text className="mb-10 max-w-sm text-center text-base leading-relaxed text-muted">
+                <Text className="mb-10 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
                   Add your email so your reflections follow you across devices.
                   We'll send you a confirmation link — no password to remember.
                 </Text>
@@ -150,7 +150,7 @@ export default function SignIn() {
                   onChangeText={setEmail}
                   onSubmitEditing={handleSendLink}
                   returnKeyType="send"
-                  className="w-72 rounded-full bg-surface px-6 py-4 text-center text-base text-ink"
+                  className="w-72 rounded-full bg-surface dark:bg-surface-dark px-6 py-4 text-center text-base text-ink dark:text-ink-dark"
                   style={{
                     shadowColor: "#2D2520",
                     shadowOpacity: 0.04,
@@ -166,13 +166,13 @@ export default function SignIn() {
                   onPress={handleSendLink}
                   className={`mt-6 rounded-full px-10 py-5 shadow-sm transition-all duration-300 ${
                     valid && !sending
-                      ? "bg-accent hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
-                      : "bg-ink/10"
+                      ? "bg-accent dark:bg-accent-dark hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+                      : "bg-ink/10 dark:bg-ink-dark/10"
                   }`}
                 >
                   <Text
                     className={`text-base font-medium tracking-wide ${
-                      valid && !sending ? "text-white" : "text-muted"
+                      valid && !sending ? "text-white" : "text-muted dark:text-muted-dark"
                     }`}
                   >
                     {sending ? "Sending…" : "Send link"}
@@ -182,7 +182,7 @@ export default function SignIn() {
 
               {error && (
                 <FadeIn delay={0} duration={400}>
-                  <Text className="mt-4 max-w-sm text-center text-xs text-muted">
+                  <Text className="mt-4 max-w-sm text-center text-xs text-muted dark:text-muted-dark">
                     {error}
                   </Text>
                 </FadeIn>

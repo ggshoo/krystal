@@ -53,7 +53,7 @@ export function CheckInStep({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <View className="flex-1 px-6 pt-10">
         <FadeIn delay={0}>
           <View className="mb-12 flex-row justify-center gap-2">
@@ -61,7 +61,7 @@ export function CheckInStep({
               <View
                 key={i}
                 className={`h-1.5 w-10 rounded-full ${
-                  i <= step ? "bg-accent" : "bg-ink/10"
+                  i <= step ? "bg-accent dark:bg-accent-dark" : "bg-ink/10 dark:bg-ink-dark/15"
                 }`}
               />
             ))}
@@ -70,14 +70,14 @@ export function CheckInStep({
 
         {/* HERO label — Mind / Body / Heart */}
         <FadeIn delay={150}>
-          <Text className="mb-5 text-center text-6xl font-semibold tracking-tight text-ink">
+          <Text className="mb-5 text-center text-6xl font-semibold tracking-tight text-ink dark:text-ink-dark">
             {label}
           </Text>
         </FadeIn>
 
         {/* Sub-question with bolded key word passed as JSX */}
         <FadeIn delay={350}>
-          <Text className="mb-16 text-center text-xl leading-relaxed text-muted">
+          <Text className="mb-16 text-center text-xl leading-relaxed text-muted dark:text-muted-dark">
             {question}
           </Text>
         </FadeIn>
@@ -95,15 +95,15 @@ export function CheckInStep({
                   onPress={() => handleSelect(n)}
                   className={`h-11 w-11 items-center justify-center rounded-full border transition-all duration-300 ${
                     selected
-                      ? "scale-125 border-accent bg-accent shadow-lg"
-                      : "border-ink/15 bg-cream hover:scale-125 hover:border-accent/60 hover:bg-accent/10 hover:shadow-md active:scale-95 active:bg-ink/5"
+                      ? "scale-125 border-accent dark:border-accent-dark bg-accent dark:bg-accent-dark shadow-lg"
+                      : "border-ink/15 dark:border-ink-dark/20 bg-cream dark:bg-cream-dark hover:scale-125 hover:border-accent/60 hover:bg-accent/10 hover:shadow-md active:scale-95 active:bg-ink/5"
                   }`}
                 >
                   <Text
                     className={
                       selected
                         ? "text-base font-semibold text-white"
-                        : "text-base text-muted"
+                        : "text-base text-muted dark:text-muted-dark"
                     }
                   >
                     {n}
@@ -117,16 +117,16 @@ export function CheckInStep({
         <FadeIn delay={700}>
           <View className="mt-4 flex-row justify-between gap-6">
             <View className="flex-1">
-              <Text className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted">
+              <Text className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                 Low
               </Text>
-              <Text className="text-sm leading-relaxed text-muted">{low}</Text>
+              <Text className="text-sm leading-relaxed text-muted dark:text-muted-dark">{low}</Text>
             </View>
             <View className="flex-1">
-              <Text className="mb-1 text-right text-[10px] font-semibold uppercase tracking-widest text-muted">
+              <Text className="mb-1 text-right text-[10px] font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                 High
               </Text>
-              <Text className="text-right text-sm leading-relaxed text-muted">
+              <Text className="text-right text-sm leading-relaxed text-muted dark:text-muted-dark">
                 {high}
               </Text>
             </View>

@@ -168,12 +168,12 @@ export default function Done() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <View className="flex-1 items-center justify-center px-8">
         {state === "saving" && (
           <>
             <ActivityIndicator size="large" color={primary?.color ?? "#C2876B"} />
-            <Text className="mt-6 text-base text-muted">
+            <Text className="mt-6 text-base text-muted dark:text-muted-dark">
               Saving your reflection…
             </Text>
           </>
@@ -196,14 +196,14 @@ export default function Done() {
                     className="mb-3 h-3 w-3 rounded-full"
                     style={{ backgroundColor: primary.color }}
                   />
-                  <Text className="text-xs font-semibold uppercase tracking-widest text-muted">
+                  <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                     {primary.name} · {secondary?.name}
                   </Text>
-                  <Text className="mt-2 text-4xl font-semibold capitalize text-ink">
+                  <Text className="mt-2 text-4xl font-semibold capitalize text-ink dark:text-ink-dark">
                     {tertiary?.name}
                   </Text>
                   {draft.plutchik_emotion && (
-                    <Text className="mt-3 text-base capitalize text-muted">
+                    <Text className="mt-3 text-base capitalize text-muted dark:text-muted-dark">
                       a feeling of {draft.plutchik_emotion}
                     </Text>
                   )}
@@ -212,13 +212,13 @@ export default function Done() {
             )}
 
             <FadeIn delay={250} duration={650}>
-              <Text className="mb-3 text-center text-lg font-normal tracking-wide text-muted/70">
+              <Text className="mb-3 text-center text-lg font-normal tracking-wide text-muted/70 dark:text-muted-dark/70">
                 saved.
               </Text>
             </FadeIn>
 
             <FadeIn delay={400} duration={650}>
-              <Text className="mb-16 text-center text-base leading-relaxed text-muted">
+              <Text className="mb-16 text-center text-base leading-relaxed text-muted dark:text-muted-dark">
                 See you tomorrow.
               </Text>
             </FadeIn>
@@ -226,7 +226,7 @@ export default function Done() {
             <FadeIn delay={650} duration={500}>
               <Pressable
                 accessibilityRole="button"
-                className="mb-3 rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+                className="mb-3 rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
                 onPress={() => router.push("/journal")}
               >
                 <Text className="text-base font-medium tracking-wide text-white">
@@ -241,7 +241,7 @@ export default function Done() {
                 className="px-4 py-2 transition-all duration-300 hover:opacity-70"
                 onPress={handleReturnHome}
               >
-                <Text className="text-sm text-muted underline">
+                <Text className="text-sm text-muted dark:text-muted-dark underline">
                   Return home
                 </Text>
               </Pressable>
@@ -251,15 +251,15 @@ export default function Done() {
 
         {state === "error" && (
           <>
-            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
+            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
               Couldn't save.
             </Text>
-            <Text className="mb-10 text-center text-sm leading-relaxed text-muted">
+            <Text className="mb-10 text-center text-sm leading-relaxed text-muted dark:text-muted-dark">
               {errorMsg}
             </Text>
             <Pressable
               accessibilityRole="button"
-              className="mb-4 rounded-full bg-accent px-10 py-5 shadow-sm active:opacity-70"
+              className="mb-4 rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm active:opacity-70"
               onPress={handleRetry}
             >
               <Text className="text-base font-medium tracking-wide text-white">
@@ -271,7 +271,7 @@ export default function Done() {
               className="px-4 py-2"
               onPress={handleReturnHome}
             >
-              <Text className="text-sm text-muted underline">
+              <Text className="text-sm text-muted dark:text-muted-dark underline">
                 Return home without saving
               </Text>
             </Pressable>

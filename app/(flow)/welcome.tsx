@@ -105,7 +105,7 @@ export default function Welcome() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-cream">
+      <SafeAreaView className="flex-1 items-center justify-center bg-cream dark:bg-cream-dark">
         <ActivityIndicator color="#C2876B" />
       </SafeAreaView>
     );
@@ -116,16 +116,16 @@ export default function Welcome() {
     const canSubmit = nameInput.trim().length > 0 && !saving;
 
     return (
-      <SafeAreaView className="flex-1 bg-cream">
+      <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           className="flex-1"
         >
           <View className="flex-1 items-center justify-center px-8">
-            <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+            <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
               Hi there.
             </Text>
-            <Text className="mb-12 text-center text-base leading-relaxed text-muted">
+            <Text className="mb-12 text-center text-base leading-relaxed text-muted dark:text-muted-dark">
               What should I call you?
             </Text>
 
@@ -137,7 +137,7 @@ export default function Welcome() {
               onChangeText={setNameInput}
               onSubmitEditing={handleSaveAndContinue}
               returnKeyType="done"
-              className="w-full rounded-full bg-surface px-6 py-4 text-center text-base text-ink"
+              className="w-full rounded-full bg-surface dark:bg-surface-dark px-6 py-4 text-center text-base text-ink dark:text-ink-dark"
               style={{
                 shadowColor: "#2D2520",
                 shadowOpacity: 0.04,
@@ -152,12 +152,12 @@ export default function Welcome() {
               disabled={!canSubmit}
               onPress={handleSaveAndContinue}
               className={`mt-8 rounded-full px-10 py-5 shadow-sm ${
-                canSubmit ? "bg-accent active:opacity-70" : "bg-ink/10"
+                canSubmit ? "bg-accent dark:bg-accent-dark active:opacity-70" : "bg-ink/10 dark:bg-ink-dark/10"
               }`}
             >
               <Text
                 className={`text-base font-medium tracking-wide ${
-                  canSubmit ? "text-white" : "text-muted"
+                  canSubmit ? "text-white" : "text-muted dark:text-muted-dark"
                 }`}
               >
                 Continue
@@ -171,15 +171,15 @@ export default function Welcome() {
 
   // ── Returning — personalized greeting ────────────────────────────────────
   return (
-    <SafeAreaView className="flex-1 bg-cream">
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark">
       <View className="flex-1 items-center justify-center px-8">
         <FadeIn delay={0} duration={650}>
-          <Text className="mb-4 text-center text-3xl font-semibold leading-snug tracking-tight text-ink">
+          <Text className="mb-4 text-center text-3xl font-semibold leading-snug tracking-tight text-ink dark:text-ink-dark">
             Hi {displayName},
           </Text>
         </FadeIn>
         <FadeIn delay={200} duration={650}>
-          <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted">
+          <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted dark:text-muted-dark">
             I hope you're doing well. Let's begin a mindfulness check-in.
           </Text>
         </FadeIn>
@@ -188,7 +188,7 @@ export default function Welcome() {
           <Pressable
             accessibilityRole="button"
             onPress={handleReady}
-            className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+            className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
           >
             <Text className="text-base font-medium tracking-wide text-white">
               Ready

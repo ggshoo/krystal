@@ -26,7 +26,7 @@ export default function PickSpecific() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -41,20 +41,20 @@ export default function PickSpecific() {
               className="mr-2 h-3 w-3 rounded-full"
               style={{ backgroundColor: primary.color }}
             />
-            <Text className="text-xs font-semibold uppercase tracking-widest text-muted">
+            <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
               {primary.name} · {secondary.name}
             </Text>
           </View>
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
+          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
             Closer to…
           </Text>
         </FadeIn>
 
         <FadeIn delay={160}>
-          <Text className="mb-10 text-base leading-relaxed text-muted">
+          <Text className="mb-10 text-base leading-relaxed text-muted dark:text-muted-dark">
             The word that fits best. There's no wrong answer.
           </Text>
         </FadeIn>
@@ -79,7 +79,7 @@ export default function PickSpecific() {
                   shadowOffset: { width: 0, height: 4 },
                 }}
               >
-                <Text className="text-xl font-medium capitalize text-ink">
+                <Text className="text-xl font-medium capitalize text-ink dark:text-ink-dark">
                   {t.name}
                 </Text>
               </Pressable>

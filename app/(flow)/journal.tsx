@@ -185,22 +185,22 @@ export default function JournalScreen() {
   // ── Saved confirmation ──────────────────────────────────────────────────
   if (state === "saved") {
     return (
-      <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+      <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
         <View className="flex-1 items-center justify-center px-8">
           <FadeIn delay={0} duration={650}>
-            <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink">
+            <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
               Journal saved.
             </Text>
           </FadeIn>
           <FadeIn delay={250} duration={650}>
-            <Text className="mb-16 max-w-sm text-center text-base leading-relaxed text-muted">
+            <Text className="mb-16 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
               Thank you for taking the time. See you tomorrow.
             </Text>
           </FadeIn>
           <FadeIn delay={500} duration={500}>
             <Pressable
               accessibilityRole="button"
-              className="rounded-full bg-accent px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+              className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
               onPress={handleReturnHome}
             >
               <Text className="text-base font-medium tracking-wide text-white">
@@ -215,7 +215,7 @@ export default function JournalScreen() {
 
   // ── Main journaling view ────────────────────────────────────────────────
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -244,7 +244,7 @@ export default function JournalScreen() {
                 </View>
               )}
               <View
-                className="flex-1 rounded-tile bg-surface p-5"
+                className="flex-1 rounded-tile bg-surface dark:bg-surface-dark p-5"
                 style={{
                   shadowColor: "#2D2520",
                   shadowOpacity: 0.04,
@@ -252,17 +252,17 @@ export default function JournalScreen() {
                   shadowOffset: { width: 0, height: 4 },
                 }}
               >
-                <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
+                <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                   Today's reflection
                 </Text>
               <View className="mb-3 flex-row gap-5">
-                <Text className="text-sm text-ink">
+                <Text className="text-sm text-ink dark:text-ink-dark">
                   <Text className="font-semibold">Mind</Text> {draft.mind_score}
                 </Text>
-                <Text className="text-sm text-ink">
+                <Text className="text-sm text-ink dark:text-ink-dark">
                   <Text className="font-semibold">Body</Text> {draft.body_score}
                 </Text>
-                <Text className="text-sm text-ink">
+                <Text className="text-sm text-ink dark:text-ink-dark">
                   <Text className="font-semibold">Heart</Text> {draft.heart_score}
                 </Text>
               </View>
@@ -271,13 +271,13 @@ export default function JournalScreen() {
                   className="mr-2 h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: themeColor }}
                 />
-                <Text className="text-sm capitalize text-muted">
+                <Text className="text-sm capitalize text-muted dark:text-muted-dark">
                   {primary?.name} → {secondary?.name} →{" "}
-                  <Text className="font-bold text-ink">{tertiary?.name}</Text>
+                  <Text className="font-bold text-ink dark:text-ink-dark">{tertiary?.name}</Text>
                   {draft.plutchik_emotion && (
                     <>
-                      <Text className="text-muted">; </Text>
-                      <Text className="font-bold text-ink">
+                      <Text className="text-muted dark:text-muted-dark">; </Text>
+                      <Text className="font-bold text-ink dark:text-ink-dark">
                         {draft.plutchik_emotion}
                       </Text>
                     </>
@@ -300,42 +300,42 @@ export default function JournalScreen() {
                   borderColor: themeColor + "33",
                 }}
               >
-                <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
-                  About <Text className="text-ink">{aboutLabel}</Text>
+                <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
+                  About <Text className="text-ink dark:text-ink-dark">{aboutLabel}</Text>
                 </Text>
 
                 <View className="mb-3">
-                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                     Similar words
                   </Text>
-                  <Text className="text-sm leading-relaxed text-ink">
+                  <Text className="text-sm leading-relaxed text-ink dark:text-ink-dark">
                     {content.similar_words.join(", ")}
                   </Text>
                 </View>
 
                 <View className="mb-3">
-                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                     Sensations
                   </Text>
-                  <Text className="text-sm leading-relaxed text-ink">
+                  <Text className="text-sm leading-relaxed text-ink dark:text-ink-dark">
                     {content.sensations}
                   </Text>
                 </View>
 
                 <View className="mb-3">
-                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                     What does it tell you?
                   </Text>
-                  <Text className="text-sm leading-relaxed text-ink">
+                  <Text className="text-sm leading-relaxed text-ink dark:text-ink-dark">
                     {content.what_it_tells_you}
                   </Text>
                 </View>
 
                 <View>
-                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  <Text className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
                     How does it help you?
                   </Text>
-                  <Text className="text-sm leading-relaxed text-ink">
+                  <Text className="text-sm leading-relaxed text-ink dark:text-ink-dark">
                     {content.how_it_helps_you}
                   </Text>
                 </View>
@@ -345,12 +345,12 @@ export default function JournalScreen() {
 
           {/* ── Header ── */}
           <FadeIn delay={240}>
-            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
+            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
               Reflect on it
             </Text>
           </FadeIn>
           <FadeIn delay={320}>
-            <Text className="mb-8 text-base leading-relaxed text-muted">
+            <Text className="mb-8 text-base leading-relaxed text-muted dark:text-muted-dark">
               Write as much or as little as you'd like. Any field can be left blank.
             </Text>
           </FadeIn>
@@ -410,7 +410,7 @@ export default function JournalScreen() {
               accessibilityRole="button"
               disabled={state === "saving"}
               onPress={handleSave}
-              className="mt-4 items-center rounded-full bg-accent py-5 shadow-sm transition-all duration-300 hover:scale-[1.05] hover:shadow-2xl active:opacity-70"
+              className="mt-4 items-center rounded-full bg-accent dark:bg-accent-dark py-5 shadow-sm transition-all duration-300 hover:scale-[1.05] hover:shadow-2xl active:opacity-70"
             >
               {state === "saving" ? (
                 <ActivityIndicator color="#FFFFFF" />
@@ -422,7 +422,7 @@ export default function JournalScreen() {
             </Pressable>
 
             {state === "error" && (
-              <Text className="mt-3 text-center text-xs text-muted">
+              <Text className="mt-3 text-center text-xs text-muted dark:text-muted-dark">
                 {errorMsg}
               </Text>
             )}
@@ -432,7 +432,7 @@ export default function JournalScreen() {
               onPress={handleReturnHome}
               className="mt-3 items-center px-4 py-2"
             >
-              <Text className="text-sm text-muted underline">
+              <Text className="text-sm text-muted dark:text-muted-dark underline">
                 Skip journal, return home
               </Text>
             </Pressable>
@@ -468,12 +468,12 @@ function Prompt({
         {hint ? (
           // Hint present → flip hierarchy: base label small/muted, hint big/bold
           <>
-            <Text className="mb-1 text-sm text-muted">{label}</Text>
-            <Text className="mb-3 text-lg font-semibold text-ink">{hint}</Text>
+            <Text className="mb-1 text-sm text-muted dark:text-muted-dark">{label}</Text>
+            <Text className="mb-3 text-lg font-semibold text-ink dark:text-ink-dark">{hint}</Text>
           </>
         ) : (
           // No hint → base label is the headline
-          <Text className="mb-2 text-base font-medium text-ink">{label}</Text>
+          <Text className="mb-2 text-base font-medium text-ink dark:text-ink-dark">{label}</Text>
         )}
         <TextInput
           multiline
@@ -483,7 +483,7 @@ function Prompt({
           placeholderTextColor="#B8AC9B"
           value={value ?? ""}
           onChangeText={onChange}
-          className="min-h-[80px] rounded-tile bg-surface px-4 py-3 text-base leading-relaxed text-ink"
+          className="min-h-[80px] rounded-tile bg-surface dark:bg-surface-dark px-4 py-3 text-base leading-relaxed text-ink dark:text-ink-dark"
           style={{
             shadowColor: "#2D2520",
             shadowOpacity: 0.03,

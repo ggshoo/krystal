@@ -139,10 +139,12 @@ export function GrapeCompanion({
   const cheekBright = "#FFB5C0";
   const cheekDeep = "#E07684";
 
-  const stemColor = "#5C6F4F";
-  const stemDark = "#3F4F36";
+  // Brown wooden stem (matches the reference's twiggy stalk look)
+  const stemColor = "#7A5A3C";
+  const stemDark = "#553D26";
+  // Two leaf shades — a brighter front leaf and a deeper back leaf
   const leafColor = "#7BAE7E";
-  const leafDark = "#5A8F5D";
+  const leafDark = "#4F8254";
 
   const mood = moodFromPrimary(emotionPrimary, plutchikEmotion);
 
@@ -238,23 +240,45 @@ export function GrapeCompanion({
             </RadialGradient>
           </Defs>
 
-          {/* Curly stem */}
+          {/* Brown twiggy stem — short upright stalk with a curly tendril */}
           <Path
-            d="M 50 18 Q 52 8 58 10"
+            d="M 50 20 L 50 8"
             stroke={`url(#${gid("stem")})`}
-            strokeWidth={2.8}
+            strokeWidth={3}
             fill="none"
             strokeLinecap="round"
           />
-          {/* Leaf */}
           <Path
-            d="M 58 10 Q 70 4 75 13 Q 67 17 58 10 Z"
+            d="M 50 10 Q 47 6 50 4"
+            stroke={`url(#${gid("stem")})`}
+            strokeWidth={2}
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* Back leaf — darker green, sits behind */}
+          <Path
+            d="M 50 12 Q 38 4 32 12 Q 38 18 50 14 Z"
+            fill={leafDark}
+            opacity={0.95}
+          />
+          <Path
+            d="M 36 11 Q 42 12 48 13"
+            stroke="#3A6B40"
+            strokeWidth={0.7}
+            fill="none"
+            opacity={0.6}
+          />
+
+          {/* Front leaf — brighter green, sits in front, points right */}
+          <Path
+            d="M 50 10 Q 64 2 72 11 Q 64 17 50 12 Z"
             fill={`url(#${gid("leaf")})`}
           />
           <Path
-            d="M 60 11 Q 67 12 72 14"
+            d="M 54 10 Q 62 11 68 13"
             stroke={leafDark}
-            strokeWidth={0.8}
+            strokeWidth={0.7}
             fill="none"
             opacity={0.5}
           />
@@ -300,11 +324,12 @@ export function GrapeCompanion({
           <Ellipse cx="50" cy="116" rx="42" ry="8" fill="#F5A0A8" opacity={0.15} />
 
           {renderBrows(mood, browColor)}
-          {renderEyes(mood, gid)}
+          {renderEyes(mood, gid, bodyColor)}
 
-          {/* Cheeks with gradient for soft falloff */}
-          <Ellipse cx="26" cy="92" rx="8" ry="4.5" fill={`url(#${gid("cheek")})`} opacity={mood === "happy" ? 1 : 0.85} />
-          <Ellipse cx="74" cy="92" rx="8" ry="4.5" fill={`url(#${gid("cheek")})`} opacity={mood === "happy" ? 1 : 0.85} />
+          {/* Cheeks with gradient for soft falloff — bright rosy by default,
+              fullest on happy. The default face needs that pleasant blush. */}
+          <Ellipse cx="26" cy="92" rx="8.5" ry="4.8" fill={`url(#${gid("cheek")})`} opacity={mood === "happy" || mood === "default" ? 1 : 0.85} />
+          <Ellipse cx="74" cy="92" rx="8.5" ry="4.8" fill={`url(#${gid("cheek")})`} opacity={mood === "happy" || mood === "default" ? 1 : 0.85} />
 
           {renderMouth(mood)}
           {mood === "sadness" && renderTear()}
@@ -375,24 +400,38 @@ function renderBrows(mood: Mood, color: string) {
     );
   }
   if (mood === "sadnessLow") {
-    // Subtle melancholy brows — very gentle, almost flat with slight outer-up
+    // Classic sad brow shape — gentle inverse arches: outer ends drop down,
+    // inner ends drop down, middle peaks slightly up. Soft, not dramatic.
     return (
       <>
-        <Path d="M 28 58 Q 36 61 44 60" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
-        <Path d="M 56 60 Q 64 61 72 58" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
+        <Path
+          d="M 26 62 Q 36 56 46 62"
+          stroke={color}
+          strokeWidth={W + 0.5}
+          fill="none"
+          strokeLinecap="round"
+        />
+        <Path
+          d="M 54 62 Q 64 56 74 62"
+          stroke={color}
+          strokeWidth={W + 0.5}
+          fill="none"
+          strokeLinecap="round"
+        />
       </>
     );
   }
+  // Default — pleasant, gently lifted brows (the always-friendly resting face)
   return (
     <>
-      <Path d="M 28 60 Q 36 56 44 60" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
-      <Path d="M 56 60 Q 64 56 72 60" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
+      <Path d="M 28 57 Q 36 53 44 57" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
+      <Path d="M 56 57 Q 64 53 72 57" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
     </>
   );
 }
 
 // ─── Eyes ───────────────────────────────────────────────────────────────────
-function renderEyes(mood: Mood, gid: (k: string) => string) {
+function renderEyes(mood: Mood, gid: (k: string) => string, bodyColor: string) {
   const eye = (cx: number, cy: number) => (
     <>
       {/* Pupil with gradient for shininess */}
@@ -481,61 +520,62 @@ function renderEyes(mood: Mood, gid: (k: string) => string) {
     );
   }
   if (mood === "sadnessLow") {
-    // Subtle melancholy — droopy upper lids covering top portion of eyes,
-    // big visible pupils below, with a soft wet shimmer welling at the
-    // bottom (no streaming tear, just glistening).
+    // Pensiveness — quiet melancholy. Big oval pupils with heavy droopy upper
+    // lids (covering ~40% of eye), and visible wet welling at the bottom
+    // (light blue with bright shimmer). No streaming tear — just glistening.
     return (
       <>
-        {eye(36, 76)}
-        {eye(64, 76)}
-        {/* Droopy upper lids — cover the top third of each eye */}
+        {/* Big oval pupils — slightly larger and slightly lower for sad look */}
+        <Ellipse cx={36} cy={78} rx={8.5} ry={9.5} fill={`url(#${gid("eye")})`} />
+        <Ellipse cx={64} cy={78} rx={8.5} ry={9.5} fill={`url(#${gid("eye")})`} />
+
+        {/* Pupil sparkles — main + secondary catchlights */}
+        <Circle cx={38.5} cy={75} r={3} fill="#FFFFFF" />
+        <Circle cx={66.5} cy={75} r={3} fill="#FFFFFF" />
+        <Circle cx={33} cy={80.5} r={1.3} fill="#FFFFFF" opacity={0.85} />
+        <Circle cx={61} cy={80.5} r={1.3} fill="#FFFFFF" opacity={0.85} />
+
+        {/* Heavy droopy upper lids — body-colored so they blend in */}
         <Path
-          d="M 26 68 Q 36 72 46 68 L 46 71 L 26 71 Z"
-          fill="#9D7BC4"
-          opacity={0.92}
+          d="M 26 70 Q 36 77 46 70 L 46 76 L 26 76 Z"
+          fill={bodyColor}
+          opacity={0.97}
         />
         <Path
-          d="M 54 68 Q 64 72 74 68 L 74 71 L 54 71 Z"
-          fill="#9D7BC4"
-          opacity={0.92}
+          d="M 54 70 Q 64 77 74 70 L 74 76 L 54 76 Z"
+          fill={bodyColor}
+          opacity={0.97}
         />
-        {/* Soft upper lid lines */}
+
+        {/* Darker lid lines for depth */}
         <Path
-          d="M 26 70 Q 36 73 46 70"
+          d="M 26 73 Q 36 78.5 46 73"
           stroke="#2D2520"
-          strokeWidth={1.3}
+          strokeWidth={2}
           fill="none"
           strokeLinecap="round"
-          opacity={0.5}
+          opacity={0.75}
         />
         <Path
-          d="M 54 70 Q 64 73 74 70"
+          d="M 54 73 Q 64 78.5 74 73"
           stroke="#2D2520"
-          strokeWidth={1.3}
+          strokeWidth={2}
           fill="none"
           strokeLinecap="round"
-          opacity={0.5}
+          opacity={0.75}
         />
-        {/* Wet shimmer in bottom of eyes (tears welling, not falling) */}
-        <Ellipse
-          cx={36}
-          cy={82}
-          rx={5}
-          ry={1.5}
-          fill="#7BCDEF"
-          opacity={0.45}
-        />
-        <Ellipse
-          cx={64}
-          cy={82}
-          rx={5}
-          ry={1.5}
-          fill="#7BCDEF"
-          opacity={0.45}
-        />
-        {/* Tiny extra highlight on the wet area */}
-        <Circle cx={37} cy={81} r={0.8} fill="#FFFFFF" opacity={0.9} />
-        <Circle cx={65} cy={81} r={0.8} fill="#FFFFFF" opacity={0.9} />
+
+        {/* Wet welling at bottom — pronounced light blue glimmer */}
+        <Ellipse cx={36} cy={85} rx={6.5} ry={2.8} fill="#A2D8F0" opacity={0.78} />
+        <Ellipse cx={64} cy={85} rx={6.5} ry={2.8} fill="#A2D8F0" opacity={0.78} />
+
+        {/* Bright shimmer highlight on the wet area */}
+        <Ellipse cx={36} cy={84.3} rx={4.2} ry={0.9} fill="#FFFFFF" opacity={0.9} />
+        <Ellipse cx={64} cy={84.3} rx={4.2} ry={0.9} fill="#FFFFFF" opacity={0.9} />
+
+        {/* Tiny extra sparkle on wet edge */}
+        <Circle cx={33} cy={86} r={0.7} fill="#FFFFFF" opacity={0.95} />
+        <Circle cx={61} cy={86} r={0.7} fill="#FFFFFF" opacity={0.95} />
       </>
     );
   }
@@ -605,5 +645,15 @@ function renderMouth(mood: Mood) {
       />
     );
   }
-  return <Path d="M 42 101 Q 50 106 58 101" stroke={STROKE} strokeWidth={2.8} fill="none" strokeLinecap="round" />;
+  // Default — small, pleasant closed smile. Slight upturn at the corners.
+  // Always friendly: the resting face you see before the user picks an emotion.
+  return (
+    <Path
+      d="M 42 101 Q 50 97 58 101"
+      stroke={STROKE}
+      strokeWidth={2.8}
+      fill="none"
+      strokeLinecap="round"
+    />
+  );
 }

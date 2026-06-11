@@ -26,7 +26,7 @@ export default function PickSecondary() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -41,20 +41,20 @@ export default function PickSecondary() {
               className="mr-2 h-3 w-3 rounded-full"
               style={{ backgroundColor: primary.color }}
             />
-            <Text className="text-xs font-semibold uppercase tracking-widest text-muted">
+            <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
               {primary.name}
             </Text>
           </View>
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink">
+          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
             Which kind?
           </Text>
         </FadeIn>
 
         <FadeIn delay={160}>
-          <Text className="mb-8 text-base leading-relaxed text-muted">
+          <Text className="mb-8 text-base leading-relaxed text-muted dark:text-muted-dark">
             Pick the one closest to what you're feeling.
           </Text>
         </FadeIn>
@@ -79,7 +79,7 @@ export default function PickSecondary() {
                   shadowOffset: { width: 0, height: 4 },
                 }}
               >
-                <Text className="text-xl font-medium capitalize text-ink">
+                <Text className="text-xl font-medium capitalize text-ink dark:text-ink-dark">
                   {s.name}
                 </Text>
               </Pressable>
