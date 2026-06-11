@@ -340,6 +340,10 @@ export function GrapeCompanion({
 }
 
 // ─── Brows ──────────────────────────────────────────────────────────────────
+// SVG coord reminder: Y increases DOWNWARD. So an "arched up" brow (raised
+// in surprise/joy) has its control point at SMALLER Y than its endpoints
+// (∩ shape). A "furrowed down" brow has control Y LARGER than endpoints
+// (∪ shape). This is the opposite of the mouth convention.
 function renderBrows(mood: Mood, color: string) {
   const W = 2;
 
@@ -421,27 +425,23 @@ function renderBrows(mood: Mood, color: string) {
       </>
     );
   }
-  // Default — pleasant, gently lifted brows (the always-friendly resting face)
-  return (
-    <>
-      <Path d="M 28 57 Q 36 53 44 57" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
-      <Path d="M 56 57 Q 64 53 72 57" stroke={color} strokeWidth={W} fill="none" strokeLinecap="round" />
-    </>
-  );
+  // Default — no brows. The reference's default face is brow-less; the
+  // pleasantness reads entirely from the eyes (big sparkly) and the smile.
+  return null;
 }
 
 // ─── Eyes ───────────────────────────────────────────────────────────────────
 function renderEyes(mood: Mood, gid: (k: string) => string, bodyColor: string) {
   const eye = (cx: number, cy: number) => (
     <>
-      {/* Pupil with gradient for shininess */}
-      <Ellipse cx={cx} cy={cy} rx={8} ry={9.5} fill={`url(#${gid("eye")})`} />
+      {/* Pupil with gradient for shininess — bigger for that big-eyed look */}
+      <Ellipse cx={cx} cy={cy} rx={9} ry={11} fill={`url(#${gid("eye")})`} />
       {/* Big sparkle highlight */}
-      <Circle cx={cx + 2.5} cy={cy - 3} r={3} fill="#FFFFFF" />
-      {/* Tiny secondary sparkle */}
-      <Circle cx={cx - 2.5} cy={cy + 3} r={1.4} fill="#FFFFFF" opacity={0.9} />
+      <Circle cx={cx + 3} cy={cy - 4} r={3.5} fill="#FFFFFF" />
+      {/* Secondary lower-left sparkle */}
+      <Circle cx={cx - 3} cy={cy + 4} r={1.8} fill="#FFFFFF" opacity={0.95} />
       {/* Catchlight rim */}
-      <Circle cx={cx + 2} cy={cy - 3} r={0.8} fill="#FFFFFF" />
+      <Circle cx={cx + 2.5} cy={cy - 4} r={1} fill="#FFFFFF" />
     </>
   );
 
@@ -645,13 +645,15 @@ function renderMouth(mood: Mood) {
       />
     );
   }
-  // Default — small, pleasant closed smile. Slight upturn at the corners.
-  // Always friendly: the resting face you see before the user picks an emotion.
+  // Default — clear gentle closed smile. Control point Y > endpoint Y, so
+  // the curve dips DOWN in the middle → smile (∪ shape).
+  // (Common pitfall: smaller Y = HIGHER on screen in SVG, so control Y less
+  // than endpoints curves UP = frown. Don't get this backwards.)
   return (
     <Path
-      d="M 42 101 Q 50 97 58 101"
+      d="M 40 100 Q 50 110 60 100"
       stroke={STROKE}
-      strokeWidth={2.8}
+      strokeWidth={3}
       fill="none"
       strokeLinecap="round"
     />
