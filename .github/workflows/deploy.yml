@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Hard timeout — if we're not done in 10 min, something's stuck
+    timeout-minutes: 10
+
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -21,22 +24,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      # Pull project config from Vercel (creates .vercel/project.json linking
-      # this repo to the existing krystal Vercel project).
-      - name: Pull Vercel config
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      # Vercel builds using the buildCommand in vercel.json (npx expo export
-      # --platform web). Build output goes to .vercel/output/.
-      - name: Build with Vercel
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      # Build the static web output ourselves. This avoids `vercel build`
+      # which has been hanging on Metro-related things in CI.
+      - name: Build web bundle
+        run: npx expo export --platform web
         env:
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
 
-      # Deploy the pre-built output from .vercel/output to the krystal project.
-      - name: Deploy
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # Vercel CLI automatically uses VERCEL_ORG_ID and VERCEL_PROJECT_ID
+      # env vars to know which project to deploy to — no .vercel/ folder
+      # needed, no risk of creating a new "dist" project.
+      - name: Deploy to Vercel
+        working-directory: ./dist
+        run: vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

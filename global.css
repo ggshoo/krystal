@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Grape companion float ────────────────────────────────────────────────
+   Subtle, occasional float. The grape sits still for the first 35% of the
+   cycle, drifts up gently between 35–55%, settles back, then idles. 9s
+   cycle, so movement happens roughly every 4–5 seconds and lasts ~2s. */
+@keyframes grape-float {
+  0%, 35% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-6px);
+  }
+  55% {
+    transform: translateY(-6px);
+  }
+  65%, 100% {
+    transform: translateY(0);
+  }
+}
+
+.grape-float {
+  animation: grape-float 9s ease-in-out infinite;
+}
+
+/* ── Special-message pop-in ───────────────────────────────────────────────
+   When the grape has something to say, the bubble fades up gently. */
+@keyframes grape-message-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.grape-message {
+  animation: grape-message-in 700ms ease-out both;
+}

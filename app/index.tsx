@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
+import { GrapeCompanion } from "@/components/GrapeCompanion";
 import {
   computeStreak,
   fetchAllEntries,
@@ -26,16 +27,46 @@ function pickGreeting(): string {
 }
 
 /**
- * Home screen.
+ * Decides whether the grape should "speak" today. Most days it stays quiet.
+ * Returns a string only on milestones; otherwise undefined → grape just sits.
+ */
+function specialGrapeMessage(
+  streak: number,
+  isReturning: boolean,
+  hasCheckinToday: boolean
+): string | undefined {
+  // First-time visit, just landed on the app
+  if (!isReturning) return "hi!";
+  // Milestone streaks (today's reflection done)
+  if (hasCheckinToday) {
+    if (streak === 3) return "three days. nice.";
+    if (streak === 7) return "a whole week!";
+    if (streak === 14) return "two weeks in.";
+    if (streak === 30) return "a month. wow.";
+    if (streak === 100) return "100 days.";
+  }
+  return undefined;
+}
+
+/**
+ * Home screen — minimal, focused.
  *
- * - **First-time visit (no entries)** → big "krystal" wordmark + tagline +
- *   "Begin reflection" CTA. This is the only place the full logo appears.
+ * Layout:
+ *   ┌──────────────────────────────────────────┐
+ *   │  [⌚ history]              [👤 account]  │
+ *   │                                          │
+ *   │            Greeting                      │
+ *   │            N days in a row               │
+ *   │                                          │
+ *   │            [Primary CTA]                 │
+ *   │            change today's emotions       │
+ *   │                                          │
+ *   │                                  🍇     │
+ *   └──────────────────────────────────────────┘
  *
- * - **Returning user** → smaller personalized greeting ("Hi, Gigi" with
- *   rotating phrasing) + streak count + same CTA stack.
- *
- * The randomized greeting is computed once per mount via useMemo so it
- * doesn't flicker on re-renders.
+ * Corner icons handle navigation (history + account) so the center stays
+ * focused on the primary action. The grape companion sits in the bottom-right
+ * corner and mirrors today's emotion (color + face).
  */
 export default function Home() {
   const router = useRouter();
@@ -46,7 +77,6 @@ export default function Home() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Pick one greeting for this mount so it doesn't reshuffle on re-render
   const greeting = useMemo(() => pickGreeting(), []);
 
   useEffect(() => {
@@ -78,7 +108,6 @@ export default function Home() {
 
   const streak = entries ? computeStreak(entries) : 0;
   const isReturning = (entries?.length ?? 0) > 0;
-
   const todaysEntry = entries?.[0];
   const isTodaysEntry = (() => {
     if (!todaysEntry) return false;
@@ -104,10 +133,56 @@ export default function Home() {
     ? () => router.push("/welcome")
     : () => router.push("/journal");
 
+  // Avatar initial (first letter of name) or generic
+  const avatarLetter =
+    displayName?.trim()[0]?.toUpperCase() ??
+    user?.email?.trim()[0]?.toUpperCase() ??
+    "?";
+
   return (
     <SafeAreaView className="flex-1 bg-cream">
+      {/* ── Top corners: history (left) + account (right) ── */}
+      <View className="absolute left-0 right-0 top-0 z-10 flex-row justify-between px-5 pt-3">
+        {/* History — only visible once today's journal is done */}
+        <View className="w-10">
+          {hasJournaledToday && (
+            <FadeIn delay={600} duration={500}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="View history"
+                onPress={() => router.push("/history")}
+                className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5"
+              >
+                <Text className="text-xl">⌚</Text>
+              </Pressable>
+            </FadeIn>
+          )}
+        </View>
+
+        {/* Account — always visible */}
+        <FadeIn delay={500} duration={500}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={isAnonymous ? "Sign in" : "Account"}
+            onPress={() => router.push("/sign-in")}
+            className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
+            style={{
+              backgroundColor: isAnonymous ? "#E8E0D3" : "#C2876B",
+            }}
+          >
+            <Text
+              className={`text-sm font-semibold ${
+                isAnonymous ? "text-muted" : "text-white"
+              }`}
+            >
+              {isAnonymous ? "?" : avatarLetter}
+            </Text>
+          </Pressable>
+        </FadeIn>
+      </View>
+
+      {/* ── Center column ── */}
       <View className="flex-1 items-center justify-center px-6">
-        {/* ── First-time splash: big krystal wordmark + tagline ── */}
         {!loading && !isReturning && (
           <>
             <FadeIn delay={0} duration={900}>
@@ -123,7 +198,6 @@ export default function Home() {
           </>
         )}
 
-        {/* ── Returning user: personalized greeting + streak ── */}
         {!loading && isReturning && (
           <>
             <FadeIn delay={0} duration={650}>
@@ -160,33 +234,6 @@ export default function Home() {
               </Pressable>
             </FadeIn>
 
-            {hasCheckinToday && todaysEntry?.emotion && (
-              <FadeIn delay={600} duration={500}>
-                <View className="mt-6 flex-row items-center">
-                  <View
-                    className="mr-2 h-2 w-2 rounded-full"
-                    style={{
-                      backgroundColor: todaysEntry.emotion.primary_color,
-                    }}
-                  />
-                  <Text className="text-xs capitalize text-muted">
-                    Today:{" "}
-                    <Text className="font-semibold text-ink">
-                      {todaysEntry.emotion.specific_name}
-                    </Text>
-                    {todaysEntry.plutchik_emotion && (
-                      <>
-                        {" · "}
-                        <Text className="font-semibold text-ink">
-                          {todaysEntry.plutchik_emotion}
-                        </Text>
-                      </>
-                    )}
-                  </Text>
-                </View>
-              </FadeIn>
-            )}
-
             {hasCheckinToday && (
               <FadeIn delay={700} duration={500}>
                 <Pressable
@@ -200,46 +247,21 @@ export default function Home() {
                 </Pressable>
               </FadeIn>
             )}
-
-            {hasJournaledToday && (
-              <FadeIn delay={780} duration={500}>
-                <Pressable
-                  accessibilityRole="button"
-                  className="mt-2 px-4 py-2 transition-all duration-300 hover:opacity-70"
-                  onPress={() => router.push("/history")}
-                >
-                  <Text className="text-sm text-muted underline">
-                    View history
-                  </Text>
-                </Pressable>
-              </FadeIn>
-            )}
-
-            <View className="mt-10">
-              {isAnonymous ? (
-                <FadeIn delay={860} duration={500}>
-                  <Pressable
-                    accessibilityRole="button"
-                    className="px-4 py-2 transition-all duration-300 hover:opacity-70"
-                    onPress={() => router.push("/sign-in")}
-                  >
-                    <Text className="text-xs text-muted underline">
-                      Save your reflections across devices
-                    </Text>
-                  </Pressable>
-                </FadeIn>
-              ) : (
-                <FadeIn delay={860} duration={500}>
-                  <Text className="text-xs text-muted">
-                    Signed in as{" "}
-                    <Text className="text-ink">{user?.email}</Text>
-                  </Text>
-                </FadeIn>
-              )}
-            </View>
           </>
         )}
       </View>
+
+      {/* ── Grape companion bottom-right ── */}
+      {!loading && (
+        <View className="absolute bottom-8 right-8">
+          <FadeIn delay={1000} duration={900}>
+            <GrapeCompanion
+              emotionPrimary={todaysEntry?.emotion?.primary_name?.toLowerCase()}
+              message={specialGrapeMessage(streak, isReturning, hasCheckinToday)}
+            />
+          </FadeIn>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
