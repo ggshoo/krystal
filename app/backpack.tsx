@@ -7,7 +7,10 @@ import { FadeIn } from "@/components/FadeIn";
 import { GrapeCompanion } from "@/components/GrapeCompanion";
 import { ITEMS, Item, nextUnlock } from "@/lib/inventory";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useInventoryStore } from "@/store/useInventoryStore";
+import {
+  useEquippedSlugs,
+  useInventoryStore,
+} from "@/store/useInventoryStore";
 
 /**
  * Backpack — the user's collection of earned items.
@@ -24,7 +27,7 @@ export default function Backpack() {
   const byId = useInventoryStore((s) => s.byId);
   const hydrate = useInventoryStore((s) => s.hydrate);
   const toggleEquipped = useInventoryStore((s) => s.toggleEquipped);
-  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
+  const equippedSlugs = useEquippedSlugs();
 
   useEffect(() => {
     if (user) void hydrate(user.id);

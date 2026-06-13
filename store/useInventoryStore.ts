@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { create } from "zustand";
 
 import { ITEMS, ItemSlug } from "@/lib/inventory";
@@ -123,3 +124,19 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
 
   reset: () => set({ byId: {}, hydrated: false }),
 }));
+
+/**
+ * Stable hook for the equipped item slugs. Always use this in components
+ * instead of `useInventoryStore(s => s.equippedSlugs())` — the latter
+ * returns a new array every render and triggers infinite re-renders.
+ */
+export function useEquippedSlugs(): ItemSlug[] {
+  const byId = useInventoryStore((s) => s.byId);
+  return useMemo(
+    () =>
+      (Object.values(byId).filter((r) => r?.equipped) as InventoryRow[]).map(
+        (r) => r.item_slug
+      ),
+    [byId]
+  );
+}

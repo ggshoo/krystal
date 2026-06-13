@@ -2,7 +2,7 @@ import { Stack, usePathname } from "expo-router";
 import { useColorScheme, View } from "react-native";
 
 import { GrapeCompanion } from "@/components/GrapeCompanion";
-import { useInventoryStore } from "@/store/useInventoryStore";
+import { useEquippedSlugs } from "@/store/useInventoryStore";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
@@ -21,7 +21,7 @@ import { useReflectionStore } from "@/store/useReflectionStore";
 export default function FlowLayout() {
   const pathname = usePathname();
   const draft = useReflectionStore((s) => s.draft);
-  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
+  const equippedSlugs = useEquippedSlugs();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 

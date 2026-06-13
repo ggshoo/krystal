@@ -20,7 +20,7 @@ import { getPlutchikLadder } from "@/lib/plutchik";
 import { getPlutchikContent } from "@/lib/plutchikContent";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useInventoryStore } from "@/store/useInventoryStore";
+import { useEquippedSlugs } from "@/store/useInventoryStore";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 type SaveState = "editing" | "saving" | "saved" | "error";
@@ -45,7 +45,7 @@ export default function JournalScreen() {
   const [state, setState] = useState<SaveState>("editing");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [resumeChecked, setResumeChecked] = useState(false);
-  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
+  const equippedSlugs = useEquippedSlugs();
 
   // If the user lands here in a fresh session (draft is empty) but has
   // already completed today's check-in, hydrate the draft from Supabase

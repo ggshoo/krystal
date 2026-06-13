@@ -11,7 +11,10 @@ import {
   HistoryEntry,
 } from "@/lib/history";
 import { GRAPE_UNLOCK_STREAK, nextUnlock } from "@/lib/inventory";
-import { useInventoryStore } from "@/store/useInventoryStore";
+import {
+  useEquippedSlugs,
+  useInventoryStore,
+} from "@/store/useInventoryStore";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -69,10 +72,9 @@ export default function Home() {
   // appears the moment the user crosses day 5).
   const hydrateInventory = useInventoryStore((s) => s.hydrate);
   const reconcileInventory = useInventoryStore((s) => s.reconcile);
-  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
-  const hasOwnedItems = useInventoryStore(
-    (s) => Object.keys(s.byId).length > 0
-  );
+  const inventoryById = useInventoryStore((s) => s.byId);
+  const equippedSlugs = useEquippedSlugs();
+  const hasOwnedItems = Object.keys(inventoryById).length > 0;
 
   useEffect(() => {
     if (!authInitialized) return;
