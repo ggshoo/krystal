@@ -5,7 +5,7 @@
 >
 > Every AI agent must read this file first and update it after meaningful work.
 
-**Last Updated By:** Claude (Cowork) · `Sonnet 4.6`
+**Last Updated By:** Claude (Cowork) · `Sonnet 4.6` (extended framework — AI Generalist + prompt library)
 **Last Updated Date:** 2026-06-12
 
 ---
@@ -189,6 +189,7 @@ Newest first. See `ai_context/session_log.md` for full history.
 
 | Date | Change | Files |
 |---|---|---|
+| 2026-06-12 | AI Generalist extension: prompt library (`ai_prompts.md`) + constitution-style START_HERE | `ai_context/ai_prompts.md`, `ai_context/START_HERE.md`, `ai_context/communication_protocol.md` |
 | 2026-06-12 | AI collaboration framework scaffolded (`ai_context/`, `.ai/`, this file) | `ai_context/*`, `.ai/*`, `README.md` |
 | 2026-06-12 | Fixed infinite re-render in inventory store. Added `useEquippedSlugs` memoized hook. | `store/useInventoryStore.ts`, all GrapeCompanion consumers |
 | 2026-06-12 | Backpack system built (Phase 2): migration, inventory store, backpack screen, hat SVG on grape | `supabase/007_inventory.sql`, `store/useInventoryStore.ts`, `app/backpack.tsx`, `components/GrapeCompanion.tsx`, `lib/inventory.ts` |

@@ -1,114 +1,192 @@
-# START HERE — AI Onboarding for Krystal
+# START HERE — AI Agent Constitution
 
-You are an AI coding assistant entering the Krystal project. **Read this file in full before doing anything else.** It will take you under two minutes.
+You are an AI coding assistant entering the Krystal project. Read this entire file before doing anything. It defines what is expected of you and what every other agent who came before or comes after will do.
+
+---
+
+## The Constitution
+
+These principles apply to every AI agent — Claude, Codex, ChatGPT, Cursor, Windsurf, Gemini, and any future agent. They are non-negotiable.
+
+### 1. Every AI agent is a generalist.
+
+You are responsible for **planning, architecture, coding, testing, documentation, debugging, and the handoff to the next AI**. Do not assume another agent will pick up any of these. You own all of it for the duration of your session.
+
+If you don't know how to do one of them, learn it from the docs in this repo, or ask the human. Do not defer it to the next agent.
+
+### 2. Read `current_state.md` before beginning work.
+
+`ai_context/current_state.md` is the source of truth. Any AI that starts work without reading it is operating on assumptions. Assumptions cause regressions.
+
+### 3. Update project memory before ending work.
+
+Before you log off, update these four files **without exception**:
+
+1. `ai_context/current_state.md`
+2. `ai_context/active_tasks.md`
+3. `ai_context/handoff.md`
+4. `ai_context/session_log.md`
+
+Project memory is the only thing that survives across sessions. Conversation memory does not. Treat the files as more important than this chat.
+
+### 4. Project memory is more important than conversation memory.
+
+The previous agent's conversation is gone. Yours will be gone too. The only persistent state is the repo. Write everything down. Write it for a competent stranger who has none of your context.
+
+### 5. Leave the project in a better state than you found it.
+
+If you noticed something broken, document it (`docs/known_issues.md`). If you fixed something undocumented, document the fix. If you discovered a useful pattern, capture it in the right doc. Small contributions to project memory compound.
+
+### 6. Document decisions, not just code changes.
+
+A line of code shows *what* changed. A decision record shows *why*. Future agents will need the why. When you make a non-obvious choice — a tradeoff, a library pick, a refactor direction — write it in `docs/DECISIONS.md` as a new ADR. When you defer a decision, write it in `ai_context/current_state.md → Open Decisions` so the next agent doesn't quietly make it for you.
+
+### 7. Assume future AI agents know nothing about prior conversations.
+
+This is the most important principle. Every prompt you write to the next agent must be self-contained. Every handoff note must include file paths, exact commands, and the "why" behind decisions. If your note assumes the next AI remembers something from a chat — your note is broken.
 
 ---
 
 ## What this project is
 
-Krystal is a daily emotional reflection app (Expo + React Native + Supabase, deployed as web to Vercel). One human owner: Gigi Hsu. Live at https://krystal-one.vercel.app.
+Krystal — a daily emotional reflection web/mobile app. Expo + React Native + TypeScript + Supabase, deployed as web to Vercel. Live at https://krystal-one.vercel.app. One human owner: Gigi Hsu.
 
-## What to read, in this order
+Full project summary in `ai_context/current_state.md → Project Summary`.
 
-1. **`ai_context/current_state.md`** — the source of truth. Everything else exists to support this. **If anything contradicts it, this file wins.**
-2. **`ai_context/handoff.md`** — what the previous AI was working on and what to do next.
-3. **`ai_context/active_tasks.md`** — the prioritized backlog.
-4. **`docs/ARCHITECTURE.md`** — folder map, data model, key flows. Read on demand when you touch unfamiliar code.
+---
 
-You can stop reading after step 1 + 2 if your task is small. Read deeper as needed.
+## Read order at session start
 
-## Source of truth
+| Order | File | Time | Why |
+|---|---|---|---|
+| 1 | This file (`START_HERE.md`) | 2 min | The constitution |
+| 2 | `ai_context/current_state.md` | 3 min | Source of truth |
+| 3 | `ai_context/handoff.md` | 1 min | Previous AI's notes |
+| 4 | `ai_context/active_tasks.md` | 1 min | Prioritized backlog |
+| On demand | `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, `ai_context/glossary.md`, `docs/known_issues.md` | varies | When you need them |
 
-The single canonical state file is:
+Steps 1–3 are mandatory. Step 4 is mandatory if you intend to do work.
 
-```
-ai_context/current_state.md
-```
-
-Treat it as **higher priority than any other documentation in the repo**. If `README.md`, `STATUS.md`, `LOVABLE.md`, or anything in `docs/` contradicts `current_state.md`, the state file is correct — note the discrepancy in your session log and surface it to the human owner.
-
-## Current priorities (snapshot)
-
-These shift over time. Always re-check `current_state.md → Current Priorities` for the live version. As of this writing:
-
-1. Push pending local commits (backpack system, day-2 grape unlock, mobile rating fix, infinite-re-render fix).
-2. Run Supabase migration `007_inventory.sql` so the hat/backpack functions.
-3. Resolve open streak-rule decision (`D-001`).
-4. Refactor `GrapeCompanion.tsx` to PNG hybrid once Gigi delivers AI-generated assets.
+---
 
 ## Coding standards
 
-- **TypeScript strict mode.** All new code must compile under `npx tsc --noEmit` with no new errors (two pre-existing warnings in `EmotionWheel.tsx` are tolerated).
-- **NativeWind 4 utility classes** for styling. Use existing tokens (`bg-cream`, `text-ink`, `text-muted`, `bg-accent`, `bg-surface`) plus their `dark:` variants. New colors go in `tailwind.config.js`.
-- **Zustand stores** under `store/`. Never select a method that returns a fresh array — it causes infinite re-renders. Use `byId`-style stable selectors + `useMemo` derivations or dedicated hooks (see `useEquippedSlugs` for the canonical pattern).
+- **TypeScript strict mode.** Run `npx tsc --noEmit` before pushing. Tolerated pre-existing errors: 2 warnings in `components/EmotionWheel.tsx` only.
+- **NativeWind 4 utility classes** for styling. Existing tokens (`bg-cream`, `text-ink`, `text-muted`, `bg-accent`, `bg-surface`) + their `dark:` variants. Add new tokens to `tailwind.config.js`.
+- **Zustand stores** under `store/`. Never select a method that returns a fresh array — causes infinite re-renders. Use `byId`-style stable selectors + `useMemo` derivations. Canonical example: `useEquippedSlugs` in `store/useInventoryStore.ts`.
 - **Expo Router** for navigation. Routes are file-system based under `app/`.
 - **Supabase RLS** on every user-owned table. Every new table needs a migration in `supabase/00N_*.sql` with policies.
-- **Comments**: write WHY, not WHAT. Code shows what. Comments earn their keep by explaining tradeoffs, constraints, and non-obvious decisions.
-- **No emojis in committed code** unless the human asks (the cream/ink palette is the visual language). Lowercase, lowercase, lowercase in copy.
+- **Comments explain WHY, not WHAT.** The code shows what. Earn the comment with tradeoffs, constraints, and non-obvious decisions.
+- **No emojis in committed code** unless the human asks.
+- **Lowercase copy.** The product voice is lowercase, soft, conversational.
+
+---
 
 ## Testing expectations
 
-- This project has no automated test suite (yet). The verification path is: `npx tsc --noEmit` → visual smoke test in browser at `localhost:8081` (web build) or Expo Go on phone → push → Vercel auto-deploys → human verifies on krystal-one.vercel.app.
-- For meaningful changes, run `npx tsc --noEmit` and confirm output is clean (or only contains the two pre-existing `EmotionWheel.tsx` warnings).
-- When you change SVG geometry or any visual component, render it inline in chat using the `show_widget` tool (if available) so the human can review before pushing.
-- Don't push for the human. Tell her the exact `git add . && git commit -m "..." && git push` command; she runs it.
+- No automated test suite (acknowledged tech debt — `D-001` in `docs/known_issues.md`).
+- Verification path: `npx tsc --noEmit` → visual smoke test in browser or Expo Go → push → Vercel auto-deploys → human verifies on live site.
+- For visual changes, render inline in chat using `show_widget` (if available) before pushing.
+- For SVG changes, double-check Y-axis math: Y increases downward, smile = control Y *larger* than endpoint Y. (We've shipped a frown thinking it was a smile. Don't be that agent.)
 
-## Handoff process
+---
 
-Before ending your session you **must** update these four files. No exceptions.
+## Handoff process (end of session)
 
-1. **`ai_context/current_state.md`** — bump timestamp, move new work into "Features Complete" or "In Progress", add to "Recent Changes" table.
-2. **`ai_context/active_tasks.md`** — mark tasks done, add discovered tasks, reorder priorities if applicable.
-3. **`ai_context/handoff.md`** — overwrite with what you were doing, current branch, blockers, and explicit "next steps for the next AI".
-4. **`ai_context/session_log.md`** — append a new dated entry summarizing the session. Don't delete prior entries.
+This is non-negotiable. Before logging off, do all four:
 
-If you skip these updates, the next agent loses context and the user pays for re-discovery. Don't skip.
+### 1. Update `ai_context/current_state.md`
 
-## How agents communicate via the repo
+- Bump `Last Updated By` and `Last Updated Date` at the top.
+- Move new work into "Features Complete" or "Features In Progress".
+- Add a row to the top of "Recent Changes" (keep last 10 — older rows move to `session_log.md`).
+- If you introduced a tradeoff requiring human decision, add it to "Open Decisions" as `D-NNN`.
 
-Full protocol in `ai_context/communication_protocol.md`. The two-line summary:
+### 2. Update `ai_context/active_tasks.md`
 
-- **Read** `current_state.md` + `handoff.md` first.
-- **Write** to `current_state.md` (state changes), `handoff.md` (next-AI instructions), `active_tasks.md` (backlog), and `session_log.md` (append-only history).
+- Mark completed tasks (move to `session_log.md`).
+- Add discovered tasks in the right priority bucket.
+- Reorder if priorities shifted.
+
+### 3. Overwrite `ai_context/handoff.md`
+
+- This file is overwritten each session — the audit trail lives in `session_log.md`.
+- Use the existing structure.
+- Include file paths, exact commands, blockers, gotchas.
+- Write for a competent stranger.
+
+### 4. Append to `ai_context/session_log.md`
+
+- Newest entry at the top.
+- Use the template at the bottom of the file.
+- Append-only — never delete prior entries.
+
+If you don't have time for all four, minimum: `current_state.md` + `handoff.md`. The other two can be partially reconstructed; the state file cannot.
+
+---
+
+## Prompt library
+
+`ai_context/ai_prompts.md` contains standardized prompts the human uses to instruct AI agents. Common ones:
+
+| Prompt | When the human uses it |
+|---|---|
+| Standard Project Kickoff | New AI session on this project |
+| Fresh AI Takeover | Switching from one AI system to another |
+| Emergency Handoff | About to lose context |
+| Continue Working | Most common — just "continue" |
+| Review and Audit | Wants a critique, not new code |
+| Project Recovery | Project state is unclear, needs rebuild |
+
+You should recognize these patterns even when the human paraphrases. If the human says "continue", treat it as the Continue Working prompt — read project memory, pick up the highest-priority task.
+
+---
 
 ## What NOT to do
 
-- Don't push code, run trades, or change Supabase row-level security policies on the human's behalf without explicit per-session permission.
-- Don't edit `LOVABLE.md` or `STATUS.md` — those are historical/archival.
-- Don't introduce a second source of truth file. If `current_state.md` is missing a section you need, add it to `current_state.md`, not somewhere else.
+- Don't push code, run trades, or change Supabase RLS on the human's behalf without explicit per-session permission. Provide the commands; she runs them.
+- Don't edit `LOVABLE.md` or `STATUS.md` — those are marked archival.
+- Don't create a second source-of-truth file (`status.md`, `progress.md`, `notes.md` — all forbidden). If `current_state.md` is missing a section you need, add it there.
 - Don't silently fix things you noticed but weren't asked about. Log them in `docs/known_issues.md` and surface to the human.
-- Don't generate large unsolicited refactors. This project values incremental, reversible changes.
+- Don't generate unsolicited large refactors. Incremental, reversible changes.
+- Don't quote prior conversations in your handoff. Conversations are gone. Write to the file.
+
+---
 
 ## Quick map of important files
 
 ```
-ai_context/
-  current_state.md           ⭐ source of truth — read first
-  START_HERE.md              you are here
-  handoff.md                 last AI's notes for the next
-  active_tasks.md            prioritized backlog
-  session_log.md             historical record
-  communication_protocol.md  how agents collaborate via repo
-  glossary.md                vocabulary (Roberts wheel, Plutchik, etc.)
+ai_context/                            ← persistent project memory
+  START_HERE.md                        the constitution (this file)
+  current_state.md                     ⭐ source of truth — read first
+  handoff.md                           previous AI's notes for the next
+  active_tasks.md                      prioritized backlog
+  session_log.md                       historical record (append-only)
+  ai_prompts.md                        prompt library
+  communication_protocol.md            how agents collaborate via repo
+  glossary.md                          project vocabulary
 
-docs/
-  ARCHITECTURE.md            folder map, data model, flows
-  PRD.md                     product requirements
-  DECISIONS.md               historical decisions log (ADRs)
-  technical_decisions.md     symlink-style pointer to DECISIONS.md
-  ROADMAP.md                 phased build plan (lightly stale)
-  known_issues.md            bugs + tech debt
+docs/                                  ← human-facing docs
+  ARCHITECTURE.md                      system shape, folder map, data model
+  PRD.md                               product requirements
+  DECISIONS.md                         ADR log (append-only)
+  technical_decisions.md               pointer at DECISIONS.md
+  ROADMAP.md                           phased build plan (lightly stale)
+  known_issues.md                      bugs, tech debt, opportunities
+  grape_image_prompts.md               AI-image generation playbook
 
-.ai/
-  skills/                    Claude Code skills for this project
-  hooks/                     hook documentation
-  workflows/                 named multi-step workflows
+.ai/                                   ← AI runtime config
+  skills/                              named procedures (context-load, session-end, ship)
+  hooks/                               event triggers (on-session-start, on-session-end, …)
+  workflows/                           multi-step plays (new-feature, add-reward-item, emergency-rollback)
 
-app/                         Expo Router screens
-components/                  shared React components
-store/                       Zustand stores
-lib/                         pure utility modules (no JSX)
-supabase/                    SQL migrations
+app/                                   Expo Router screens
+components/                            shared React components
+store/                                 Zustand stores
+lib/                                   pure utility modules (no JSX)
+supabase/                              SQL migrations
 ```
 
-Welcome. Be useful, leave the repo cleaner than you found it, and write your handoff before you log off.
+---
+
+Welcome. Read `current_state.md` next, then `handoff.md`. Make yourself useful. Write your handoff before you log off.

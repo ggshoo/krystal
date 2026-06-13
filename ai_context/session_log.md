@@ -6,6 +6,29 @@ Each entry should answer: what changed, what was decided, what's left.
 
 ---
 
+## 2026-06-12 · AI Generalist framework extension
+
+**Agent:** Claude (Cowork) · `Sonnet 4.6`
+**Branch:** `main`
+
+### Completed
+- Created `ai_context/ai_prompts.md` with 6 standardized prompts (Kickoff, Takeover, Emergency Handoff, Continue, Audit, Recovery).
+- Rewrote `ai_context/START_HERE.md` as a 7-principle constitution: every AI is a generalist, project memory beats conversation memory, write for a competent stranger.
+- Updated `ai_context/communication_protocol.md` to add `ai_prompts.md` to the file role table.
+- Added `Prompt library` section to `START_HERE.md` so agents recognize prompt patterns even when the human paraphrases.
+
+### Decisions made
+- The protocol now explicitly treats prompt templates as part of the agent infrastructure, not just documentation.
+- The constitution principles are listed in `START_HERE.md` as non-negotiable for all agents (Claude / Codex / ChatGPT / Cursor / Windsurf / Gemini).
+
+### Open at log-off
+- Same as previous entry: T-001 (push pending), T-002 (migration), T-003 (streak rule), T-005 (PNG assets).
+
+### Notable
+- The "Continue Working" prompt is intentionally one word. If an agent doesn't behave correctly on a bare "continue", the constitution wasn't loaded and the human should re-invoke the Kickoff prompt.
+
+---
+
 ## 2026-06-12 · AI collaboration framework + backpack system + bug fixes
 
 **Agent:** Claude (Cowork) · `Sonnet 4.6`

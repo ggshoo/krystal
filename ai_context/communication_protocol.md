@@ -59,6 +59,7 @@ If you don't have time to do all four, at minimum do `current_state.md` + `hando
 | `ai_context/active_tasks.md` | Backlog | Every session | Every session | Edit in place |
 | `ai_context/session_log.md` | Historical record | On demand | Every session | Append-only |
 | `ai_context/communication_protocol.md` | This file | First session only | Rarely | When protocol itself changes |
+| `ai_context/ai_prompts.md` | Prompt library for the human | First session only | When you add a new prompt template | Stable; copy-paste ready |
 | `ai_context/glossary.md` | Vocabulary | On demand | When you introduce new terms | Append-only |
 | `docs/ARCHITECTURE.md` | System reference | When touching unfamiliar code | When architecture changes | Authoritative for system shape |
 | `docs/PRD.md` | Product reqs | When scope questions arise | When product changes | Authoritative for product |
