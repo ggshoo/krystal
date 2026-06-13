@@ -1,25 +1,38 @@
 # Krystal
 
-A mobile app for cultivating emotional clarity through guided reflection.
+A daily emotional reflection app — mind/body/heart check-in, emotion identification via the Roberts wheel, intensity laddering via Plutchik, optional journaling, and a streak-based relationship with a grape companion character.
 
-## What this is
+**Live:** https://krystal-one.vercel.app
 
-Krystal guides a daily emotional reflection practice: grounding → mind-body-heart check-in → emotion identification → emotion understanding → guided journaling → pattern discovery over time.
+## For AI agents entering this project
 
-## Docs
+Start here:
 
-- [Product Requirements](./docs/PRD.md) — what we're building and why
+1. **`ai_context/START_HERE.md`** — onboarding for any AI assistant
+2. **`ai_context/current_state.md`** — ⭐ source of truth, mandatory read
+3. **`ai_context/handoff.md`** — what the previous agent was doing
+
+Multi-AI collaboration protocol: see `ai_context/communication_protocol.md`.
+
+## For humans
+
+Docs:
+- [Current state](./ai_context/current_state.md) — what's done, what's in progress, what's open
+- [Product Requirements](./docs/PRD.md)
 - [Architecture](./docs/ARCHITECTURE.md) — folder structure, data flow, schema
 - [Roadmap](./docs/ROADMAP.md) — phased build plan
-- [Decisions log](./docs/DECISIONS.md) — append-only record of choices
+- [Decisions log](./docs/DECISIONS.md) — ADRs
+- [Known issues](./docs/known_issues.md) — bugs + tech debt
+- [Grape image prompts](./docs/grape_image_prompts.md) — for generating AI grape assets
 
 ## Stack
 
-- **App:** Expo SDK 54 · React Native · TypeScript · Expo Router (file-based routing)
-- **Styling:** NativeWind 4 (Tailwind for React Native)
+- **App:** Expo SDK 54 · React Native · TypeScript · Expo Router
+- **Styling:** NativeWind 4 (Tailwind for RN), dark mode via media query
 - **State:** Zustand
-- **Backend:** Supabase (Postgres + Auth + Row Level Security)
-- **Analytics:** PostHog (wired up in a later phase)
+- **Backend:** Supabase (Postgres + Auth + RLS)
+- **Deploy:** GitHub Actions → Vercel (web build)
+- **Analytics:** PostHog (planned)
 
 ## Getting started
 
@@ -34,33 +47,58 @@ cp .env.example .env
 npx expo start
 ```
 
-Scan the QR code with the **Expo Go** app on your phone.
+Scan the QR with the **Expo Go** app on your phone, or press `w` for web.
 
 ## Project structure
 
 ```
 krystal/
-├── app/                  # Expo Router screens (file-based routing)
-│   ├── _layout.tsx       # Root layout — providers, theme, status bar
-│   └── index.tsx         # Home screen
-├── components/           # Reusable UI components
-├── lib/
-│   └── supabase.ts       # Supabase client + auth config
-├── store/
-│   └── useReflectionStore.ts  # Daily reflection draft state
-├── docs/                 # Product docs (Phase 2)
-└── supabase/             # SQL migrations (Phase 3)
+├── ai_context/           # AI memory + multi-agent collaboration
+│   ├── current_state.md  # ⭐ source of truth
+│   ├── START_HERE.md     # onboarding
+│   ├── handoff.md        # inter-AI notes
+│   ├── active_tasks.md   # prioritized backlog
+│   ├── session_log.md    # historical record
+│   ├── communication_protocol.md
+│   └── glossary.md
+├── .ai/                  # AI runtime config
+│   ├── skills/           # named procedures
+│   ├── hooks/            # event triggers
+│   └── workflows/        # multi-step plays
+├── app/                  # Expo Router screens
+│   ├── _layout.tsx       # root layout, providers, theme
+│   ├── index.tsx         # home
+│   ├── history.tsx
+│   ├── backpack.tsx      # earned-items inventory
+│   ├── sign-in.tsx
+│   └── (flow)/           # reflection flow (welcome → check-in → wheel → done → journal)
+├── components/           # shared UI (GrapeCompanion, FadeIn, CheckInStep, EmotionWheel)
+├── lib/                  # pure utility modules (no JSX)
+│   ├── supabase.ts
+│   ├── emotions.ts
+│   ├── history.ts
+│   ├── inventory.ts
+│   ├── plutchik.ts
+│   └── plutchikContent.ts
+├── store/                # Zustand stores
+│   ├── useAuthStore.ts
+│   ├── useReflectionStore.ts
+│   └── useInventoryStore.ts
+├── supabase/             # SQL migrations
+├── docs/                 # human-facing documentation
+└── assets/               # images, including grape PNGs (planned)
 ```
 
-## Build phases
+## Deploying
 
-- [x] **Phase 1** — Bootstrap
-- [x] **Phase 2** — Architecture docs (PRD, ARCHITECTURE, ROADMAP)
-- [ ] **Phase 3** — Supabase schema + RLS
-- [ ] **Phase 4** — Emotion taxonomy
-- [ ] **Phase 5** — Daily reflection screens
-- [ ] **Phase 6** — Auth, persistence, insights
-- [ ] **Phase 7** — Ship to TestFlight
+```bash
+rm -f ~/code/krystal/.git/index.lock
+git add . && git commit -m "feat: ..." && git push
+```
+
+GitHub Actions builds and deploys to Vercel on push to `main`. Wait ~2 min, then hard-refresh https://krystal-one.vercel.app with Cmd+Shift+R.
+
+Migrations in `supabase/00N_*.sql` must be run manually in the Supabase SQL editor before any code that depends on them goes live.
 
 ## License
 

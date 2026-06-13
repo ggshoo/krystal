@@ -1,8 +1,10 @@
 # Where I am with krystal
 
+> **ARCHIVAL — frozen 2026-06-12.** This file is superseded by [`ai_context/current_state.md`](./ai_context/current_state.md). The new file is the source of truth. Do not update this file. Read it only for historical context.
+
 A living snapshot so any future session can pick up. Update this as things change.
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-02 (frozen — see `ai_context/current_state.md` for live state)
 
 ## The big picture
 

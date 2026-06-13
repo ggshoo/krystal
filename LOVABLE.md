@@ -1,5 +1,7 @@
 # Krystal — Migration to Lovable
 
+> **ARCHIVAL — historical reference only.** This file documented a one-time exploration of migrating Krystal to the Lovable platform. The project stayed in Expo. The Supabase data model + emotion taxonomy described here are still accurate and useful as reference. The Lovable-specific instructions are obsolete. Live project state is in [`ai_context/current_state.md`](./ai_context/current_state.md).
+
 **Purpose of this doc:** everything you need to rebuild Krystal in Lovable. Self-contained — you should never need to open another file in this repo to use it. Paste the relevant sections into Lovable as prompts.
 
 ---
