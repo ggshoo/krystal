@@ -196,7 +196,7 @@ function EntryCard({
             value={entry.journal.what_is_life_giving}
           />
           <JournalRow
-            label="What do you need?"
+            label="What can you do, in your control, to provide what you need right now?"
             value={entry.journal.what_do_you_need}
           />
         </View>

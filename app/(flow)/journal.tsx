@@ -20,6 +20,7 @@ import { getPlutchikLadder } from "@/lib/plutchik";
 import { getPlutchikContent } from "@/lib/plutchikContent";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useInventoryStore } from "@/store/useInventoryStore";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 type SaveState = "editing" | "saving" | "saved" | "error";
@@ -44,6 +45,7 @@ export default function JournalScreen() {
   const [state, setState] = useState<SaveState>("editing");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [resumeChecked, setResumeChecked] = useState(false);
+  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
 
   // If the user lands here in a fresh session (draft is empty) but has
   // already completed today's check-in, hydrate the draft from Supabase
@@ -240,6 +242,7 @@ export default function JournalScreen() {
                     emotionPrimary={primary.slug}
                     plutchikEmotion={draft.plutchik_emotion ?? undefined}
                     size={64}
+                    equipped={equippedSlugs}
                   />
                 </View>
               )}
@@ -399,7 +402,7 @@ export default function JournalScreen() {
 
           <Prompt
             delay={800}
-            label="What do you need?"
+            label="What can you do, in your control, to provide what you need right now?"
             value={draft.journal_what_do_you_need}
             onChange={(v) => setField("journal_what_do_you_need", v)}
           />

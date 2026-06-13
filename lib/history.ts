@@ -189,6 +189,46 @@ export function computeStreak(entries: HistoryEntry[]): number {
   return count;
 }
 
+/**
+ * Counts consecutive days (including today) where the user actually wrote
+ * something in their journal. A row with a journal_entries record but all
+ * fields null doesn't count — we need real content for the streak to credit.
+ *
+ * This is the "real" streak that drives reward unlocks (grape at 2, hat at 5).
+ * The plain checkin streak is kept for analytics / display elsewhere.
+ */
+export function computeJournalStreak(entries: HistoryEntry[]): number {
+  if (entries.length === 0) return 0;
+
+  const dayKey = (d: Date) =>
+    `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+  const journaledDays = new Set(
+    entries
+      .filter((e) => journalHasContent(e.journal))
+      .map((e) => dayKey(new Date(e.occurred_at)))
+  );
+
+  let count = 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+
+  while (journaledDays.has(dayKey(cursor))) {
+    count++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return count;
+}
+
+/** Has at least one prompt been written in? */
+function journalHasContent(j: HistoryEntry["journal"]): boolean {
+  if (!j) return false;
+  return Object.values(j).some(
+    (v) => typeof v === "string" && v.trim().length > 0
+  );
+}
+
 /** Friendly date label like "Today", "Yesterday", or "Mon, Jun 9". */
 export function formatEntryDate(iso: string): string {
   const d = new Date(iso);

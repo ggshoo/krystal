@@ -14,6 +14,7 @@ import { fetchTodaysEntry } from "@/lib/history";
 import { supabase } from "@/lib/supabase";
 import { uuid } from "@/lib/uuid";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useInventoryStore } from "@/store/useInventoryStore";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 type SaveState = "saving" | "saved" | "error";
@@ -34,6 +35,7 @@ export default function Done() {
 
   const [state, setState] = useState<SaveState>("saving");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
 
   // Prevent double-submission if the effect re-runs (auth state arrives later)
   const submittedRef = useRef(false);
@@ -190,6 +192,7 @@ export default function Done() {
                       emotionPrimary={primary.slug}
                       plutchikEmotion={draft.plutchik_emotion ?? undefined}
                       size={88}
+                      equipped={equippedSlugs}
                     />
                   </View>
                   <View

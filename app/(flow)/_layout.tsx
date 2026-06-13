@@ -2,6 +2,7 @@ import { Stack, usePathname } from "expo-router";
 import { useColorScheme, View } from "react-native";
 
 import { GrapeCompanion } from "@/components/GrapeCompanion";
+import { useInventoryStore } from "@/store/useInventoryStore";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
@@ -20,6 +21,7 @@ import { useReflectionStore } from "@/store/useReflectionStore";
 export default function FlowLayout() {
   const pathname = usePathname();
   const draft = useReflectionStore((s) => s.draft);
+  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
@@ -49,6 +51,7 @@ export default function FlowLayout() {
             emotionPrimary={draft.emotion_primary}
             plutchikEmotion={draft.plutchik_emotion}
             size={52}
+            equipped={equippedSlugs}
           />
         </View>
       )}

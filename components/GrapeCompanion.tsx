@@ -5,9 +5,12 @@ import {
   Ellipse,
   Path,
   RadialGradient,
+  Rect,
   Stop,
   Svg,
 } from "react-native-svg";
+
+import { ItemSlug } from "@/lib/inventory";
 
 /**
  * Krystal — the grape companion.
@@ -71,6 +74,12 @@ type Props = {
   plutchikEmotion?: string;
   size?: number;
   message?: string;
+  /**
+   * Backpack items currently equipped on the grape. Each slug maps to an SVG
+   * accessory rendered on top of the grape (e.g. "hat" → knit beanie).
+   * When a headwear item is equipped, the stem + leaves hide behind it.
+   */
+  equipped?: ItemSlug[];
 };
 
 type Mood =
@@ -125,7 +134,9 @@ export function GrapeCompanion({
   plutchikEmotion,
   size = 80,
   message,
+  equipped,
 }: Props) {
+  const hasHat = !!equipped?.includes("hat");
   const tint = emotionPrimary ? TINT_PER_PRIMARY[emotionPrimary] : null;
   const bodyColor = tint ? mix(BASE_COLOR, tint, 0.3) : BASE_COLOR;
 
@@ -240,48 +251,55 @@ export function GrapeCompanion({
             </RadialGradient>
           </Defs>
 
-          {/* Brown twiggy stem — short upright stalk with a curly tendril */}
-          <Path
-            d="M 50 20 L 50 8"
-            stroke={`url(#${gid("stem")})`}
-            strokeWidth={3}
-            fill="none"
-            strokeLinecap="round"
-          />
-          <Path
-            d="M 50 10 Q 47 6 50 4"
-            stroke={`url(#${gid("stem")})`}
-            strokeWidth={2}
-            fill="none"
-            strokeLinecap="round"
-          />
+          {/* Stem + leaves only render if no headwear is equipped.
+              When the grape's wearing a hat we hide them since the hat
+              naturally covers that area. */}
+          {!hasHat && (
+            <>
+              {/* Brown twiggy stem — short upright stalk with a curly tendril */}
+              <Path
+                d="M 50 20 L 50 8"
+                stroke={`url(#${gid("stem")})`}
+                strokeWidth={3}
+                fill="none"
+                strokeLinecap="round"
+              />
+              <Path
+                d="M 50 10 Q 47 6 50 4"
+                stroke={`url(#${gid("stem")})`}
+                strokeWidth={2}
+                fill="none"
+                strokeLinecap="round"
+              />
 
-          {/* Back leaf — darker green, sits behind */}
-          <Path
-            d="M 50 12 Q 38 4 32 12 Q 38 18 50 14 Z"
-            fill={leafDark}
-            opacity={0.95}
-          />
-          <Path
-            d="M 36 11 Q 42 12 48 13"
-            stroke="#3A6B40"
-            strokeWidth={0.7}
-            fill="none"
-            opacity={0.6}
-          />
+              {/* Back leaf — darker green, sits behind */}
+              <Path
+                d="M 50 12 Q 38 4 32 12 Q 38 18 50 14 Z"
+                fill={leafDark}
+                opacity={0.95}
+              />
+              <Path
+                d="M 36 11 Q 42 12 48 13"
+                stroke="#3A6B40"
+                strokeWidth={0.7}
+                fill="none"
+                opacity={0.6}
+              />
 
-          {/* Front leaf — brighter green, sits in front, points right */}
-          <Path
-            d="M 50 10 Q 64 2 72 11 Q 64 17 50 12 Z"
-            fill={`url(#${gid("leaf")})`}
-          />
-          <Path
-            d="M 54 10 Q 62 11 68 13"
-            stroke={leafDark}
-            strokeWidth={0.7}
-            fill="none"
-            opacity={0.5}
-          />
+              {/* Front leaf — brighter green, sits in front, points right */}
+              <Path
+                d="M 50 10 Q 64 2 72 11 Q 64 17 50 12 Z"
+                fill={`url(#${gid("leaf")})`}
+              />
+              <Path
+                d="M 54 10 Q 62 11 68 13"
+                stroke={leafDark}
+                strokeWidth={0.7}
+                fill="none"
+                opacity={0.5}
+              />
+            </>
+          )}
 
           {/* Body with radial gradient — gives that 3D sphere feel */}
           <Path
@@ -322,6 +340,38 @@ export function GrapeCompanion({
 
           {/* Pink rim glow (subsurface scattering effect) */}
           <Ellipse cx="50" cy="116" rx="42" ry="8" fill="#F5A0A8" opacity={0.15} />
+
+          {/* Equipped: knit beanie. Sits on top of the body, replacing the
+              stem and leaves visually. Warm burgundy color with subtle knit
+              ribbing and a fluffy white pom-pom. */}
+          {hasHat && (
+            <>
+              <Path
+                d="M 28 22 Q 28 6 50 6 Q 72 6 72 22 Z"
+                fill="#C45B5B"
+              />
+              <Rect x="26" y="20" width="48" height="4" rx="1.5" fill="#A04545" />
+              {/* Knit ribbed texture */}
+              <Path d="M 34 20 L 34 8" stroke="#A04545" strokeWidth={0.7} opacity={0.4} />
+              <Path d="M 42 20 L 42 7" stroke="#A04545" strokeWidth={0.7} opacity={0.4} />
+              <Path d="M 50 20 L 50 6" stroke="#A04545" strokeWidth={0.7} opacity={0.4} />
+              <Path d="M 58 20 L 58 7" stroke="#A04545" strokeWidth={0.7} opacity={0.4} />
+              <Path d="M 66 20 L 66 8" stroke="#A04545" strokeWidth={0.7} opacity={0.4} />
+              {/* Soft highlight on the front-left for shape */}
+              <Path
+                d="M 32 19 Q 32 11 38 8"
+                stroke="#E89090"
+                strokeWidth={2.2}
+                opacity={0.6}
+                fill="none"
+                strokeLinecap="round"
+              />
+              {/* Pom-pom */}
+              <Circle cx="50" cy="4" r={4} fill="#FFFFFF" />
+              <Circle cx="48.5" cy="3" r={1.8} fill="#FFE0E0" opacity={0.85} />
+              <Circle cx="51" cy="5" r={0.8} fill="#D8B0B0" opacity={0.5} />
+            </>
+          )}
 
           {renderBrows(mood, browColor)}
           {renderEyes(mood, gid, bodyColor)}

@@ -6,10 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FadeIn } from "@/components/FadeIn";
 import { GrapeCompanion } from "@/components/GrapeCompanion";
 import {
-  computeStreak,
+  computeJournalStreak,
   fetchAllEntries,
   HistoryEntry,
 } from "@/lib/history";
+import { GRAPE_UNLOCK_STREAK, nextUnlock } from "@/lib/inventory";
+import { useInventoryStore } from "@/store/useInventoryStore";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -26,19 +28,21 @@ function pickGreeting(): string {
   return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
 }
 
-function specialGrapeMessage(
-  streak: number,
-  isReturning: boolean,
-  hasCheckinToday: boolean
-): string | undefined {
-  if (!isReturning) return "hi!";
-  if (hasCheckinToday) {
-    if (streak === 3) return "three days. nice.";
-    if (streak === 7) return "a whole week!";
-    if (streak === 14) return "two weeks in.";
-    if (streak === 30) return "a month. wow.";
-    if (streak === 100) return "100 days.";
-  }
+/**
+ * Returns a one-time message bubble for the grape on the home page.
+ *
+ * Tied to journal streak milestones. Day 2 is the grape's debut — first time
+ * the user has ever seen it on the home page, so it introduces itself.
+ * Day 5 is the hat unlock — points the user to the backpack.
+ */
+function specialGrapeMessage(streak: number): string | undefined {
+  if (streak === 2) return "hi! i'm krystal.";
+  if (streak === 3) return "three days. nice.";
+  if (streak === 5) return "a hat! check your backpack.";
+  if (streak === 7) return "a whole week!";
+  if (streak === 14) return "two weeks in.";
+  if (streak === 30) return "a month. wow.";
+  if (streak === 100) return "100 days.";
   return undefined;
 }
 
@@ -60,6 +64,15 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const greeting = useMemo(() => pickGreeting(), []);
+
+  // Inventory: hydrate on load, reconcile when streak changes (so a new hat
+  // appears the moment the user crosses day 5).
+  const hydrateInventory = useInventoryStore((s) => s.hydrate);
+  const reconcileInventory = useInventoryStore((s) => s.reconcile);
+  const equippedSlugs = useInventoryStore((s) => s.equippedSlugs());
+  const hasOwnedItems = useInventoryStore(
+    (s) => Object.keys(s.byId).length > 0
+  );
 
   useEffect(() => {
     if (!authInitialized) return;
@@ -88,8 +101,24 @@ export default function Home() {
     };
   }, [authInitialized, user]);
 
-  const streak = entries ? computeStreak(entries) : 0;
+  const streak = entries ? computeJournalStreak(entries) : 0;
   const isReturning = (entries?.length ?? 0) > 0;
+  // Grape appears only once the user reaches the first streak milestone
+  // (day 2). Before that the home is just the title + CTA. If the streak
+  // later breaks, the grape disappears — they have to re-earn it.
+  const grapeUnlocked = streak >= GRAPE_UNLOCK_STREAK;
+  const upcoming = nextUnlock(streak);
+
+  // Hydrate inventory once we know who the user is.
+  useEffect(() => {
+    if (user) void hydrateInventory(user.id);
+  }, [user, hydrateInventory]);
+
+  // Reconcile rewards whenever the streak changes — drops new items into
+  // the backpack the moment the user crosses a threshold.
+  useEffect(() => {
+    if (user && entries) void reconcileInventory(user.id, streak);
+  }, [user, entries, streak, reconcileInventory]);
   const todaysEntry = entries?.[0];
   const isTodaysEntry = (() => {
     if (!todaysEntry) return false;
@@ -124,7 +153,7 @@ export default function Home() {
     <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark">
       {/* ── Top corners ── */}
       <View className="absolute left-0 right-0 top-0 z-10 flex-row justify-between px-5 pt-3">
-        <View className="w-10">
+        <View className="flex-row gap-1">
           {hasJournaledToday && (
             <FadeIn delay={600} duration={500}>
               <Pressable
@@ -134,6 +163,21 @@ export default function Home() {
                 className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5 dark:hover:bg-ink-dark/10"
               >
                 <Text className="text-xl">⌚</Text>
+              </Pressable>
+            </FadeIn>
+          )}
+          {/* Backpack — only appears once the user has earned at least one
+              item (currently the hat at day 5). Empty backpack stays hidden
+              so the home doesn't pre-tease an empty surface. */}
+          {hasOwnedItems && (
+            <FadeIn delay={700} duration={500}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Open backpack"
+                onPress={() => router.push("/backpack")}
+                className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5 dark:hover:bg-ink-dark/10"
+              >
+                <Text className="text-xl">🎒</Text>
               </Pressable>
             </FadeIn>
           )}
@@ -166,24 +210,23 @@ export default function Home() {
           <ActivityIndicator color="#C2876B" />
         ) : (
           <>
-            {/* Grape above the title, centered.
-                Home is the friendly "welcome back" surface — the grape ALWAYS
-                shows its pleasant default face here, regardless of whether
-                today's check-in is done. Emotion-mirroring happens inside the
-                flow (Welcome → Check-in → Wheel) and on Done/Journal, not on
-                Home. The grape is a consistent companion at the door. */}
-            <FadeIn delay={0} duration={900}>
-              <View className="mb-6">
-                <GrapeCompanion
-                  size={isReturning ? 78 : 96}
-                  message={specialGrapeMessage(
-                    streak,
-                    isReturning,
-                    hasCheckinToday
-                  )}
-                />
-              </View>
-            </FadeIn>
+            {/* Grape above the title, centered. Only appears once the user
+                has built a 2-day journal streak — before that the home is
+                grape-less to make the day-2 reveal feel earned.
+                The grape ALWAYS shows its pleasant default face here
+                regardless of today's emotion. Emotion-mirroring lives inside
+                the flow (Welcome → Check-in → Wheel) and on Done/Journal. */}
+            {grapeUnlocked && (
+              <FadeIn delay={0} duration={900}>
+                <View className="mb-6">
+                  <GrapeCompanion
+                    size={isReturning ? 78 : 96}
+                    message={specialGrapeMessage(streak)}
+                    equipped={equippedSlugs}
+                  />
+                </View>
+              </FadeIn>
+            )}
 
             {/* Title: krystal for first-time, greeting for returning */}
             {!isReturning ? (
@@ -212,10 +255,21 @@ export default function Home() {
                     <Text className="mb-12 text-sm text-muted dark:text-muted-dark">
                       <Text className="font-semibold text-ink dark:text-ink-dark">{streak}</Text>{" "}
                       {streak === 1 ? "day" : "days"} in a row
+                      {/* Foreshadow the next unlock when one exists */}
+                      {upcoming && (
+                        <Text className="text-muted dark:text-muted-dark">
+                          {" · "}
+                          {upcoming.name.toLowerCase()} at day {upcoming.unlockStreak}
+                        </Text>
+                      )}
                     </Text>
                   </FadeIn>
                 ) : (
-                  <View className="mb-12" />
+                  <FadeIn delay={500} duration={650}>
+                    <Text className="mb-12 text-sm text-muted dark:text-muted-dark">
+                      first day. welcome.
+                    </Text>
+                  </FadeIn>
                 )}
               </>
             )}
