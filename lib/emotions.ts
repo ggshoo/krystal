@@ -1,11 +1,18 @@
 /**
- * Krystal — emotion taxonomy (Geoffrey Roberts emotion wheel).
+ * Crystal — emotion taxonomy (Geoffrey Roberts emotion wheel).
  *
  * 7 primaries (happy, surprised, bad, fearful, angry, disgusted, sad).
  * Each primary has a variable number of secondaries (4–9).
  * Each secondary has 2 tertiaries.
  *
  * Sourced from the wheel image at https://feelingswheel.com/ (Geoffrey Roberts).
+ *
+ * VISUAL SOURCE OF TRUTH: the 76 tertiary ("end") emotions and their grape
+ * illustrations are canonicalized in the reference chart
+ * `Gemini_Generated_Image_8i59q8i59q8i59q8.png` (repo root) — "76 Emotions:
+ * The Grape Edition". See `docs/emotion-grape-reference.md` for the full
+ * emotion→grape mapping. When editing this taxonomy, keep it in sync with that
+ * chart and doc.
  *
  * If you edit this, mirror the change to the SQL seed migration
  * (supabase/migrations/006_replace_taxonomy.sql) so the database stays in sync.

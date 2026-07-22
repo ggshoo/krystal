@@ -1,7 +1,8 @@
 import { Stack, usePathname } from "expo-router";
-import { useColorScheme, View } from "react-native";
+import { View } from "react-native";
 
 import { GrapeCompanion } from "@/components/GrapeCompanion";
+import { currentScene } from "@/lib/scene";
 import { useEquippedSlugs } from "@/store/useInventoryStore";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
@@ -22,8 +23,7 @@ export default function FlowLayout() {
   const pathname = usePathname();
   const draft = useReflectionStore((s) => s.draft);
   const equippedSlugs = useEquippedSlugs();
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
+  const scene = currentScene();
 
   // Hide corner grape on screens that already show a larger inline grape
   const hideCornerGrape =
@@ -35,7 +35,7 @@ export default function FlowLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: {
-            backgroundColor: isDark ? "#1F1B16" : "#F7F0E5",
+            backgroundColor: scene.sky[0],
           },
           animation: "fade",
           animationDuration: 700,

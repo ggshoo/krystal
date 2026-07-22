@@ -1,7 +1,6 @@
 import { Redirect, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,10 +9,13 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ChunkyButton } from "@/components/ChunkyButton";
 import { FadeIn } from "@/components/FadeIn";
 import { GrapeCompanion } from "@/components/GrapeCompanion";
+import { Scene } from "@/components/Scene";
+import { currentScene } from "@/lib/scene";
+import { trackJournalSaved } from "@/lib/analytics";
 import { findPrimary, findSecondary, findTertiary } from "@/lib/emotions";
 import { fetchTodaysEntry } from "@/lib/history";
 import { getPlutchikLadder } from "@/lib/plutchik";
@@ -46,6 +48,7 @@ export default function JournalScreen() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [resumeChecked, setResumeChecked] = useState(false);
   const equippedSlugs = useEquippedSlugs();
+  const scene = currentScene();
 
   // If the user lands here in a fresh session (draft is empty) but has
   // already completed today's check-in, hydrate the draft from Supabase
@@ -62,9 +65,9 @@ export default function JournalScreen() {
       if (cancelled) return;
       if (entry) {
         setField("daily_checkin_id", entry.id);
-        setField("mind_score", entry.mind_score);
-        setField("body_score", entry.body_score);
-        setField("heart_score", entry.heart_score);
+        setField("mind_score", entry.mind_score ?? undefined);
+        setField("body_score", entry.body_score ?? undefined);
+        setField("heart_score", entry.heart_score ?? undefined);
         if (entry.emotion) {
           setField(
             "emotion_primary",
@@ -133,7 +136,7 @@ export default function JournalScreen() {
   // The label shown in "About X" — the specific intensity word the user
   // chose, falling back to the ladder's primary name.
   const aboutLabel = draft.plutchik_emotion ?? ladder?.primary ?? "";
-  const themeColor = primary?.color ?? "#C2876B";
+  const themeColor = primary?.color ?? "#E97451";
 
   const handleSave = async () => {
     if (!user) {
@@ -176,6 +179,22 @@ export default function JournalScreen() {
       return;
     }
 
+    // Fire analytics — count how many of the 6 prompts have content, so the
+    // PostHog dashboard can compute journal-completion-rate cohorts.
+    const filledFieldCount = [
+      payload.reflection,
+      payload.why_feeling,
+      payload.body_sensations,
+      payload.what_is_hard,
+      payload.what_is_life_giving,
+      payload.what_do_you_need,
+    ].filter((v) => typeof v === "string" && v.trim().length > 0).length;
+    trackJournalSaved({
+      filled_field_count: filledFieldCount,
+      has_content: filledFieldCount > 0,
+      is_edit: !!existing,
+    });
+
     setState("saved");
   };
 
@@ -187,37 +206,39 @@ export default function JournalScreen() {
   // ── Saved confirmation ──────────────────────────────────────────────────
   if (state === "saved") {
     return (
-      <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+      <Scene edges={["top", "bottom"]}>
         <View className="flex-1 items-center justify-center px-8">
           <FadeIn delay={0} duration={650}>
-            <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+            <Text
+              className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
+              style={{ color: scene.ink }}
+            >
               Journal saved.
             </Text>
           </FadeIn>
           <FadeIn delay={250} duration={650}>
-            <Text className="mb-16 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
+            <Text
+              className="mb-16 max-w-sm text-center font-body text-base font-semibold leading-relaxed"
+              style={{ color: scene.subInk }}
+            >
               Thank you for taking the time. See you tomorrow.
             </Text>
           </FadeIn>
           <FadeIn delay={500} duration={500}>
-            <Pressable
-              accessibilityRole="button"
-              className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+            <ChunkyButton
+              label="Return home"
+              variant="primary"
               onPress={handleReturnHome}
-            >
-              <Text className="text-base font-medium tracking-wide text-white">
-                Return home
-              </Text>
-            </Pressable>
+            />
           </FadeIn>
         </View>
-      </SafeAreaView>
+      </Scene>
     );
   }
 
   // ── Main journaling view ────────────────────────────────────────────────
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+    <Scene edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -348,12 +369,18 @@ export default function JournalScreen() {
 
           {/* ── Header ── */}
           <FadeIn delay={240}>
-            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+            <Text
+              className="mb-3 font-display text-3xl font-extrabold tracking-tight"
+              style={{ color: scene.ink }}
+            >
               Reflect on it
             </Text>
           </FadeIn>
           <FadeIn delay={320}>
-            <Text className="mb-8 text-base leading-relaxed text-muted dark:text-muted-dark">
+            <Text
+              className="mb-8 font-body text-base font-semibold leading-relaxed"
+              style={{ color: scene.subInk }}
+            >
               Write as much or as little as you'd like. Any field can be left blank.
             </Text>
           </FadeIn>
@@ -409,23 +436,21 @@ export default function JournalScreen() {
 
           {/* ── Save + return ── */}
           <FadeIn delay={920}>
-            <Pressable
-              accessibilityRole="button"
-              disabled={state === "saving"}
-              onPress={handleSave}
-              className="mt-4 items-center rounded-full bg-accent dark:bg-accent-dark py-5 shadow-sm transition-all duration-300 hover:scale-[1.05] hover:shadow-2xl active:opacity-70"
-            >
-              {state === "saving" ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text className="text-base font-medium tracking-wide text-white">
-                  Save journal
-                </Text>
-              )}
-            </Pressable>
+            <View className="mt-4">
+              <ChunkyButton
+                label="Save journal"
+                variant="primary"
+                full
+                loading={state === "saving"}
+                onPress={handleSave}
+              />
+            </View>
 
             {state === "error" && (
-              <Text className="mt-3 text-center text-xs text-muted dark:text-muted-dark">
+              <Text
+                className="mt-3 text-center font-body text-xs font-semibold"
+                style={{ color: scene.subInk }}
+              >
                 {errorMsg}
               </Text>
             )}
@@ -435,14 +460,17 @@ export default function JournalScreen() {
               onPress={handleReturnHome}
               className="mt-3 items-center px-4 py-2"
             >
-              <Text className="text-sm text-muted dark:text-muted-dark underline">
+              <Text
+                className="font-body text-sm font-bold underline"
+                style={{ color: scene.subInk }}
+              >
                 Skip journal, return home
               </Text>
             </Pressable>
           </FadeIn>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Scene>
   );
 }
 

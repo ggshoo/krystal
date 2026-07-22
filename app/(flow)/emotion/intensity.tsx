@@ -1,10 +1,12 @@
 import { Redirect, useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
+import { Scene } from "@/components/Scene";
+import { shadeHex } from "@/lib/color";
 import { findPrimary, findSecondary, findTertiary } from "@/lib/emotions";
 import { getPlutchikLadder, plutchikLevels } from "@/lib/plutchik";
+import { currentScene } from "@/lib/scene";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
@@ -18,6 +20,7 @@ export default function PickIntensity() {
   const router = useRouter();
   const draft = useReflectionStore((s) => s.draft);
   const setField = useReflectionStore((s) => s.setField);
+  const scene = currentScene();
 
   const primary = findPrimary(draft.emotion_primary);
   const secondary = findSecondary(draft.emotion_primary, draft.emotion_secondary);
@@ -47,7 +50,7 @@ export default function PickIntensity() {
         : "In between";
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+    <Scene edges={["top", "bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -62,20 +65,29 @@ export default function PickIntensity() {
               className="mr-2 h-3 w-3 rounded-full"
               style={{ backgroundColor: primary.color }}
             />
-            <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
+            <Text
+              className="font-display text-xs font-bold uppercase tracking-widest"
+              style={{ color: scene.subInk }}
+            >
               {primary.name} · {secondary.name} · {tertiary.name}
             </Text>
           </View>
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+          <Text
+            className="mb-3 font-display text-4xl font-extrabold tracking-tight"
+            style={{ color: scene.ink }}
+          >
             How intense?
           </Text>
         </FadeIn>
 
         <FadeIn delay={160}>
-          <Text className="mb-8 text-base leading-relaxed text-muted dark:text-muted-dark">
+          <Text
+            className="mb-8 font-body text-base font-semibold leading-relaxed"
+            style={{ color: scene.subInk }}
+          >
             From the {ladder.primary} family, which feels closest? Listed from
             most to least intense.
           </Text>
@@ -90,21 +102,19 @@ export default function PickIntensity() {
                 accessibilityLabel={`${l.name}, ${intensityLabel(l.level)}`}
                 accessibilityState={{ selected }}
                 onPress={() => pick(l.slug)}
-                className="mb-4 h-28 items-center justify-center rounded-tile transition-all duration-300 hover:scale-[1.08] hover:shadow-2xl active:scale-[0.98] active:opacity-70"
+                className="mb-4 h-28 items-center justify-center rounded-tile transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
                 style={{
-                  backgroundColor: primary.color + (selected ? "55" : "26"),
-                  borderWidth: selected ? 2 : 0,
+                  backgroundColor: primary.color + (selected ? "FF" : "D0"),
+                  borderWidth: 2,
                   borderColor: primary.color,
-                  shadowColor: primary.color,
-                  shadowOpacity: 0.12,
-                  shadowRadius: 12,
-                  shadowOffset: { width: 0, height: 4 },
+                  borderBottomWidth: selected ? 4 : 6,
+                  borderBottomColor: shadeHex(primary.color),
                 }}
               >
-                <Text className="text-2xl font-medium capitalize text-ink dark:text-ink-dark">
+                <Text className="font-display text-2xl font-extrabold capitalize text-white">
                   {l.name}
                 </Text>
-                <Text className="mt-1 text-xs uppercase tracking-widest text-muted dark:text-muted-dark">
+                <Text className="mt-1 font-body text-xs font-bold uppercase tracking-widest text-white/85">
                   {intensityLabel(l.level)}
                 </Text>
               </Pressable>
@@ -112,6 +122,6 @@ export default function PickIntensity() {
           );
         })}
       </ScrollView>
-    </SafeAreaView>
+    </Scene>
   );
 }

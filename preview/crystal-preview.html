@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crystal — redesign preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#2E2416; --sub:#6B5B44; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#EFE7D6; font-family:"Roboto",sans-serif; color:#2E2416;
+        display:flex; flex-direction:column; align-items:center; padding:28px 16px 60px; }
+  h1{ font-family:"Roboto",sans-serif; font-weight:800; font-size:24px; margin:0 0 4px; }
+  .note{ color:#6B5B44; font-weight:600; font-size:13px; margin:0 0 20px; text-align:center; max-width:520px; }
+  .switch{ display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap; justify-content:center; }
+  .switch button{ font-family:"Roboto",sans-serif; font-weight:700; font-size:13px; cursor:pointer;
+        padding:9px 16px; border-radius:999px; border:2px solid #C3B79A; background:#FFF6E3; color:#6B5B44;
+        border-bottom-width:4px; transition:transform .1s; }
+  .switch button:active{ transform:translateY(2px); border-bottom-width:2px; }
+  .switch button.on{ background:#E97451; border-color:#B9502E; color:#fff; }
+
+  .stage{ display:flex; gap:26px; flex-wrap:wrap; justify-content:center; }
+
+  .phone{ width:300px; height:620px; border-radius:38px; overflow:hidden; position:relative;
+        box-shadow:0 18px 50px rgba(46,36,22,.32); border:7px solid #2E2416; }
+  .sky{ position:absolute; inset:0; transition:background .6s ease; }
+  .hills svg, .sky svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .content{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+        justify-content:center; padding:0 26px; text-align:center; }
+  .label{ position:absolute; top:14px; left:0; right:0; text-align:center; font-family:"Roboto",sans-serif;
+        font-weight:700; font-size:12px; letter-spacing:.5px; opacity:.85; }
+
+  .pill{ font-family:"Roboto",sans-serif; font-weight:800; font-size:11px; letter-spacing:.8px;
+        text-transform:uppercase; color:#4A4E52; background:#EDEFF1; border:1px solid #C3C7CB;
+        padding:7px 15px; border-radius:999px; box-shadow:0 3px 6px rgba(0,0,0,.12); margin-bottom:16px; }
+  .greet{ font-family:"Roboto",sans-serif; font-weight:800; font-size:30px; margin:0 0 10px; line-height:1.1; }
+  .sub{ font-family:"Roboto",sans-serif; font-weight:600; font-size:14px; margin:0 0 30px; }
+  .cta{ font-family:"Roboto",sans-serif; font-weight:800; font-size:16px; color:#fff; background:#E97451;
+        border-bottom:6px solid #B9502E; border-radius:18px; padding:15px 30px; cursor:pointer; transition:transform .1s; }
+  .cta:active{ transform:translateY(3px); border-bottom-width:3px; }
+  .link{ font-family:"Roboto",sans-serif; font-weight:700; font-size:13px; text-decoration:underline;
+        margin-top:18px; cursor:pointer; }
+
+  .grape-wrap{ margin-bottom:22px; animation:float 6s ease-in-out infinite; }
+  @keyframes float{ 0%,35%{transform:translateY(0)} 50%{transform:translateY(-8px)} 65%,100%{transform:translateY(0)} }
+  .bubble{ font-family:"Roboto",sans-serif; font-weight:600; font-size:12px; color:#2E2416; background:#FFFDF6;
+        border:1px solid rgba(153,93,166,.3); padding:5px 11px; border-radius:14px; display:inline-block; margin-bottom:8px; }
+
+  .tiles{ display:grid; grid-template-columns:repeat(2,1fr); gap:9px; width:100%; }
+  .tile{ height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+        font-family:"Roboto",sans-serif; font-weight:800; font-size:15px; color:#fff; border-width:2px;
+        border-style:solid; }
+  .cap{ font-family:"Roboto"; font-weight:600; font-size:12px; color:#6B5B44; margin-top:16px; text-align:center; max-width:520px; }
+</style>
+</head>
+<body>
+  <h1>crystal</h1>
+  <p class="note">The same home screen through the day — tap a time to watch the world change. This mirrors the live app's time-based scenes, fonts, grape, and chunky buttons.</p>
+
+  <div class="switch" id="switch">
+    <button data-k="morning">Morning</button>
+    <button data-k="day" class="on">Day</button>
+    <button data-k="dusk">Dusk</button>
+    <button data-k="night">Night</button>
+  </div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="sky" id="sky"></div>
+      <div class="content" id="home">
+        <div class="label" id="tod" style="color:#6B5B44">DAY · 2:00 PM</div>
+        <div class="grape-wrap">
+          <div class="bubble">hi! i'm crystal.</div>
+          <div id="grape"></div>
+        </div>
+        <div class="pill">Today's little journey</div>
+        <div class="greet" id="greet" style="color:#2E2416">Hi Gigi,</div>
+        <div class="sub" id="sub" style="color:#6B5B44"><b style="font-family:Roboto">3</b> days in a row · hat at day 5</div>
+        <div class="cta">quick check-in</div>
+        <div class="link" id="link" style="color:#6B5B44">take a deeper reflection</div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="sky" id="sky2"></div>
+      <div class="content" style="justify-content:flex-start; padding-top:60px; align-items:flex-start; text-align:left">
+        <div style="font-family:Roboto;font-weight:700;font-size:12px;letter-spacing:.5px;color:#fff;opacity:.9;margin-bottom:6px">● ANGRY</div>
+        <div style="font-family:Roboto;font-weight:800;font-size:28px;color:#fff;margin-bottom:6px">Which kind?</div>
+        <div style="font-family:Roboto;font-weight:600;font-size:13px;color:rgba(255,255,255,.9);margin-bottom:18px">Pick the one closest to what you're feeling.</div>
+        <div class="tiles">
+          <div class="tile" style="background:#E27B7B;border-color:#E27B7B;border-bottom-width:6px;border-bottom-color:#a74848">Let Down</div>
+          <div class="tile" style="background:#E27B7B;border-color:#E27B7B;border-bottom-width:6px;border-bottom-color:#a74848">Humiliated</div>
+          <div class="tile" style="background:#E27B7B;border-color:#E27B7B;border-bottom-width:6px;border-bottom-color:#a74848">Bitter</div>
+          <div class="tile" style="background:#E27B7B;border-color:#E27B7B;border-bottom-width:6px;border-bottom-color:#a74848">Mad</div>
+          <div class="tile" style="background:#E27B7B;border-color:#E27B7B;border-bottom-width:6px;border-bottom-color:#a74848">Frustrated</div>
+          <div class="tile" style="background:#E27B7B;border-color:#E27B7B;border-bottom-width:6px;border-bottom-color:#a74848">Distant</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="cap">Left: home screen (time-based scene switcher). Right: an emotion picker with chunky tiles — this screen keeps a dusk scene so you can see a second time of day at once.</p>
+
+<script>
+const SCENES = {
+  morning:{ sky:["#FBD3B0","#F7E7B8","#CDE9D4"], hills:["#7FB06A","#6FA050","#537E3E"], orb:{x:.24,y:.24,c:"#FFE7A8",g:"#FBC77F",moon:false}, ink:"#2E2416", sub:"#6B5B44", star:false, tod:"MORNING · 7:30 AM" },
+  day:{ sky:["#BFE8DA","#F4E3A6","#F0C978"], hills:["#6FA050","#5C8C48","#4F7A3D"], orb:{x:.8,y:.2,c:"#FFF0B8",g:"#F4D06A",moon:false}, ink:"#2E2416", sub:"#6B5B44", star:false, tod:"DAY · 2:00 PM" },
+  dusk:{ sky:["#6E5C99","#C77E86","#EFB65A"], hills:["#4A5A46","#39472F","#293722"], orb:{x:.76,y:.3,c:"#FFD98A",g:"#E98A5A",moon:false}, ink:"#FBEFD9", sub:"#E7D6C0", star:false, tod:"DUSK · 7:15 PM" },
+  night:{ sky:["#1E2A50","#354067","#5A5686"], hills:["#25321F","#1E2A1A","#161F14"], orb:{x:.78,y:.22,c:"#F3F1E6",g:"#AEB6E0",moon:true}, ink:"#F5ECDA", sub:"#C9BBD4", star:true, tod:"NIGHT · 10:40 PM" }
+};
+
+function sceneSVG(s){
+  const stars = s.star ? Array.from({length:22},(_,i)=>`<circle cx="${(i*53)%100}%" cy="${(i*29)%42}%" r="${.6+(i*7)%10/10}" fill="#fff" opacity="${.4+(i*3)%6/10}"/>`).join("") : "";
+  const moon = s.orb.moon ? `<circle cx="${s.orb.x*100}%" cy="${(s.orb.y*100)+5}%" r="26" fill="${s.sky[0]}"/>` : "";
+  return `
+  <svg viewBox="0 0 300 620" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${s.sky[0]}"/><stop offset="0.6" stop-color="${s.sky[1]}"/><stop offset="1" stop-color="${s.sky[2]}"/>
+      </linearGradient>
+      <radialGradient id="og" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="${s.orb.g}" stop-opacity=".55"/><stop offset="1" stop-color="${s.orb.g}" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="300" height="620" fill="url(#g)"/>
+    ${stars}
+    <circle cx="${s.orb.x*300}" cy="${s.orb.y*620}" r="80" fill="url(#og)"/>
+    <circle cx="${s.orb.x*300}" cy="${s.orb.y*620}" r="30" fill="${s.orb.c}"/>
+    ${moon.replace(/%/g,'').replace(`cx="${s.orb.x*100}"`,`cx="${s.orb.x*300}"`).replace(`cy="${(s.orb.y*100)+5}"`,`cy="${s.orb.y*620-10}"`)}
+    <ellipse cx="84" cy="620" rx="255" ry="180" fill="${s.hills[0]}"/>
+    <ellipse cx="234" cy="620" rx="270" ry="120" fill="${s.hills[1]}"/>
+    <ellipse cx="120" cy="620" rx="300" ry="72" fill="${s.hills[2]}"/>
+  </svg>`;
+}
+
+function grapeSVG(){
+  return `<svg width="118" height="150" viewBox="0 0 100 130">
+    <defs>
+      <radialGradient id="body" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#D3B2DE"/><stop offset="45%" stop-color="#995DA6"/><stop offset="100%" stop-color="#733F80"/></radialGradient>
+    </defs>
+    <path d="M 50 20 L 50 8" stroke="#7A5A3C" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 50 12 Q 38 4 32 12 Q 38 18 50 14 Z" fill="#4F8254"/>
+    <path d="M 50 10 Q 64 2 72 11 Q 64 17 50 12 Z" fill="#7BAE7E"/>
+    <path d="M 50 20 C 76 22, 96 46, 96 82 C 96 108, 78 124, 50 124 C 22 124, 4 108, 4 82 C 4 46, 24 22, 50 20 Z" fill="url(#body)"/>
+    <ellipse cx="26" cy="92" rx="8.5" ry="4.8" fill="#FFB5C0" opacity=".9"/>
+    <ellipse cx="74" cy="92" rx="8.5" ry="4.8" fill="#FFB5C0" opacity=".9"/>
+    <ellipse cx="36" cy="72" rx="9" ry="11" fill="#241018"/>
+    <ellipse cx="64" cy="72" rx="9" ry="11" fill="#241018"/>
+    <circle cx="39" cy="68" r="3.5" fill="#fff"/><circle cx="67" cy="68" r="3.5" fill="#fff"/>
+    <circle cx="33" cy="76" r="1.8" fill="#fff" opacity=".9"/><circle cx="61" cy="76" r="1.8" fill="#fff" opacity=".9"/>
+    <path d="M 40 100 Q 50 110 60 100" stroke="#2D2520" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function apply(k){
+  const s = SCENES[k];
+  document.getElementById("sky").innerHTML = sceneSVG(s);
+  document.getElementById("tod").textContent = s.tod;
+  document.getElementById("tod").style.color = s.sub;
+  document.getElementById("greet").style.color = s.ink;
+  document.getElementById("sub").style.color = s.sub;
+  document.getElementById("link").style.color = s.sub;
+  [...document.querySelectorAll("#switch button")].forEach(b=>b.classList.toggle("on", b.dataset.k===k));
+}
+document.getElementById("grape").innerHTML = grapeSVG();
+document.getElementById("sky2").innerHTML = sceneSVG(SCENES.dusk);
+document.getElementById("switch").addEventListener("click", e=>{ if(e.target.dataset.k) apply(e.target.dataset.k); });
+apply("day");
+</script>
+</body>
+</html>

@@ -8,9 +8,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ChunkyButton } from "@/components/ChunkyButton";
 import { FadeIn } from "@/components/FadeIn";
+import { Scene } from "@/components/Scene";
+import { currentScene } from "@/lib/scene";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -27,6 +29,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 export default function SignIn() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const scene = currentScene();
 
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
@@ -58,7 +61,7 @@ export default function SignIn() {
   const valid = email.trim().includes("@");
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+    <Scene edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -68,7 +71,12 @@ export default function SignIn() {
             onPress={() => router.push("/")}
             className="px-2 py-2 transition-all duration-300 hover:opacity-70"
           >
-            <Text className="text-sm text-muted dark:text-muted-dark">← Home</Text>
+            <Text
+              className="font-body text-sm font-bold"
+              style={{ color: scene.subInk }}
+            >
+              ← Home
+            </Text>
           </Pressable>
         </View>
 
@@ -76,63 +84,79 @@ export default function SignIn() {
           {alreadyLinked ? (
             <>
               <FadeIn delay={0} duration={650}>
-                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+                <Text
+                  className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
+                  style={{ color: scene.ink }}
+                >
                   You're signed in.
                 </Text>
               </FadeIn>
               <FadeIn delay={250} duration={650}>
-                <Text className="mb-12 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
+                <Text
+                  className="mb-12 max-w-sm text-center font-body text-base font-semibold leading-relaxed"
+                  style={{ color: scene.subInk }}
+                >
                   Your reflections are saved to{" "}
-                  <Text className="font-semibold text-ink dark:text-ink-dark">{user?.email}</Text>.
-                  You can open krystal on any device and they'll be here.
+                  <Text className="font-display font-extrabold" style={{ color: scene.ink }}>
+                    {user?.email}
+                  </Text>
+                  . You can open crystal on any device and they'll be here.
                 </Text>
               </FadeIn>
               <FadeIn delay={500} duration={500}>
-                <Pressable
-                  className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl"
+                <ChunkyButton
+                  label="Back home"
+                  variant="primary"
                   onPress={() => router.push("/")}
-                >
-                  <Text className="text-base font-medium tracking-wide text-white">
-                    Back home
-                  </Text>
-                </Pressable>
+                />
               </FadeIn>
             </>
           ) : sent ? (
             <>
               <FadeIn delay={0} duration={650}>
-                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+                <Text
+                  className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
+                  style={{ color: scene.ink }}
+                >
                   Check your inbox.
                 </Text>
               </FadeIn>
               <FadeIn delay={250} duration={650}>
-                <Text className="mb-12 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
+                <Text
+                  className="mb-12 max-w-sm text-center font-body text-base font-semibold leading-relaxed"
+                  style={{ color: scene.subInk }}
+                >
                   We sent a confirmation link to{" "}
-                  <Text className="font-semibold text-ink dark:text-ink-dark">{email}</Text>. Open
-                  the email and tap the link to finish signing in. Your existing
-                  reflections will stay attached.
+                  <Text className="font-display font-extrabold" style={{ color: scene.ink }}>
+                    {email}
+                  </Text>
+                  . Open the email and tap the link to finish signing in. Your
+                  existing reflections will stay attached.
                 </Text>
               </FadeIn>
               <FadeIn delay={500} duration={500}>
-                <Pressable
-                  className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl"
+                <ChunkyButton
+                  label="Back home"
+                  variant="primary"
                   onPress={() => router.push("/")}
-                >
-                  <Text className="text-base font-medium tracking-wide text-white">
-                    Back home
-                  </Text>
-                </Pressable>
+                />
               </FadeIn>
             </>
           ) : (
             <>
               <FadeIn delay={0} duration={650}>
-                <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+                <Text
+                  className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
+                  style={{ color: scene.ink }}
+                >
                   Save your reflections
                 </Text>
               </FadeIn>
               <FadeIn delay={250} duration={650}>
-                <Text className="mb-10 max-w-sm text-center text-base leading-relaxed text-muted dark:text-muted-dark">
+                <Text
+                  className="mb-10 max-w-sm text-center font-body text-base font-semibold leading-relaxed"
+                  style={{ color: scene.subInk }}
+                >
                   Add your email so your reflections follow you across devices.
                   We'll send you a confirmation link — no password to remember.
                 </Text>
@@ -145,44 +169,42 @@ export default function SignIn() {
                   autoCapitalize="none"
                   autoCorrect={false}
                   placeholder="your@email.com"
-                  placeholderTextColor="#B8AC9B"
+                  placeholderTextColor="#9A8B76"
                   value={email}
                   onChangeText={setEmail}
                   onSubmitEditing={handleSendLink}
                   returnKeyType="send"
-                  className="w-72 rounded-full bg-surface dark:bg-surface-dark px-6 py-4 text-center text-base text-ink dark:text-ink-dark"
+                  className="w-72 rounded-tile px-6 py-4 text-center font-body text-base text-ink"
                   style={{
-                    shadowColor: "#2D2520",
-                    shadowOpacity: 0.04,
+                    backgroundColor: "#FFFDF6",
+                    borderWidth: 2,
+                    borderColor: "#E4D6BC",
+                    shadowColor: "#2E2416",
+                    shadowOpacity: 0.06,
                     shadowRadius: 12,
-                    shadowOffset: { width: 0, height: 2 },
+                    shadowOffset: { width: 0, height: 3 },
                   }}
                 />
               </FadeIn>
 
               <FadeIn delay={600} duration={500}>
-                <Pressable
-                  disabled={!valid || sending}
-                  onPress={handleSendLink}
-                  className={`mt-6 rounded-full px-10 py-5 shadow-sm transition-all duration-300 ${
-                    valid && !sending
-                      ? "bg-accent dark:bg-accent-dark hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
-                      : "bg-ink/10 dark:bg-ink-dark/10"
-                  }`}
-                >
-                  <Text
-                    className={`text-base font-medium tracking-wide ${
-                      valid && !sending ? "text-white" : "text-muted dark:text-muted-dark"
-                    }`}
-                  >
-                    {sending ? "Sending…" : "Send link"}
-                  </Text>
-                </Pressable>
+                <View className="mt-6">
+                  <ChunkyButton
+                    label={sending ? "Sending…" : "Send link"}
+                    variant="primary"
+                    disabled={!valid || sending}
+                    loading={sending}
+                    onPress={handleSendLink}
+                  />
+                </View>
               </FadeIn>
 
               {error && (
                 <FadeIn delay={0} duration={400}>
-                  <Text className="mt-4 max-w-sm text-center text-xs text-muted dark:text-muted-dark">
+                  <Text
+                    className="mt-4 max-w-sm text-center font-body text-xs font-semibold"
+                    style={{ color: scene.subInk }}
+                  >
                     {error}
                   </Text>
                 </FadeIn>
@@ -191,6 +213,6 @@ export default function SignIn() {
           )}
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Scene>
   );
 }

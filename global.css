@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Web font defaults ────────────────────────────────────────────────────
+   On the exported web build Roboto is loaded in app/+html.tsx. Default the
+   whole document to Roboto so any un-tagged text still reads in it. Harmless
+   on native (this file is web CSS). */
+html,
+body {
+  font-family: "Roboto", system-ui, sans-serif;
+}
+
 /* ── Grape companion float ────────────────────────────────────────────────
    Subtle, occasional float. The grape sits still for the first 35% of the
    cycle, drifts up gently between 35–55%, settles back, then idles. 9s

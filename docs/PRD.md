@@ -1,230 +1,241 @@
-# Krystal — Product Requirements Document
+# Crystal — Product Requirements Document
 
-**Status:** Living doc · v1.0 · 2026-06-02
+**Status:** Living doc · v2.0 · 2026-07-05
 **Owner:** Gigi Hsu
+**Codebase name:** `krystal` (internal). **Product name:** `crystal` (user-facing).
+
+> **What changed in v2.0.** The v1.0 PRD (2026-06-02) was written for a broad "anyone with 3 minutes" audience and explicitly excluded reminders, watch integration, and multiple surfaces. v2.0 sharpens the target user, embraces multi-surface presence, and admits reminders back into scope — carefully. It also documents the streak / backpack reward system that shipped between v1 and v2. Anti-patterns and product philosophy are preserved.
 
 ---
 
 ## 1. Vision
 
-Krystal helps people answer a question most of us struggle with: *"How am I actually feeling?"* It is a daily mobile practice that combines mindfulness, emotional intelligence, and reflective journaling into a single calm, non-judgmental experience.
+Crystal helps busy young adults answer the question *"how am I actually feeling?"* — in the 30 seconds they can spare between meetings, not in the hour they don't have. It meets them wherever they are (phone, watch, computer, text) and captures a check-in before the moment passes.
 
-Over time, Krystal aims to help users see how their emotions move week to week, month to month, and across seasons of life — turning daily reflection into the raw material for genuine self-understanding. (Deeper analytics like week-over-week comparisons and seasonal patterns are post-v1; the daily practice comes first so there's something real to look back on.)
+Over time, the daily practice becomes emotional fluency: pattern recognition, richer vocabulary, and — for the many who are in therapy or considering it — a small artifact to bring back to a session.
 
-## 2. Target user
+## 2. Target user (ICP)
 
-**Anyone, especially people who are strapped for time.**
+The primary user is a **busy young adult starting out in their career, still figuring themselves out.**
 
-Krystal is designed for a wide audience: students, working adults, parents, anyone who has 3 minutes a day and a vague sense that "I should probably check in with myself more." It is deliberately **low-effort**. The whole flow should feel like the easiest possible version of paying attention to yourself — never homework, never a chore.
+Specifically:
+- **Age:** 22–32.
+- **Life stage:** early to mid career. Full-time job or the equivalent grind (grad school, portfolio building, freelance). Life is happening fast.
+- **Mental health context:** currently in therapy, has been in therapy in the last 12 months, or is seriously considering starting.
+- **Behavior signal:** has tried a wellness app before (Reflectly, Daylio, Finch, Stoic, or the Notes app). Some of them stuck, most didn't.
+- **Constraint:** genuinely does not have 20 minutes to journal daily. Has 30 seconds between subway stops.
+- **Emotional posture:** wants to be better with feelings, feels behind on it, worries about "doing self-care wrong."
 
-People who might use it:
+They are the only audience for their own data. No followers, no share features.
 
-- Someone between meetings who wants a quick pause before the next thing
-- A student who can't get themselves to journal but can tap through a guided flow
-- A parent of small children who has 4 minutes between bedtime and collapsing on the couch
-- Anyone in therapy who wants something to bring back to a session
-- Anyone not in therapy who wants a private, gentle place to notice what's going on
+### Anti-target
 
-The user is **the only audience for their own data.** No followers, no friends, no share features. What you reflect on stays with you.
+We are **not** for:
+- People who already have a robust daily journaling practice — they don't need us.
+- Kids or teens (different product, different regulatory considerations).
+- People in acute crisis — we're not a crisis app and shouldn't pretend to be. Copy should point users to real crisis resources when appropriate.
 
-## 3. Product philosophy
+## 3. The core problem
 
-### The core idea
+The ICP faces three simultaneous forces:
 
-**Being aware of your emotions is, in part, about reconnecting with your kid-self.** The part of you that felt things openly before learning to manage, optimize, and suppress. Krystal's job is to make that reconnection feel safe and inviting — not clinical, not aspirational, not productized.
+1. **Distraction.** Notifications, meetings, deadlines, dating apps, family texts. There's no natural pause in the day where reflection is easy.
+2. **Cognitive load.** Even a 3-minute journal feels like homework at 8pm when they're already fried.
+3. **Perfectionism about self-care.** They've internalized that they *should* be journaling, meditating, doing gratitude lists. The gap between should and reality generates shame, which becomes another reason not to open a wellness app.
 
-That belief drives every aesthetic and tonal decision below.
+The unlock: a check-in that takes 30 seconds and doesn't feel like homework. The 30-second version is the *daily* version. The deeper version is the *sometimes* version.
 
-### Aesthetic commitments
+## 4. Solution — dual-mode capture across every surface
 
-These are non-negotiable.
+Two capture modes, always available. The user picks in the moment.
 
-- **Calm.** Visuals, motion, and copy reduce arousal, never raise it.
-- **Warm.** The product feels like a friend, not a tool. Soft edges, warm palette, gentle motion.
-- **Encouraging.** Microcopy is supportive without being saccharine. "Nice work" lives here; "You crushed it!" doesn't.
-- **Cute, but not childish.** Picture a thoughtful cartoon game — *Untitled Goose Game* or a quieter *Animal Crossing* — not a kids' app. Cute in the service of opening people up, never in the service of looking young.
-- **Reflective.** The product asks more than it tells. Users do the work; we hold the structure.
-- **Safe.** No diagnostic language. No claims of certainty about what emotions "mean." Possibility-framed copy throughout.
-- **Non-judgmental.** No "right" emotions. No optimization metaphors. No good/bad framing of scores.
+### Quick Capture (default — 30 seconds)
 
-### Visual direction (starting point)
+- Open the app / widget / text.
+- Big emotion picker: 8 primary emotions, one tap.
+- Optional one-line "what's happening" (voice or text).
+- Save. Grape acknowledges. Done.
 
-Cartoon-game aesthetic, dialed soft:
+This is the daily bar. If a user only ever does this, the product is working.
 
-- Hand-drawn-feeling shapes, slightly imperfect lines
-- Warm, slightly desaturated palette (cream base, see Architecture §12)
-- Light, playful illustrations woven into transitions, never overwhelming the reflection itself
-- Type that feels approachable and unstuffy (final pairing TBD in Phase 5)
+### Deep Reflection (opt-in — 5 minutes)
 
-### Companion: a small purple grape
+- The existing full flow: Mind / Body / Heart check-in → emotion wheel (primary → secondary → tertiary → intensity) → done → six journal prompts.
+- Positioned as *"when you have time"* or *"for your next therapy session"*.
+- Accessed via a secondary link on the home page: **"take a deeper reflection"**.
 
-Krystal has a quiet companion — **a cute purple grape character** — who appears alongside the user through the daily flow. Not a mascot, not a coach: a small friend who's present and warm. Some principles for the grape:
+Both modes count toward the streak equally. The product does not moralize about depth.
 
-- **Quiet by default.** It doesn't narrate, lecture, or pop up with tips. Presence over instruction.
-- **Reactive, not proactive.** It softens in response to what the user does (e.g. a slow blink during grounding, a gentle wave on confirmation), but doesn't demand attention.
-- **Never judges.** It doesn't react more positively to "good" emotion choices or higher scores.
-- **One character, not a roster.** No unlockable variants, no "evolutions," no shop. The grape just is.
+### Seamless multi-surface access
 
-A name and exact look come in the design phase. For now: small, round, purple, with eyes.
+Crystal is present wherever the user already is. Phased rollout:
 
-### Anti-patterns
+| Surface | Mechanism | Phase |
+|---|---|---|
+| **Web (mobile + desktop)** | Live at krystal-one.vercel.app | ✓ shipped |
+| **Progressive Web App** | Add manifest + service worker; installs to phone home screen. iOS 16.4+ supports web push. | Next |
+| **iOS native** | Expo build → TestFlight → App Store. | Phase B |
+| **iOS home screen widget** | WidgetKit extension. One tap opens Quick Capture. | Phase B |
+| **Apple Watch** | watchOS companion app via WatchConnectivity. Mirror Quick Capture only. | Phase C |
+| **SMS check-in** | Twilio number: text an emotion + one line → saved to your account. Great for on-the-go and low-friction. | Phase B (may leapfrog to A if Twilio account is easy) |
+| **Android** | Same Expo build path as iOS. | Phase C |
 
-Five things Krystal will never do:
+**Design principle for every surface:** *the shortest path from thought to saved reflection.* No sign-in gates, no wheel scrolls, no 6-prompt gauntlet. Deep Reflection stays available but is never the required path.
 
-- No social features
-- No gamification (badges, levels, points, leaderboards)
-- No streak pressure (no "you broke your streak!" notifications)
-- No competitive mechanics
-- No engagement-maximizing design (no infinite scroll, no notifications designed to pull users back)
+## 5. Reminders — frequent but not annoying
 
-## 4. The daily reflection — five-step flow
+Reminders are back in scope (they were out of scope in v1.0). The user explicitly asked for them. Design them well or don't ship them.
 
-The core experience. Each step is one screen.
+### Rules
 
-### Step 1 — Grounding
+- **User-chosen anchor time.** Never a marketing team's guess. The user picks their moment.
+- **One reminder per day maximum.** Baseline. Even that's opt-in.
+- **Content is the *action*, not the ask.** *"how's your body feeling?"* — not *"come back to Crystal!"*.
+- **Voice matches the grape.** Small, quiet, warm. Never guilt-tripping.
+- **Graceful escalation, then disengagement.**
+  - Day 1 skip: nothing.
+  - Day 2 skip: gentle nudge at the same anchor time.
+  - Day 3 skip: gentle nudge with an easier ask (*"even just one word today?"*).
+  - Day 7 skip: reminder turns off automatically. The user comes back when they're ready.
+- **Surface-appropriate.** Watch = haptic tap only. Phone = notification. SMS = a short text from the crystal number. No email — that's noise.
+- **Never streak-shaming.** A missed day never generates guilt copy. The product's job is to be there when you show up, not to punish absence.
+- **Off is easy.** One-tap disable in settings. No dark patterns.
 
-Three guided breaths before any data entry. A short pause to bring awareness to the present moment.
+### Reminder anchor menu (initial set)
 
-- No skip button. The pause is the point.
-- Gentle scale/opacity animation matching breath pacing (~4s in, ~2s hold, ~6s out).
-- "Continue" appears after the three breaths complete.
+The user picks any subset. Times are user-configurable:
 
-### Step 2 — Mind, Body, Heart check-in
+- **Morning coffee** (default 8:00 am)
+- **Lunch pause** (default 12:30 pm)
+- **Between meetings** (adaptive — TBD, out of scope for v0.3)
+- **Before therapy** (user picks day + time; nudge fires 1 hour before)
+- **Bedtime wind-down** (default 10:00 pm)
 
-Three sliders, 1–10 each, with low/high anchor examples shown contextually.
+Default state at first launch: **all reminders off.** User must actively opt in. The absence of nagging IS a feature.
 
-- **Mind:** "How are your thoughts today?" *(Low: worried, racing, foggy. High: focused, clear, present.)*
-- **Body:** "How does your body feel right now?" *(Low: fatigue, pain, tension. High: relaxed, alive, active.)*
-- **Heart:** "How emotionally connected and open do you feel today?" *(Low: numb, closed off. High: open, connected.)*
+## 6. Product principles (preserved from v1.0)
 
-Stored as `mind_score`, `body_score`, `heart_score`.
+These are non-negotiable and apply across every surface and mode.
 
-### Step 3 — Emotion identification
+- **Calm.** Visuals, motion, and copy reduce arousal.
+- **Warm.** The product feels like a friend, not a tool.
+- **Encouraging.** *"Nice work"* lives here; *"You crushed it!"* doesn't.
+- **Cute, but not childish.** Thoughtful cartoon-game aesthetic. Untitled Goose Game energy, not kids' app.
+- **Reflective.** The product asks more than it tells.
+- **Safe.** No diagnostic language. Possibility-framed copy throughout (*"this may be telling you…"*).
+- **Non-judgmental.** No "right" emotions. No optimization framing of scores.
 
-The product's primary emotional-awareness feature. Three-level progressive selection using **Plutchik's wheel** — chosen because its three rings represent low-to-high intensity of each primary emotion (e.g. *serenity → joy → ecstasy*), making the picker itself a calibration exercise.
+### New v2.0 principle
 
-- **Level 1 (primary):** 8 options from Plutchik's basic emotions (joy, trust, fear, surprise, sadness, disgust, anger, anticipation).
-- **Level 2 (secondary):** mid-intensity variants per primary.
-- **Level 3 (specific):** highest-intensity variants per primary (Plutchik's outer ring).
+- **Seamless.** The user should never have to *decide* to open Crystal — they should already be in it. Widgets, watches, texts. The shortest path wins.
 
-Stored as `emotion_primary`, `emotion_secondary`, `emotion_specific`. All three are required.
+## 7. Anti-patterns (updated for v2.0)
 
-Atlas of Emotions content is *not* surfaced as a wheel choice in the picker. It is editorially mapped to each Plutchik tertiary by Gigi (manually, post-seed) and surfaces in the next screen.
+Five things Crystal will never do:
 
-Color-coded by primary emotion, used as supportive context only (not the dominant visual element):
+- **No social features.** No feed, no friends, no share to other users.
+- **No gamification of guilt.** Streaks exist, but broken streaks never trigger notifications or shame copy.
+- **No engagement-farming design.** No infinite scroll. No "you have 3 unread insights!" hooks.
+- **No selling insights back to the user as a paywalled feature.** The pattern-observation stays free.
+- **No diagnostic claims.** Never *"you have anxiety"* — always *"anxiety may be present."*
 
-- Joy → gold/yellow
-- Sadness → blue
-- Anger → red
-- Fear → purple
-- Trust → green
-- Disgust → brown
-- Surprise → cyan
-- Anticipation → orange
+**What v2.0 changes vs. v1.0:** the flat *"no notifications, no reminders"* rule is retired. Reminders are now permitted under the rules in §5.
 
-### Step 4 — Understanding + journaling (single screen)
+## 8. Companion — Crystal (the grape)
 
-The educational content and the journaling prompts live on the same screen. The Atlas-of-Emotions-style content (editorially mapped to the chosen Plutchik tertiary) appears not as something to read, but as **prompts to reflect against**. The user is invited to journal in response to each piece of educational framing.
+The purple grape character is the product's emotional anchor. The user's implicit friend. Renamed with the product from Krystal → Crystal.
 
-The selected emotion path is shown at the top: *"Today you identified: Fear → Anxiety → Overwhelmed."*
+Principles from v1.0 carry:
 
-Then, sequentially:
+- **Quiet by default.** No unsolicited tips.
+- **Reactive, not proactive.** Softens in response to what the user does.
+- **Never judges.** Doesn't react more positively to "good" emotion choices.
+- **One character.** No evolutions, no shops, no lore.
 
-- **Similar words** for this emotion (e.g. *worried, uneasy, nervous*) — shown as context, no input. Helps the user feel "yes, that's the one" or "actually, the closer word is…"
-- **Sensations** (educational): a short list of how this emotion commonly shows up in the body (e.g. *tight chest, restlessness, jittery energy*) — followed by a journal prompt: *"How are you experiencing this in your body right now?"* → `journal_sensation`
-- **What this emotion may be telling you** (educational, possibility-framed: *"Anxiety may be telling you that something important to you feels uncertain or at risk."*) — followed by a journal prompt: *"What might it be telling you in your life?"* → `journal_meaning`
-- **How this emotion can help you** (educational, possibility-framed: *"Anxiety can help identify risks, prepare for challenges, and clarify priorities."*) — followed by a journal prompt: *"How might it be helping you?"* → `journal_helpfulness`
+New in v2.0:
 
-Each journal field accepts 1–2 sentences (soft cap, not enforced). Each is **optional individually** — a user can leave any single prompt blank.
+- **Backpack + rewards.** Users earn items (currently: a knit hat at 5-day streak) as small quiet moments of recognition. The user chooses whether to equip. This is *not* gamification of guilt — earned items stay in the backpack forever, and unearned days never punish.
+- **Streak-gated on home.** The grape only appears on the home screen once the user has hit a 2-day streak. Before that, home is minimalist. The grape's arrival is the first reward.
+- **Multi-surface.** The grape shows up wherever Crystal shows up — home screen widget, Apple Watch complication, SMS confirmation.
 
-Two persistent affordances on this screen:
+## 9. Metrics — north star + inputs
 
-- **"Explore more"** — opens a deeper read-only view of the emotion's educational content (longer description, citations). For users who want context, not journaling.
-- **"Done"** — submits whatever was entered (including nothing).
+### North star
 
-**Critical copy rule:** never make diagnostic claims. Always *"may be telling you,"* *"can sometimes help by,"* *"often, but not always."* If a copy decision creates ambiguity, err toward less certainty.
+> **% of weekly active users who hit a 5-day journal streak.**
 
-The act of identifying the emotion is itself the practice — finishing with empty journal fields is a complete reflection.
+A journal streak is consecutive days with non-empty journal content. WAU = any user with a check-in in the last 7 days. This measures whether the ICP is finding *depth* alongside consistency.
 
-### Step 5 — Save + insights summary
+The home-page "N days in a row" number is a separate, more lenient count (any check-in, quick or deep). That's the motivation surface; the north star is the analytics surface.
 
-On submit:
+### Input metrics (dashboarded)
 
-- Write one `daily_checkins` row + optional `journal_entries` row to Supabase (when online) or local queue (when offline).
-- Show a calm confirmation screen with one observed pattern, if any (e.g. *"This is your third fear-related entry this week."*).
-- One-tap return home.
+1. **Day-1 retention.** % of new users who check in on day 2.
+2. **Day-2 retention.** Same, sliced to the day-2 grape unlock cohort.
+3. **Journal completion rate.** % of check-ins where at least one journal prompt was filled.
+4. **Hat unlock rate.** % of users who reach a 5-day journal streak.
+5. **Quick Capture vs. Deep Reflection split.** % of check-ins that use each mode. The healthy state is *Quick Capture dominant* (that's the ICP win); Deep Reflection should be the sometimes mode.
 
-> Originally the flow was six steps. With Understanding and Journaling now merged into a single screen, the flow is **five steps**: Grounding → Check-in → Emotion Identification → Understanding + Journaling → Save.
+Full definition + PostHog wiring in `docs/pm_portfolio/README.md`.
 
-## 5. Insights system
+## 10. What's shipped (v0.3, live now)
 
-The highest-value feature **after** journaling. The purpose is emotional clarity through pattern discovery — not metrics, not gamification.
+- Welcome → Mind → Body → Heart → primary wheel → secondary → tertiary → intensity → done → journal (this is the Deep Reflection flow)
+- One reflection per day per user (upsert pattern)
+- Anonymous Supabase auth + email upgrade
+- History view (expandable cards)
+- Streak counting (both lenient and strict, both fired to analytics)
+- Backpack + hat unlock at day 5
+- Grape companion with per-emotion face variations
+- Dark mode (system-following)
+- Web build at krystal-one.vercel.app
+- PostHog analytics (queued — needs account setup)
 
-### v1 scope: rule-based insights
+## 11. What's next (v0.4 build order)
 
-No ML for MVP. Hand-written rule observations like:
+Ordered by ICP leverage:
 
-- *"Your lowest Heart scores often occur on weekdays."*
-- *"Fear-related emotions appear most often after low Body scores."*
-- *"Joy-related emotions appear more frequently when you've checked in for two days in a row."*
-- *"Anxiety entries commonly mention work."* *(requires simple keyword scan over journal entries)*
-- *"Body scores are highest on Saturdays."*
+1. **Quick Capture mode.** New screen `app/quick-capture.tsx`. Big 8-emotion picker + optional one-line + save. Home page CTA becomes *"quick check-in"* (default) with *"take a deeper reflection"* as secondary link.
+2. **PWA foundations.** `manifest.json`, favicon set, service worker for offline shell, "add to home screen" prompt. Makes the web app installable.
+3. **Reminders v1.** Settings screen. Anchor time picker. Web push notifications (iOS 16.4+ Safari + Android). Rules in §5.
+4. **SMS check-in via Twilio.** Register a number. Inbound SMS webhook → parse → save via existing Supabase RLS-scoped user. Requires linking a phone number to the user account.
+5. **iOS TestFlight build.** Expo → EAS Build → TestFlight. Enables home screen widget and Apple Watch work later.
+6. **Home screen widget (iOS).** WidgetKit extension calling Quick Capture.
+7. **Apple Watch app.** watchOS companion mirroring Quick Capture.
 
-Insights only display once a user has at least **5 entries** (avoid premature pattern-claiming).
+Steps 1–4 unblock the "seamless" vision without leaving Expo/web. Steps 5–7 add native reach.
 
-Each insight is framed as observation, never prescription. Never *"you should…"* or *"try to…"*.
+## 12. Success criteria (v2.0)
 
-### Future (post-v1)
+- **North star ≥ 20%** within 90 days of the ICP-refined recruit + PWA + Quick Capture shipping.
+- **A first-time user can complete Quick Capture in under 30 seconds** on a mobile browser with a normal connection.
+- **The web app works offline.** Reflections queue locally and sync on reconnect.
+- **Reminder opt-in rate ≥ 40%** among users who complete their first Quick Capture. (Users who set a reminder are meaningfully choosing to invite Crystal into their day.)
+- **≥ 5 real user interviews** in the ICP demographic completed and synthesized before any Deep Reflection UI is redesigned.
+- **The product feels calm to actual users.** Qualitative signal from those interviews.
 
-- Weekly summary screen
-- Monthly emotional trend visualization
-- Optional therapist-export feature (PDF of last 30 days)
+Explicitly NOT success criteria:
 
-## 6. v1 (MVP) scope
+- DAU / MAU / time-in-app growth — those metrics push toward the anti-patterns in §7.
 
-**In scope:**
+## 13. Open questions
 
-- The six-step daily flow
-- Emotion taxonomy with hybrid Plutchik + Atlas content
-- Daily check-in storage (Supabase, RLS-protected)
-- Offline-first reflection (queues locally, syncs when online)
-- Email magic-link authentication
-- Insights screen with 5–8 rule-based observations
-- Calm home screen with daily entry CTA
-- Simple settings (sign out, delete all data, view privacy info)
+Tracked as `D-NNN` open decisions in `ai_context/current_state.md`. Currently:
 
-**Explicitly out of scope for v1:**
+- **D-002 (grape rendering):** hybrid PNG (home) + SVG (in-flow corner). Agreed; awaiting PNG assets.
+- **D-004 (resolved 2026-07-05):** Quick Capture allows "just checking in" with no emotion selected. Nothing is required except tapping save. Rationale: the ICP is distracted and time-pressed — friction cost of requiring a selection is higher than the analytical cost of null-emotion entries. Analytics can still slice by `emotion_primary is null`. Applied in `app/quick-capture.tsx`.
+- **D-005 (new for v2.0):** Should therapy-export be a first-class feature or a nice-to-have? First-class strengthens the ICP fit; nice-to-have keeps scope tight.
+- **D-006 (new for v2.0):** Should the SMS check-in charge us per message (Twilio) or be free-tier limited to N per day? Affects sustainability.
 
-- Social features of any kind
-- Push notifications (reflection should be self-initiated)
-- Reminders (revisit in v2 after observing how people actually use it)
-- Multiple users per account
-- Export / sharing
-- AI-generated reflections or suggestions
-- Mood charts / trend lines (v1 keeps insights textual)
-- Apple Health / fitness integrations
-- Apple Watch app
-- Web version
-- Dark mode toggle (the entire app uses a single thoughtful palette)
-- Custom emotion definitions
-- Voice journaling
+Answers land in `docs/DECISIONS.md` as ADRs when made.
 
-## 7. Success criteria
+## 14. Portfolio angle
 
-We deliberately do **not** define success by engagement metrics (DAU, retention, time-in-app). Those would push the product toward the very anti-patterns we're avoiding.
+Crystal is Gigi's headline PM portfolio piece. Every product decision documented in this PRD is a potential case study. The most portfolio-shaped moves in v0.4:
 
-Instead, v1 success means:
+- **The dual-mode capture decision.** Why did we split Quick Capture from Deep Reflection instead of shortening the full flow? Trade-off case study.
+- **The reminder design constraints.** Notifications are a hotly debated PM topic; documenting a principled framework (§5) is itself an artifact.
+- **The multi-surface roadmap.** Sequencing PWA → SMS → Widget → Watch is a resource-constrained prioritization exercise. Recruiters love this.
+- **The therapy-adjacent positioning.** A defensible target-user story that's *not* the wellness-app cliché.
 
-- A user can complete the full reflection flow in under 3 minutes on a stable connection.
-- The flow works end-to-end offline.
-- Insights surface only meaningful, evidence-backed observations (no false patterns).
-- Privacy is verifiable: a user can confirm only they see their data (transparent RLS, clear data-deletion).
-- The product feels calm to actual users. (Qualitative; collected via 1:1 conversations, not in-app surveys.)
-
-## 8. Open questions for later
-
-- Should there be a "skip a day" affordance, or do we just allow gaps silently? (Currently: silent gaps.)
-- Should Mind/Body/Heart scores allow decimals or be integer-only? (Default: integer 1–10.)
-- What's the response if a user tries to do two reflections in one day? (Default: overwrite the day's existing entry, with a soft "you already reflected today, this will replace it" confirm.)
-- Do we eventually offer prompts in additional languages? (Out of scope for v1, worth tracking.)
-- Therapist-export feature (PDF, last N days) — high user-request potential, but adds compliance considerations (HIPAA depending on positioning).
+Full skills mapping in `docs/pm_portfolio/skills.md`.

@@ -11,7 +11,7 @@ export default function BodyStep() {
       question={
         <>
           How does your{" "}
-          <Text className="font-semibold text-ink">body</Text> feel right now?
+          <Text className="font-display font-extrabold">body</Text> feel right now?
         </>
       }
       low="Fatigued. In pain. Tense. Stiff. Heavy."

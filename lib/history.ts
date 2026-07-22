@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 /**
- * Krystal — history queries.
+ * Crystal — history queries.
  *
  * One daily_checkin per user per day. Journal entries are optional (1:1 with
  * a daily_checkin when present). History gating: history list is only
@@ -11,9 +11,21 @@ import { supabase } from "@/lib/supabase";
 export type HistoryEntry = {
   id: string;
   occurred_at: string;
-  mind_score: number;
-  body_score: number;
-  heart_score: number;
+  /**
+   * Which capture mode wrote this entry. Quick captures may have most of
+   * the deep-mode fields null; deep captures have the full set filled.
+   */
+  capture_mode: "quick" | "deep";
+  /** Quick Capture only — one of the 7 Roberts primaries, or null if
+   *  the user did a "just checking in" quick capture with no emotion. */
+  quick_emotion_primary: string | null;
+  /** Quick Capture only — optional one-line note. Not a journal (which
+   *  requires a journal_entries row); this is inline context. */
+  quick_note: string | null;
+  // Deep Reflection fields — nullable now that Quick Capture exists.
+  mind_score: number | null;
+  body_score: number | null;
+  heart_score: number | null;
   plutchik_emotion: string | null;
   emotion: {
     primary_name: string;
@@ -51,15 +63,18 @@ export async function fetchTodaysEntry(
       `
       id,
       occurred_at,
+      capture_mode,
+      quick_emotion_primary,
+      quick_note,
       mind_score,
       body_score,
       heart_score,
       plutchik_emotion,
-      emotion_details!inner (
+      emotion_details (
         name,
-        emotion_subcategories!inner (
+        emotion_subcategories (
           name,
-          emotion_categories!inner (name, color)
+          emotion_categories (name, color)
         )
       ),
       journal_entries (
@@ -92,15 +107,18 @@ export async function fetchAllEntries(userId: string): Promise<HistoryEntry[]> {
       `
       id,
       occurred_at,
+      capture_mode,
+      quick_emotion_primary,
+      quick_note,
       mind_score,
       body_score,
       heart_score,
       plutchik_emotion,
-      emotion_details!inner (
+      emotion_details (
         name,
-        emotion_subcategories!inner (
+        emotion_subcategories (
           name,
-          emotion_categories!inner (name, color)
+          emotion_categories (name, color)
         )
       ),
       journal_entries (
@@ -138,9 +156,12 @@ function shapeRow(row: any): HistoryEntry {
   return {
     id: row.id,
     occurred_at: row.occurred_at,
-    mind_score: row.mind_score,
-    body_score: row.body_score,
-    heart_score: row.heart_score,
+    capture_mode: (row.capture_mode ?? "deep") as "quick" | "deep",
+    quick_emotion_primary: row.quick_emotion_primary ?? null,
+    quick_note: row.quick_note ?? null,
+    mind_score: row.mind_score ?? null,
+    body_score: row.body_score ?? null,
+    heart_score: row.heart_score ?? null,
     plutchik_emotion: row.plutchik_emotion ?? null,
     emotion:
       ed && sub && cat
@@ -165,8 +186,14 @@ function shapeRow(row: any): HistoryEntry {
 }
 
 /**
- * Counts consecutive days (including today) with at least one daily_checkin.
- * Stops at the first gap. Returns 0 if today has no entry yet.
+ * Counts the current run of consecutive days with at least one daily_checkin.
+ *
+ * "Grace for today": the streak is still considered alive until the user
+ * misses a WHOLE day. So if you checked in yesterday but haven't yet today,
+ * your streak still shows (counting from yesterday) instead of dropping to 0
+ * the moment the clock rolls past midnight. It only resets once both today
+ * AND yesterday are empty. This is what a habit tracker should do — it
+ * shouldn't punish you for not having opened the app yet this morning.
  */
 export function computeStreak(entries: HistoryEntry[]): number {
   if (entries.length === 0) return 0;
@@ -177,10 +204,16 @@ export function computeStreak(entries: HistoryEntry[]): number {
 
   const days = new Set(entries.map((e) => dayKey(new Date(e.occurred_at))));
 
-  let count = 0;
   const cursor = new Date();
   cursor.setHours(0, 0, 0, 0);
 
+  // If today isn't logged yet, start counting from yesterday so an unbroken
+  // run through yesterday still reads as a live streak.
+  if (!days.has(dayKey(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  let count = 0;
   while (days.has(dayKey(cursor))) {
     count++;
     cursor.setDate(cursor.getDate() - 1);
@@ -209,16 +242,27 @@ export function computeJournalStreak(entries: HistoryEntry[]): number {
       .map((e) => dayKey(new Date(e.occurred_at)))
   );
 
-  let count = 0;
   const cursor = new Date();
   cursor.setHours(0, 0, 0, 0);
 
+  // Same "grace for today" rule as computeStreak — don't reset until a full
+  // day is missed.
+  if (!journaledDays.has(dayKey(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  let count = 0;
   while (journaledDays.has(dayKey(cursor))) {
     count++;
     cursor.setDate(cursor.getDate() - 1);
   }
 
   return count;
+}
+
+/** Total number of days the user has journaled real content (all-time). */
+export function countJournaledDays(entries: HistoryEntry[]): number {
+  return entries.filter((e) => journalHasContent(e.journal)).length;
 }
 
 /** Has at least one prompt been written in? */

@@ -10,8 +10,10 @@ Prioritized backlog. Newest items go in their priority bucket, not at the bottom
 
 | ID | Task | Status | Owner | Depends on |
 |---|---|---|---|---|
-| T-001 | User pushes pending commits (backpack + day-2 grape + mobile fix + AI framework) | `blocked` | Gigi | Git lock removal (see handoff) |
+| T-001 | User pushes pending commits (backpack + day-2 grape + mobile fix + AI framework + PostHog + v2.0 PRD + rename) | `blocked` | Gigi | Git lock removal + `npm install` |
 | T-002 | User runs `supabase/007_inventory.sql` migration in Supabase SQL editor | `blocked` | Gigi | None — just needs human action |
+| V4-001 | Build Quick Capture screen (`app/quick-capture.tsx` — big 8-emotion picker, optional one-line, save in ≤30s) | `todo` | next AI | PRD v2.0 approved (done) |
+| V4-002 | Update home CTA: primary → "quick check-in", secondary link → "take a deeper reflection" | `todo` | next AI | V4-001 |
 
 ## P1 — Active work
 
@@ -20,6 +22,23 @@ Prioritized backlog. Newest items go in their priority bucket, not at the bottom
 | T-003 | Resolve D-001 streak rule (strict vs lenient) | `blocked` | Gigi to decide | None |
 | T-004 | Refactor `GrapeCompanion` for hybrid PNG/SVG rendering | `blocked` | next AI | Gigi generating PNG assets |
 | T-005 | Generate AI grape PNG variants (default + 7 emotions + 3 intensity) | `in-progress` | Gigi | None |
+
+### PM portfolio (parallel track)
+
+| ID | Task | Status | Owner | Depends on |
+|---|---|---|---|---|
+| PM-001 | Wire up PostHog + instrument north star + 4 input metrics | `done` | Claude | shipped 2026-07-05 — see session_log |
+| PM-001a | Create PostHog account + paste API key into `.env` | `todo` | Gigi | None (posthog.com → new project → copy key) |
+| PM-002 | Draft day-2 grape A/B test case study skeleton (before experiment runs) | `todo` | Gigi | None |
+| PM-003 | Recruit 5 user interview participants | `in-progress` | Gigi | copy ready in `docs/pm_portfolio/recruit_copy.md` |
+| PM-004 | Conduct 5 user interviews | `todo` | Gigi | PM-003 |
+| PM-005 | Synthesize interview findings into `case_studies/5_interviews.md` | `todo` | Gigi | PM-004 |
+| PM-006 | Run day-2 grape A/B test (6 weeks) | `blocked` | Gigi | PM-001a |
+| PM-007 | Update day-2 case study with experiment results | `blocked` | Gigi | PM-006 |
+| PM-008 | Build `/roadmap` public page on krystal-one.vercel.app | `todo` | next AI | None |
+| PM-009 | Build `/process` page on portfolio site documenting AI Generalist workflow | `todo` | Gigi | gigihsu.com being live |
+| PM-010 | Generate 10 AI grape PNG assets via Nano Banana | `in-progress` | Gigi | checklist ready in `docs/pm_portfolio/grape_generation_checklist.md` |
+| PM-011 | Refactor `GrapeCompanion.tsx` for hybrid PNG (home) / SVG (corner) once PM-010 lands | `blocked` | next AI | PM-010 |
 
 ## P2 — Next reasonable improvements
 

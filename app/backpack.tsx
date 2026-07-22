@@ -1,11 +1,13 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
 import { GrapeCompanion } from "@/components/GrapeCompanion";
+import { Scene } from "@/components/Scene";
+import { trackItemToggled } from "@/lib/analytics";
 import { ITEMS, Item, nextUnlock } from "@/lib/inventory";
+import { currentScene } from "@/lib/scene";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
   useEquippedSlugs,
@@ -28,6 +30,7 @@ export default function Backpack() {
   const hydrate = useInventoryStore((s) => s.hydrate);
   const toggleEquipped = useInventoryStore((s) => s.toggleEquipped);
   const equippedSlugs = useEquippedSlugs();
+  const scene = currentScene();
 
   useEffect(() => {
     if (user) void hydrate(user.id);
@@ -42,10 +45,7 @@ export default function Backpack() {
   );
 
   return (
-    <SafeAreaView
-      className="flex-1 bg-cream dark:bg-cream-dark"
-      edges={["top", "bottom"]}
-    >
+    <Scene edges={["top", "bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -60,7 +60,10 @@ export default function Backpack() {
               onPress={() => router.push("/")}
               className="px-2 py-2 transition-all duration-300 hover:opacity-70"
             >
-              <Text className="text-sm text-muted dark:text-muted-dark">
+              <Text
+                className="font-body text-sm font-bold"
+                style={{ color: scene.subInk }}
+              >
                 ← Home
               </Text>
             </Pressable>
@@ -68,13 +71,19 @@ export default function Backpack() {
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-2 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+          <Text
+            className="mb-2 font-display text-4xl font-extrabold tracking-tight"
+            style={{ color: scene.ink }}
+          >
             Backpack
           </Text>
         </FadeIn>
         <FadeIn delay={160}>
-          <Text className="mb-8 text-base leading-relaxed text-muted dark:text-muted-dark">
-            What you've earned by showing up.
+          <Text
+            className="mb-8 font-body text-base font-semibold leading-relaxed"
+            style={{ color: scene.subInk }}
+          >
+            What you've gathered by showing up.
           </Text>
         </FadeIn>
 
@@ -96,7 +105,13 @@ export default function Backpack() {
                 owned={owned}
                 equipped={equipped}
                 onPress={() => {
-                  if (owned && user) toggleEquipped(user.id, item.slug);
+                  if (owned && user) {
+                    toggleEquipped(user.id, item.slug);
+                    trackItemToggled({
+                      item_slug: item.slug,
+                      equipped: !equipped,
+                    });
+                  }
                 }}
               />
             </FadeIn>
@@ -105,13 +120,16 @@ export default function Backpack() {
 
         {upcoming && (
           <FadeIn delay={500}>
-            <Text className="mt-4 text-center text-xs text-muted dark:text-muted-dark">
+            <Text
+              className="mt-4 text-center font-body text-xs font-semibold"
+              style={{ color: scene.subInk }}
+            >
               Next: {upcoming.name.toLowerCase()} at day {upcoming.unlockStreak}
             </Text>
           </FadeIn>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </Scene>
   );
 }
 

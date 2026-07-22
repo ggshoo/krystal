@@ -100,8 +100,8 @@ export function EmotionWheel({ onPick, selected }: Props) {
           ? `translate(${offsetX} ${offsetY}) translate(${wedgeCx} ${wedgeCy}) scale(${scale}) translate(${-wedgeCx} ${-wedgeCy})`
           : "translate(0 0)";
 
-        const fillAlpha = isSelected ? "DD" : isHovered ? "BB" : "40";
-        const strokeColor = lit ? e.color : "#F7F0E5";
+        const fillAlpha = isSelected ? "DD" : isHovered ? "BB" : "66";
+        const strokeColor = lit ? e.color : "#FFF6E3";
         // Thicker stroke gives the rounded line joins more visual weight,
         // which softens the otherwise-sharp wedge corners.
         const strokeWidth = isHovered ? 7 : isSelected ? 7 : 6;
@@ -145,7 +145,7 @@ export function EmotionWheel({ onPick, selected }: Props) {
             <SvgText
               x={labelX}
               y={labelY}
-              fill="#2D2520"
+              fill="#2E2416"
               fontSize={labelSize}
               fontWeight={labelWeight}
               textAnchor="middle"
@@ -163,7 +163,7 @@ export function EmotionWheel({ onPick, selected }: Props) {
         );
       })}
       {/* Soft center hole */}
-      <Circle cx={CENTER} cy={CENTER} r={INNER_R - 1.5} fill="#F7F0E5" />
+      <Circle cx={CENTER} cy={CENTER} r={INNER_R - 1.5} fill="#FFF6E3" />
     </Svg>
   );
 }

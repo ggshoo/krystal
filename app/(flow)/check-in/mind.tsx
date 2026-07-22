@@ -11,7 +11,7 @@ export default function MindStep() {
       question={
         <>
           How are your{" "}
-          <Text className="font-semibold text-ink">thoughts</Text> today?
+          <Text className="font-display font-extrabold">thoughts</Text> today?
         </>
       }
       low="Worried. Racing thoughts. Foggy brain. Cluttered. Distracted."

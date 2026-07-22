@@ -1,79 +1,112 @@
 # Handoff — for the next AI
 
-> Overwrite this file when you end your session. The previous AI's notes get replaced — the audit trail lives in `session_log.md`.
+> Overwrite this file when you end your session. The audit trail lives in `session_log.md`.
 
 **From:** Claude (Cowork) · `Sonnet 4.6`
 **To:** Next agent (Claude / Codex / Cursor / Gemini / whoever)
-**Date:** 2026-06-12
-**Branch:** `main` (uncommitted local changes — see below)
+**Date:** 2026-07-05
+**Branch:** `main` (uncommitted local changes)
 
 ---
 
 ## Current objective
 
-Two parallel tracks were active when I logged off:
-
-1. **Multi-AI collaboration framework** (this scaffolding). DONE — all `ai_context/` and `.ai/` files exist. Verify by reading `current_state.md`.
-2. **Backpack + day-2 grape unlock system** — code complete in folder, not yet pushed, requires Supabase migration `007_inventory.sql` to function fully.
+Gigi came back after a break to reboot the project. Four tasks were teed up. Three are code-complete in the folder; one (grape PNG generation) can't be done by AI. Everything's ready for her to run the human steps.
 
 ---
 
-## What I left in a working state
+## What's in the folder, uncommitted
 
-- `app/index.tsx` — home page with grape gating, day-1/2/5 messages, backpack icon, streak now journal-content based
-- `app/backpack.tsx` — new screen with live grape preview + equip/unequip
-- `components/GrapeCompanion.tsx` — supports `equipped` prop, renders knit beanie when hat equipped
-- `store/useInventoryStore.ts` — Zustand store with `useEquippedSlugs` memoized hook (fixed infinite re-render bug)
-- `lib/inventory.ts` — items catalog (currently 1 item: hat at day 5)
-- `lib/history.ts` — added `computeJournalStreak` (counts journal-content days)
-- `supabase/007_inventory.sql` — migration for `user_inventory` table with RLS
-- All flow grape consumers (`app/(flow)/_layout.tsx`, `done.tsx`, `journal.tsx`) now use `useEquippedSlugs()` so the hat shows everywhere
-- Journal prompt renamed to "What can you do, in your control, to provide what you need right now?"
-- Mobile rating row uses `flex-1` instead of fixed 44px (was cutting off buttons 9 + 10)
-- Dark mode is live across all screens
+**D-001 resolved (lenient streak).** `app/index.tsx` now uses `computeStreak` for the "N days in a row" display. `computeJournalStreak` still runs alongside and fires as an event property so PostHog can measure the strict cohort separately.
 
-`npx tsc --noEmit` runs clean (only the two pre-existing `EmotionWheel.tsx` style-prop warnings remain).
+**PostHog wired end-to-end.**
+- `lib/analytics.ts` — the whole event surface, single source for tracking.
+- `app/_layout.tsx` — `initAnalytics()` + `identifyUser()` on auth resolve.
+- `app/(flow)/done.tsx` — fires `trackCheckinSaved` on save.
+- `app/(flow)/journal.tsx` — fires `trackJournalSaved` with `filled_field_count`.
+- `app/index.tsx` — fires `trackStreakSnapshot` on every home load with both streak flavors.
+- `app/backpack.tsx` — fires `trackItemToggled` on equip/unequip.
+- `package.json` — added `posthog-js`.
+- `.env.example` — documented `EXPO_PUBLIC_POSTHOG_API_KEY` and `EXPO_PUBLIC_POSTHOG_HOST`.
+
+**PM portfolio prep.**
+- `docs/pm_portfolio/recruit_copy.md` — LinkedIn / Reddit / X / Discord recruit posts + follow-up DM template + recruit tracking table.
+- `docs/pm_portfolio/grape_generation_checklist.md` — 20-minute Nano Banana playbook.
+
+**Framework docs updated.**
+- `ai_context/current_state.md` — D-001 marked resolved; new Recent Changes row; timestamp bumped.
+- `ai_context/active_tasks.md` — PM-001 done, PM-001a new (Gigi runs PostHog signup), PM-010/PM-011 added.
+- `ai_context/session_log.md` — new dated entry appended.
+
+`npx tsc --noEmit` is clean except for:
+- Two pre-existing `EmotionWheel.tsx` warnings (tolerated).
+- One new `lib/analytics.ts` warning ("Cannot find module 'posthog-js'") — resolves the second Gigi runs `npm install`.
 
 ---
 
-## What needs to happen next, in order
+## What Gigi needs to do next, in order
 
-### 1. Get the user to push
+### 1. Restore Supabase (blocks everything)
 
-There's a known git lock issue from the sandbox. Tell her:
+Dashboard → project `mtnallsztrulbrmbvbpf` → click Restore. ~2 min.
 
-```bash
+While there, check Table Editor for `user_inventory`. If absent, run `supabase/007_inventory.sql` in SQL Editor.
+
+### 2. Install the new dependency
+
+```
+cd ~/code/krystal
+npm install
+```
+
+Resolves the `posthog-js` TypeScript error and updates `package-lock.json`.
+
+### 3. Create PostHog project + paste API key
+
+- Sign up at https://app.posthog.com (free tier is fine)
+- Create a project called "krystal"
+- Copy the Project API Key from Settings → Project
+- Paste into `.env`:
+  ```
+  EXPO_PUBLIC_POSTHOG_API_KEY=phc_...
+  EXPO_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+  ```
+
+Analytics silently no-ops if the key is blank (dev/preview builds keep working), so this is safe to do before OR after pushing.
+
+### 4. Push the pending changes
+
+```
 rm -f ~/code/krystal/.git/index.lock
 cd ~/code/krystal
 git add .
-git commit -m "feat: backpack system + day-2 grape + mobile fix + AI collab framework"
+git commit -m "feat: PostHog analytics + D-001 lenient streak + PM portfolio prep"
 git push
 ```
 
-Wait ~2 min for GitHub Action → Vercel. Hard refresh https://krystal-one.vercel.app (Cmd+Shift+R).
+### 5. Verify the live site
 
-### 2. Run the inventory migration
+After Vercel deploys (~2 min), hard-refresh https://krystal-one.vercel.app with Cmd+Shift+R. Do one full pass through the reflection flow. Confirm nothing regressed.
 
-The hat/backpack won't function until `user_inventory` exists in Supabase. Walk her through:
+### 6. Build the PostHog dashboard (10 min in the PostHog UI)
 
-1. Open https://supabase.com/dashboard/project/mtnallsztrulbrmbvbpf/sql/new
-2. Paste the contents of `supabase/007_inventory.sql`
-3. Click Run
+Once events start flowing (fire a couple manually by using the site), create these Insights in PostHog:
 
-The store handles a missing table gracefully (empty inventory, no errors), so the app will load either way. The backpack icon just won't appear and the hat won't drop until the migration runs.
+- **North star (metric):** cohort of unique users where `streak_snapshot.journal_streak >= 5` in the last 7 days, divided by cohort of unique users with any event in the last 7 days.
+- **Day-1 retention (funnel):** users who fired `checkin_saved` → users who fired `checkin_saved` again the next day.
+- **Day-2 retention (funnel):** same, filtered to `days_since_first_checkin = 1`.
+- **Journal completion rate (trend):** % of `journal_saved` events with `has_content = true`.
+- **Hat unlock rate (funnel):** users who reach `streak_snapshot.journal_streak >= 5`.
 
-### 3. Resolve the streak rule decision (D-001)
+All five feed the north star. Pin them to a dashboard called "Krystal North Star".
 
-See `current_state.md → Open Decisions`. Gigi noticed history shows 3 days but streak says 2. The cause: one of those days has no journal content. Current rule is strict (require content). She needs to pick:
+### 7. Run the grape generation checklist (20 min external)
 
-- **Strict (current):** keep `computeJournalStreak` in `app/index.tsx`.
-- **Lenient:** revert to `computeStreak` in `app/index.tsx`.
+Open `docs/pm_portfolio/grape_generation_checklist.md` and follow it step-by-step in Google AI Studio. Save the 10 PNGs to `~/code/krystal/assets/grape/`.
 
-I recommended lenient. She hasn't decided yet.
+### 8. Kick off user interview recruiting
 
-### 4. Watch for the PNG grape handoff
-
-She agreed to generate AI grape variants via Google Nano Banana. When she returns with PNGs in `assets/grape/`, refactor `GrapeCompanion.tsx` for hybrid PNG/SVG rendering. Master prompt is in `docs/grape_image_prompts.md`.
+Open `docs/pm_portfolio/recruit_copy.md`, pick the LinkedIn variant, post it. Then post the Reddit variant to r/journaling (after asking mods for permission). Track responses in the table at the bottom of that file.
 
 ---
 
@@ -81,9 +114,10 @@ She agreed to generate AI grape variants via Google Nano Banana. When she return
 
 | Blocker | Who | What we need |
 |---|---|---|
-| `user_inventory` table missing in Supabase | Gigi to run migration | Paste `supabase/007_inventory.sql` in Supabase SQL editor |
-| Streak rule decision (D-001) | Gigi to choose | Strict vs lenient streak |
-| AI grape PNG assets | Gigi to generate | Use master prompt with Nano Banana, drop into `assets/grape/` |
+| Supabase paused | Gigi | Click Restore in dashboard |
+| PostHog account | Gigi | Sign up + paste API key |
+| `posthog-js` module | Gigi | Run `npm install` |
+| PNG grape assets | Gigi | Run generation checklist |
 
 None of these are dev-blocked. All are awaiting human action.
 
@@ -91,20 +125,14 @@ None of these are dev-blocked. All are awaiting human action.
 
 ## Context that's NOT obvious from the code
 
-- **Anonymous auth is the default**. Users get a Supabase anon JWT on first load (persisted in localStorage). They can later upgrade to email via `supabase.auth.updateUser({ email })` — the user_id stays the same so all their data carries over.
-- **Local dev workflow** — Gigi doesn't run a local dev server. She pushes to `main` and tests on https://krystal-one.vercel.app after the GitHub Action finishes. Any local "did it work?" needs you to do `npx tsc --noEmit` and reason about correctness, not run the app.
-- **SVG Y-axis traps everyone.** Y increases downward. I shipped a frown thinking it was a smile because I had the math backwards. There's now a comment in `GrapeCompanion.tsx` explaining the convention. Don't re-flip it.
-- **The grape is dynamic, the hat is permanent.** The grape on home only shows if current journal streak ≥ 2. Break your streak → grape disappears. Items in backpack persist forever once earned. This was a deliberate design choice — see Gigi's wording in `session_log.md`.
-- **The `(flow)` route group** wraps Welcome → Check-in → Wheel → Done → Journal. The corner grape lives in that layout, hidden on Done + Journal where a larger inline grape is already shown.
+- **Two streaks now coexist.** `computeStreak` (lenient — any check-in) drives home display and grape gating. `computeJournalStreak` (strict — journal content) drives the north-star cohort in PostHog. Don't remove either.
+- **Analytics fails open.** If the PostHog key is missing, `initAnalytics` logs a warning and every `track*` function no-ops. Dev builds don't need a key.
+- **PostHog SDK choice.** I picked `posthog-js` (web) not `posthog-react-native`. Krystal is web-only right now. If Gigi ships native later, swap `lib/analytics.ts` — the public interface (named `track*` functions) stays the same.
+- **Free-tier Supabase auto-pause is a persistent risk.** If Gigi steps away for another 7+ days, the site goes down until restored. Consider upgrading to a paid tier before the portfolio site drives traffic, OR add a scheduled task that pings the project.
+- **The framework survived first contact.** Gigi came back after a break and I reconstituted full state from `current_state.md` + `handoff.md` without asking her to re-explain anything. Preserve this — it's the whole point of the AI Generalist system.
 
 ---
 
 ## How to update this file when you finish
 
-1. Replace this entire file with your own handoff.
-2. Keep the same structure (sections above).
-3. Date + name yourself at the top.
-4. Be specific about what's done, what's next, and what blockers exist.
-5. Then update `current_state.md` and `session_log.md` separately.
-
-The next AI is reading this cold. Make it self-contained.
+Overwrite this file with your own handoff. Keep the same structure. Date + name yourself at the top. Then update `current_state.md` and `session_log.md` separately. The next AI is reading this cold — make it self-contained.

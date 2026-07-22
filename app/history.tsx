@@ -7,10 +7,12 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FadeIn } from "@/components/FadeIn";
+import { Scene } from "@/components/Scene";
+import { findPrimary } from "@/lib/emotions";
 import { fetchAllEntries, formatEntryDate, HistoryEntry } from "@/lib/history";
+import { currentScene } from "@/lib/scene";
 import { useAuthStore } from "@/store/useAuthStore";
 
 /**
@@ -26,6 +28,7 @@ export default function HistoryScreen() {
 
   const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const scene = currentScene();
 
   useEffect(() => {
     if (!authInitialized || !user) return;
@@ -40,7 +43,7 @@ export default function HistoryScreen() {
   }, [authInitialized, user]);
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+    <Scene edges={["top", "bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -55,27 +58,41 @@ export default function HistoryScreen() {
               onPress={() => router.push("/")}
               className="px-2 py-2 transition-all duration-300 hover:opacity-70"
             >
-              <Text className="text-sm text-muted dark:text-muted-dark">← Home</Text>
+              <Text
+                className="font-body text-sm font-bold"
+                style={{ color: scene.subInk }}
+              >
+                ← Home
+              </Text>
             </Pressable>
           </View>
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-2 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
-            Your history
+          <Text
+            className="mb-2 font-display text-4xl font-extrabold tracking-tight"
+            style={{ color: scene.ink }}
+          >
+            Your journey so far
           </Text>
         </FadeIn>
         <FadeIn delay={160}>
-          <Text className="mb-10 text-base leading-relaxed text-muted dark:text-muted-dark">
-            Each day you've checked in.
+          <Text
+            className="mb-10 font-body text-base font-semibold leading-relaxed"
+            style={{ color: scene.subInk }}
+          >
+            Every day you've checked in.
           </Text>
         </FadeIn>
 
         {entries === null && (
           <FadeIn delay={300}>
             <View className="items-center py-10">
-              <ActivityIndicator color="#C2876B" />
-              <Text className="mt-4 text-sm text-muted dark:text-muted-dark">
+              <ActivityIndicator color="#E97451" />
+              <Text
+                className="mt-4 font-body text-sm font-semibold"
+                style={{ color: scene.subInk }}
+              >
                 Loading your reflections…
               </Text>
             </View>
@@ -85,7 +102,12 @@ export default function HistoryScreen() {
         {entries !== null && entries.length === 0 && (
           <FadeIn delay={300}>
             <View className="items-center py-10">
-              <Text className="text-base text-muted dark:text-muted-dark">No reflections yet.</Text>
+              <Text
+                className="font-body text-base font-semibold"
+                style={{ color: scene.subInk }}
+              >
+                No reflections yet.
+              </Text>
             </View>
           </FadeIn>
         )}
@@ -103,7 +125,7 @@ export default function HistoryScreen() {
             </FadeIn>
           ))}
       </ScrollView>
-    </SafeAreaView>
+    </Scene>
   );
 }
 
@@ -116,7 +138,12 @@ function EntryCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const themeColor = entry.emotion?.primary_color ?? "#C2876B";
+  const isQuick = entry.capture_mode === "quick";
+  const quickEmotion = isQuick
+    ? findPrimary(entry.quick_emotion_primary ?? undefined)
+    : undefined;
+  const themeColor =
+    entry.emotion?.primary_color ?? quickEmotion?.color ?? "#E97451";
   const dateLabel = formatEntryDate(entry.occurred_at);
 
   return (
@@ -130,28 +157,42 @@ function EntryCard({
         shadowOffset: { width: 0, height: 2 },
       }}
     >
-      {/* Date + scores row */}
+      {/* Date + mode/scores row */}
       <View className="mb-3 flex-row items-center justify-between">
-        <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
-          {dateLabel}
-        </Text>
-        <View className="flex-row gap-4">
-          <Text className="text-xs text-muted dark:text-muted-dark">
-            <Text className="font-semibold text-ink dark:text-ink-dark">Mind</Text>{" "}
-            {entry.mind_score}
+        <View className="flex-row items-center gap-2">
+          <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
+            {dateLabel}
           </Text>
-          <Text className="text-xs text-muted dark:text-muted-dark">
-            <Text className="font-semibold text-ink dark:text-ink-dark">Body</Text>{" "}
-            {entry.body_score}
-          </Text>
-          <Text className="text-xs text-muted dark:text-muted-dark">
-            <Text className="font-semibold text-ink dark:text-ink-dark">Heart</Text>{" "}
-            {entry.heart_score}
-          </Text>
+          {isQuick && (
+            <View className="rounded-chip bg-accent/15 px-2 py-0.5">
+              <Text className="text-[10px] font-semibold uppercase tracking-widest text-accent dark:text-accent-dark">
+                Quick
+              </Text>
+            </View>
+          )}
         </View>
+
+        {/* Mind/Body/Heart only render for Deep Reflections. Quick Captures
+            don't collect these fields (they're null in the row). */}
+        {!isQuick && (
+          <View className="flex-row gap-4">
+            <Text className="text-xs text-muted dark:text-muted-dark">
+              <Text className="font-semibold text-ink dark:text-ink-dark">Mind</Text>{" "}
+              {entry.mind_score ?? "—"}
+            </Text>
+            <Text className="text-xs text-muted dark:text-muted-dark">
+              <Text className="font-semibold text-ink dark:text-ink-dark">Body</Text>{" "}
+              {entry.body_score ?? "—"}
+            </Text>
+            <Text className="text-xs text-muted dark:text-muted-dark">
+              <Text className="font-semibold text-ink dark:text-ink-dark">Heart</Text>{" "}
+              {entry.heart_score ?? "—"}
+            </Text>
+          </View>
+        )}
       </View>
 
-      {/* Emotion path */}
+      {/* Emotion path — Deep vs Quick shape differently. */}
       {entry.emotion && (
         <View className="flex-row items-center">
           <View
@@ -173,6 +214,30 @@ function EntryCard({
             )}
           </Text>
         </View>
+      )}
+
+      {isQuick && quickEmotion && (
+        <View className="flex-row items-center">
+          <View
+            className="mr-2 h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: quickEmotion.color }}
+          />
+          <Text className="text-sm capitalize text-ink dark:text-ink-dark font-medium">
+            {quickEmotion.name}
+          </Text>
+        </View>
+      )}
+
+      {isQuick && !quickEmotion && (
+        <Text className="text-sm italic text-muted dark:text-muted-dark">
+          just checking in
+        </Text>
+      )}
+
+      {isQuick && entry.quick_note && (
+        <Text className="mt-2 text-sm leading-relaxed text-ink dark:text-ink-dark">
+          "{entry.quick_note}"
+        </Text>
       )}
 
       {/* Expanded journal */}

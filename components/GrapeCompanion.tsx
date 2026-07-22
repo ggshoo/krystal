@@ -13,7 +13,7 @@ import {
 import { ItemSlug } from "@/lib/inventory";
 
 /**
- * Krystal — the grape companion.
+ * Crystal — the grape companion.
  *
  * Cute purple grape with glossy 3D-style shading (radial gradients on the
  * body and cheeks), curly stem with single leaf, big sparkly eyes, gentle

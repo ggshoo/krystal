@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EmotionWheel } from "@/components/EmotionWheel";
 import { FadeIn } from "@/components/FadeIn";
+import { Scene } from "@/components/Scene";
+import { currentScene } from "@/lib/scene";
 import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
@@ -13,6 +14,7 @@ export default function PickPrimary() {
   const router = useRouter();
   const setEmotionPrimary = useReflectionStore((s) => s.setEmotionPrimary);
   const currentPrimary = useReflectionStore((s) => s.draft.emotion_primary);
+  const scene = currentScene();
 
   const pick = (slug: string) => {
     setEmotionPrimary(slug);
@@ -20,17 +22,23 @@ export default function PickPrimary() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+    <Scene edges={["top", "bottom"]}>
       <View className="flex-1 items-center px-6 pt-12">
         <FadeIn delay={0}>
-          <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+          <Text
+            className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
+            style={{ color: scene.ink }}
+          >
             What's coming up?
           </Text>
         </FadeIn>
 
         <FadeIn delay={120}>
-          <Text className="mb-10 max-w-xs text-center text-base leading-relaxed text-muted dark:text-muted-dark">
-            Tap the closest emotion. We'll narrow down from there.
+          <Text
+            className="mb-10 max-w-xs text-center font-body text-base font-semibold leading-relaxed"
+            style={{ color: scene.subInk }}
+          >
+            Tap the closest feeling. We'll wander in from there.
           </Text>
         </FadeIn>
 
@@ -40,6 +48,6 @@ export default function PickPrimary() {
           </View>
         </FadeIn>
       </View>
-    </SafeAreaView>
+    </Scene>
   );
 }

@@ -1,4 +1,4 @@
-# Krystal
+# Crystal
 
 A daily emotional reflection app — mind/body/heart check-in, emotion identification via the Roberts wheel, intensity laddering via Plutchik, optional journaling, and a streak-based relationship with a grape companion character.
 

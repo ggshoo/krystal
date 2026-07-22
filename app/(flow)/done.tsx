@@ -1,10 +1,13 @@
 import { Redirect, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ChunkyButton } from "@/components/ChunkyButton";
 import { FadeIn } from "@/components/FadeIn";
 import { GrapeCompanion } from "@/components/GrapeCompanion";
+import { Scene } from "@/components/Scene";
+import { currentScene } from "@/lib/scene";
+import { trackCheckinSaved } from "@/lib/analytics";
 import {
   findPrimary,
   findSecondary,
@@ -36,6 +39,7 @@ export default function Done() {
   const [state, setState] = useState<SaveState>("saving");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const equippedSlugs = useEquippedSlugs();
+  const scene = currentScene();
 
   // Prevent double-submission if the effect re-runs (auth state arrives later)
   const submittedRef = useRef(false);
@@ -145,6 +149,16 @@ export default function Done() {
           .getState()
           .setField("daily_checkin_id", dailyCheckinId);
 
+        // Fire analytics after successful save (fire-and-forget)
+        trackCheckinSaved({
+          capture_mode: "deep",
+          mind: draft.mind_score!,
+          body: draft.body_score!,
+          heart: draft.heart_score!,
+          emotion_primary: draft.emotion_primary!,
+          is_edit: !!existingTodaysEntry,
+        });
+
         setState("saved");
       } catch (e) {
         setState("error");
@@ -170,12 +184,15 @@ export default function Done() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark" edges={["top", "bottom"]}>
+    <Scene edges={["top", "bottom"]}>
       <View className="flex-1 items-center justify-center px-8">
         {state === "saving" && (
           <>
-            <ActivityIndicator size="large" color={primary?.color ?? "#C2876B"} />
-            <Text className="mt-6 text-base text-muted dark:text-muted-dark">
+            <ActivityIndicator size="large" color={primary?.color ?? "#E97451"} />
+            <Text
+              className="mt-6 font-body text-base font-semibold"
+              style={{ color: scene.subInk }}
+            >
               Saving your reflection…
             </Text>
           </>
@@ -191,7 +208,7 @@ export default function Done() {
                     <GrapeCompanion
                       emotionPrimary={primary.slug}
                       plutchikEmotion={draft.plutchik_emotion ?? undefined}
-                      size={88}
+                      size={96}
                       equipped={equippedSlugs}
                     />
                   </View>
@@ -199,14 +216,23 @@ export default function Done() {
                     className="mb-3 h-3 w-3 rounded-full"
                     style={{ backgroundColor: primary.color }}
                   />
-                  <Text className="text-xs font-semibold uppercase tracking-widest text-muted dark:text-muted-dark">
+                  <Text
+                    className="font-display text-xs font-bold uppercase tracking-widest"
+                    style={{ color: scene.subInk }}
+                  >
                     {primary.name} · {secondary?.name}
                   </Text>
-                  <Text className="mt-2 text-4xl font-semibold capitalize text-ink dark:text-ink-dark">
+                  <Text
+                    className="mt-2 font-display text-4xl font-extrabold capitalize"
+                    style={{ color: scene.ink }}
+                  >
                     {tertiary?.name}
                   </Text>
                   {draft.plutchik_emotion && (
-                    <Text className="mt-3 text-base capitalize text-muted dark:text-muted-dark">
+                    <Text
+                      className="mt-3 font-body text-base font-semibold capitalize"
+                      style={{ color: scene.subInk }}
+                    >
                       a feeling of {draft.plutchik_emotion}
                     </Text>
                   )}
@@ -215,27 +241,31 @@ export default function Done() {
             )}
 
             <FadeIn delay={250} duration={650}>
-              <Text className="mb-3 text-center text-lg font-normal tracking-wide text-muted/70 dark:text-muted-dark/70">
+              <Text
+                className="mb-3 text-center font-display text-lg font-bold tracking-wide"
+                style={{ color: scene.ink }}
+              >
                 saved.
               </Text>
             </FadeIn>
 
             <FadeIn delay={400} duration={650}>
-              <Text className="mb-16 text-center text-base leading-relaxed text-muted dark:text-muted-dark">
+              <Text
+                className="mb-16 text-center font-body text-base font-semibold leading-relaxed"
+                style={{ color: scene.subInk }}
+              >
                 See you tomorrow.
               </Text>
             </FadeIn>
 
             <FadeIn delay={650} duration={500}>
-              <Pressable
-                accessibilityRole="button"
-                className="mb-3 rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
-                onPress={() => router.push("/journal")}
-              >
-                <Text className="text-base font-medium tracking-wide text-white">
-                  Continue to journal
-                </Text>
-              </Pressable>
+              <View className="mb-4">
+                <ChunkyButton
+                  label="Continue to journal"
+                  variant="primary"
+                  onPress={() => router.push("/journal")}
+                />
+              </View>
             </FadeIn>
 
             <FadeIn delay={800} duration={500}>
@@ -244,7 +274,10 @@ export default function Done() {
                 className="px-4 py-2 transition-all duration-300 hover:opacity-70"
                 onPress={handleReturnHome}
               >
-                <Text className="text-sm text-muted dark:text-muted-dark underline">
+                <Text
+                  className="font-body text-sm font-bold underline"
+                  style={{ color: scene.subInk }}
+                >
                   Return home
                 </Text>
               </Pressable>
@@ -254,33 +287,36 @@ export default function Done() {
 
         {state === "error" && (
           <>
-            <Text className="mb-3 text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+            <Text
+              className="mb-3 font-display text-3xl font-extrabold tracking-tight"
+              style={{ color: scene.ink }}
+            >
               Couldn't save.
             </Text>
-            <Text className="mb-10 text-center text-sm leading-relaxed text-muted dark:text-muted-dark">
+            <Text
+              className="mb-10 text-center font-body text-sm font-semibold leading-relaxed"
+              style={{ color: scene.subInk }}
+            >
               {errorMsg}
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              className="mb-4 rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm active:opacity-70"
-              onPress={handleRetry}
-            >
-              <Text className="text-base font-medium tracking-wide text-white">
-                Try again
-              </Text>
-            </Pressable>
+            <View className="mb-4">
+              <ChunkyButton label="Try again" variant="primary" onPress={handleRetry} />
+            </View>
             <Pressable
               accessibilityRole="button"
               className="px-4 py-2"
               onPress={handleReturnHome}
             >
-              <Text className="text-sm text-muted dark:text-muted-dark underline">
+              <Text
+                className="font-body text-sm font-bold underline"
+                style={{ color: scene.subInk }}
+              >
                 Return home without saving
               </Text>
             </Pressable>
           </>
         )}
       </View>
-    </SafeAreaView>
+    </Scene>
   );
 }

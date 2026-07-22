@@ -5,7 +5,7 @@ import { ITEMS, ItemSlug } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
 
 /**
- * Krystal — inventory store.
+ * Crystal — inventory store.
  *
  * One row per (user, item) in `user_inventory`. We hold a hydrated copy
  * here so the home page, backpack screen, and GrapeCompanion can read

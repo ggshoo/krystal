@@ -11,7 +11,7 @@ export default function HeartStep() {
       question={
         <>
           How{" "}
-          <Text className="font-semibold text-ink">emotionally</Text>{" "}
+          <Text className="font-display font-extrabold">emotionally</Text>{" "}
           connected do you feel?
         </>
       }

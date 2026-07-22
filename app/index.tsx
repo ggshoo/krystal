@@ -1,12 +1,18 @@
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ChunkyButton } from "@/components/ChunkyButton";
 import { FadeIn } from "@/components/FadeIn";
 import { GrapeCompanion } from "@/components/GrapeCompanion";
+import { JourneyPill } from "@/components/JourneyPill";
+import { Scene } from "@/components/Scene";
+import { currentScene } from "@/lib/scene";
+import { trackStreakSnapshot } from "@/lib/analytics";
 import {
   computeJournalStreak,
+  computeStreak,
+  countJournaledDays,
   fetchAllEntries,
   HistoryEntry,
 } from "@/lib/history";
@@ -39,7 +45,7 @@ function pickGreeting(): string {
  * Day 5 is the hat unlock — points the user to the backpack.
  */
 function specialGrapeMessage(streak: number): string | undefined {
-  if (streak === 2) return "hi! i'm krystal.";
+  if (streak === 2) return "hi! i'm crystal.";
   if (streak === 3) return "three days. nice.";
   if (streak === 5) return "a hat! check your backpack.";
   if (streak === 7) return "a whole week!";
@@ -52,7 +58,7 @@ function specialGrapeMessage(streak: number): string | undefined {
 /**
  * Home screen.
  *
- * Grape sits ABOVE the title, centered. First-time users see the krystal
+ * Grape sits ABOVE the title, centered. First-time users see the crystal
  * wordmark; returning users see the personalized greeting.
  *
  * Top corners hold navigation (history left, account right).
@@ -67,6 +73,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const greeting = useMemo(() => pickGreeting(), []);
+  const scene = currentScene();
 
   // Inventory: hydrate on load, reconcile when streak changes (so a new hat
   // appears the moment the user crosses day 5).
@@ -103,7 +110,17 @@ export default function Home() {
     };
   }, [authInitialized, user]);
 
-  const streak = entries ? computeJournalStreak(entries) : 0;
+  // D-001 resolved: lenient streak. Home shows "N days in a row" based on any
+  // day with a completed check-in, so history and streak count don't diverge
+  // confusingly. The stricter journal-content streak is still available and
+  // is what powers the north star measurement (see lib/analytics.ts) — we just
+  // don't punish the user's motivation number by requiring depth.
+  const streak = entries ? computeStreak(entries) : 0;
+  const journalStreak = entries ? computeJournalStreak(entries) : 0;
+  // All-time progress totals — one daily_checkin per day, so entries.length is
+  // the number of days checked in. Journaled days is a subset.
+  const totalCheckins = entries?.length ?? 0;
+  const totalJournaled = entries ? countJournaledDays(entries) : 0;
   const isReturning = (entries?.length ?? 0) > 0;
   // Grape appears only once the user reaches the first streak milestone
   // (day 2). Before that the home is just the title + CTA. If the streak
@@ -121,6 +138,19 @@ export default function Home() {
   useEffect(() => {
     if (user && entries) void reconcileInventory(user.id, streak);
   }, [user, entries, streak, reconcileInventory]);
+
+  // Fire an analytics snapshot every time entries load. Both streak flavors
+  // included so the PostHog dashboard can compute either cohort. See
+  // docs/pm_portfolio/README.md for how the north star is derived from this.
+  useEffect(() => {
+    if (entries) {
+      trackStreakSnapshot({
+        checkin_streak: streak,
+        journal_streak: journalStreak,
+        is_returning: entries.length > 0,
+      });
+    }
+  }, [entries, streak, journalStreak]);
   const todaysEntry = entries?.[0];
   const isTodaysEntry = (() => {
     if (!todaysEntry) return false;
@@ -134,17 +164,40 @@ export default function Home() {
   })();
   const hasCheckinToday = isTodaysEntry;
   const hasJournaledToday = hasCheckinToday && !!todaysEntry?.journal;
+  const todaysMode = todaysEntry?.capture_mode ?? null;
   const isAnonymous = !user?.email;
 
-  const primaryLabel = !hasCheckinToday
-    ? "Begin reflection"
-    : hasJournaledToday
-      ? "Edit today's journal"
-      : "Continue today's journal";
+  // Home CTA state machine (v2.0 — Quick Capture is default; Deep is opt-in).
+  // Ordered by likelihood the user is choosing this action right now.
+  let primaryLabel: string;
+  let primaryOnPress: () => void;
+  let secondaryLabel: string | null;
+  let secondaryOnPress: (() => void) | null;
 
-  const primaryOnPress = !hasCheckinToday
-    ? () => router.push("/welcome")
-    : () => router.push("/journal");
+  if (!hasCheckinToday) {
+    // No entry today — offer the fast path first.
+    primaryLabel = "quick check-in";
+    primaryOnPress = () => router.push("/quick-capture");
+    secondaryLabel = "take a deeper reflection";
+    secondaryOnPress = () => router.push("/welcome");
+  } else if (todaysMode === "quick") {
+    // They did the fast path — nudge (softly) toward depth if they want.
+    primaryLabel = "add a deeper reflection";
+    primaryOnPress = () => router.push("/welcome");
+    secondaryLabel = "edit quick check-in";
+    secondaryOnPress = () => router.push("/quick-capture");
+  } else if (hasJournaledToday) {
+    primaryLabel = "Edit today's journal";
+    primaryOnPress = () => router.push("/journal");
+    secondaryLabel = "Change today's emotions";
+    secondaryOnPress = () => router.push("/welcome");
+  } else {
+    // Deep check-in done, journal not written
+    primaryLabel = "Continue today's journal";
+    primaryOnPress = () => router.push("/journal");
+    secondaryLabel = "Change today's emotions";
+    secondaryOnPress = () => router.push("/welcome");
+  }
 
   const avatarLetter =
     displayName?.trim()[0]?.toUpperCase() ??
@@ -152,20 +205,17 @@ export default function Home() {
     "?";
 
   return (
-    <SafeAreaView className="flex-1 bg-cream dark:bg-cream-dark">
+    <Scene>
       {/* ── Top corners ── */}
       <View className="absolute left-0 right-0 top-0 z-10 flex-row justify-between px-5 pt-3">
-        <View className="flex-row gap-1">
+        <View className="flex-row gap-2">
           {hasJournaledToday && (
             <FadeIn delay={600} duration={500}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="View history"
+              <CornerButton
+                label="View history"
+                glyph="⌚"
                 onPress={() => router.push("/history")}
-                className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5 dark:hover:bg-ink-dark/10"
-              >
-                <Text className="text-xl">⌚</Text>
-              </Pressable>
+              />
             </FadeIn>
           )}
           {/* Backpack — only appears once the user has earned at least one
@@ -173,14 +223,11 @@ export default function Home() {
               so the home doesn't pre-tease an empty surface. */}
           {hasOwnedItems && (
             <FadeIn delay={700} duration={500}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Open backpack"
+              <CornerButton
+                label="Open backpack"
+                glyph="🎒"
                 onPress={() => router.push("/backpack")}
-                className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-ink/5 dark:hover:bg-ink-dark/10"
-              >
-                <Text className="text-xl">🎒</Text>
-              </Pressable>
+              />
             </FadeIn>
           )}
         </View>
@@ -190,15 +237,16 @@ export default function Home() {
             accessibilityRole="button"
             accessibilityLabel={isAnonymous ? "Sign in" : "Account"}
             onPress={() => router.push("/sign-in")}
-            className="h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
+            className="h-11 w-11 items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
             style={{
-              backgroundColor: isAnonymous ? "#E8E0D3" : "#C2876B",
+              backgroundColor: isAnonymous ? "#FFF6E3" : "#E97451",
+              borderWidth: 2,
+              borderColor: isAnonymous ? "#C3C7CB" : "#B9502E",
             }}
           >
             <Text
-              className={`text-sm font-semibold ${
-                isAnonymous ? "text-muted dark:text-muted-dark" : "text-white"
-              }`}
+              className="font-display text-sm font-semibold"
+              style={{ color: isAnonymous ? "#6B5B44" : "#FFFFFF" }}
             >
               {isAnonymous ? "?" : avatarLetter}
             </Text>
@@ -209,7 +257,7 @@ export default function Home() {
       {/* ── Center column ── */}
       <View className="flex-1 items-center justify-center px-6">
         {loading ? (
-          <ActivityIndicator color="#C2876B" />
+          <ActivityIndicator color="#E97451" />
         ) : (
           <>
             {/* Grape above the title, centered. Only appears once the user
@@ -222,7 +270,7 @@ export default function Home() {
               <FadeIn delay={0} duration={900}>
                 <View className="mb-6">
                   <GrapeCompanion
-                    size={isReturning ? 78 : 96}
+                    size={isReturning ? 82 : 104}
                     message={specialGrapeMessage(streak)}
                     equipped={equippedSlugs}
                   />
@@ -230,47 +278,92 @@ export default function Home() {
               </FadeIn>
             )}
 
-            {/* Title: krystal for first-time, greeting for returning */}
+            {/* Title: crystal for first-time, greeting for returning */}
             {!isReturning ? (
               <>
                 <FadeIn delay={350} duration={900}>
-                  <Text className="mb-4 text-5xl font-semibold tracking-tight text-ink dark:text-ink-dark">
-                    krystal
+                  <Text
+                    className="mb-4 font-display text-6xl font-extrabold tracking-tight"
+                    style={{ color: scene.ink }}
+                  >
+                    crystal
                   </Text>
                 </FadeIn>
                 <FadeIn delay={650} duration={900}>
-                  <Text className="mb-16 max-w-xs text-center text-base leading-relaxed text-muted dark:text-muted-dark">
-                    A daily practice for emotional clarity.
+                  <Text
+                    className="mb-16 max-w-xs text-center font-body text-base font-semibold leading-relaxed"
+                    style={{ color: scene.subInk }}
+                  >
+                    A cozy daily check-in — see where today finds you.
                   </Text>
                 </FadeIn>
               </>
             ) : (
               <>
+                <FadeIn delay={200} duration={650}>
+                  <View className="mb-4">
+                    <JourneyPill />
+                  </View>
+                </FadeIn>
                 <FadeIn delay={300} duration={650}>
-                  <Text className="mb-3 text-center text-3xl font-semibold tracking-tight text-ink dark:text-ink-dark">
+                  <Text
+                    className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
+                    style={{ color: scene.ink }}
+                  >
                     {greeting}
                     {displayName ? `, ${displayName}` : ""}.
                   </Text>
                 </FadeIn>
                 {streak > 0 ? (
-                  <FadeIn delay={500} duration={650}>
-                    <Text className="mb-12 text-sm text-muted dark:text-muted-dark">
-                      <Text className="font-semibold text-ink dark:text-ink-dark">{streak}</Text>{" "}
-                      {streak === 1 ? "day" : "days"} in a row
-                      {/* Foreshadow the next unlock when one exists */}
-                      {upcoming && (
-                        <Text className="text-muted dark:text-muted-dark">
-                          {" · "}
-                          {upcoming.name.toLowerCase()} at day {upcoming.unlockStreak}
-                        </Text>
-                      )}
-                    </Text>
-                  </FadeIn>
+                  <>
+                    <FadeIn delay={500} duration={650}>
+                      <Text
+                        className="mb-1 font-body text-sm font-semibold"
+                        style={{ color: scene.subInk }}
+                      >
+                        <Text
+                          className="font-display font-extrabold"
+                          style={{ color: scene.ink }}
+                        >
+                          {streak}
+                        </Text>{" "}
+                        {streak === 1 ? "day" : "days"} in a row
+                        {/* Foreshadow the next unlock when one exists */}
+                        {upcoming && (
+                          <Text style={{ color: scene.subInk }}>
+                            {" · "}
+                            {upcoming.name.toLowerCase()} at day {upcoming.unlockStreak}
+                          </Text>
+                        )}
+                      </Text>
+                    </FadeIn>
+                    <FadeIn delay={620} duration={650}>
+                      <Text
+                        className="mb-12 font-body text-xs font-semibold"
+                        style={{ color: scene.subInk }}
+                      >
+                        {totalCheckins} {totalCheckins === 1 ? "check-in" : "check-ins"} ·{" "}
+                        {totalJournaled} journaled
+                      </Text>
+                    </FadeIn>
+                  </>
                 ) : (
                   <FadeIn delay={500} duration={650}>
-                    <Text className="mb-12 text-sm text-muted dark:text-muted-dark">
-                      first day. welcome.
-                    </Text>
+                    <View className="mb-12 items-center">
+                      <Text
+                        className="font-body text-sm font-semibold"
+                        style={{ color: scene.ink }}
+                      >
+                        welcome back.
+                      </Text>
+                      <Text
+                        className="mt-1 font-body text-xs font-semibold"
+                        style={{ color: scene.subInk }}
+                      >
+                        {totalCheckins} {totalCheckins === 1 ? "check-in" : "check-ins"} ·{" "}
+                        {totalJournaled} journaled · new streak starts today
+                      </Text>
+                    </View>
                   </FadeIn>
                 )}
               </>
@@ -278,27 +371,29 @@ export default function Home() {
 
             {/* Primary CTA */}
             <FadeIn delay={isReturning ? 700 : 1000} duration={500}>
-              <Pressable
-                accessibilityRole="button"
-                className="rounded-full bg-accent dark:bg-accent-dark px-10 py-5 shadow-sm transition-all duration-300 hover:scale-[1.15] hover:shadow-2xl active:opacity-70"
+              <ChunkyButton
+                label={primaryLabel}
                 onPress={primaryOnPress}
-              >
-                <Text className="text-base font-medium tracking-wide text-white">
-                  {primaryLabel}
-                </Text>
-              </Pressable>
+                variant="primary"
+              />
             </FadeIn>
 
-            {/* Secondary: change today's emotions */}
-            {hasCheckinToday && (
+            {/* Secondary — driven by the CTA state machine above.
+                Always present in v2.0: it either offers depth (from Quick)
+                or offers editing (from Deep) or offers the deeper flow
+                (from a fresh visit). See PRD v2.0 §4 dual-mode. */}
+            {secondaryLabel && secondaryOnPress && (
               <FadeIn delay={850} duration={500}>
                 <Pressable
                   accessibilityRole="button"
                   className="mt-5 px-4 py-2 transition-all duration-300 hover:opacity-70"
-                  onPress={() => router.push("/welcome")}
+                  onPress={secondaryOnPress}
                 >
-                  <Text className="text-sm text-muted dark:text-muted-dark underline">
-                    Change today's emotions
+                  <Text
+                    className="font-body text-sm font-bold underline"
+                    style={{ color: scene.subInk }}
+                  >
+                    {secondaryLabel}
                   </Text>
                 </Pressable>
               </FadeIn>
@@ -306,6 +401,33 @@ export default function Home() {
           </>
         )}
       </View>
-    </SafeAreaView>
+    </Scene>
+  );
+}
+
+/** Soft parchment corner chip, readable on any sky. */
+function CornerButton({
+  label,
+  glyph,
+  onPress,
+}: {
+  label: string;
+  glyph: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      className="h-11 w-11 items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
+      style={{
+        backgroundColor: "#FFF6E3",
+        borderWidth: 2,
+        borderColor: "#C3C7CB",
+      }}
+    >
+      <Text className="text-xl">{glyph}</Text>
+    </Pressable>
   );
 }

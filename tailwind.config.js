@@ -10,26 +10,44 @@ module.exports = {
   darkMode: "media",
   theme: {
     extend: {
+      // ── Fonts ────────────────────────────────────────────────────────────
+      // Roboto everywhere — clean and neutral. `font-display` and `font-body`
+      // both resolve to Roboto; weight is controlled by the font-weight
+      // utilities. Loaded on native via @expo-google-fonts/roboto (see
+      // app/_layout.tsx) and on web via app/+html.tsx <link>.
+      fontFamily: {
+        display: ["Roboto", "system-ui", "sans-serif"],
+        body: ["Roboto", "system-ui", "sans-serif"]
+      },
       colors: {
-        // krystal palette — warm cartoon-game vibe
-        // ── Light mode ─────────────────────────────────────────────
-        cream: "#F7F0E5",   // warm cream background
-        ink: "#2D2520",     // warm dark brown for primary text
-        muted: "#8A7E6F",   // warm taupe for secondary text
-        accent: "#C2876B",  // soft terracotta CTA
-        grape: "#9D7BC4",   // light purple companion
-        surface: "#FDF7EC", // soft surface for nested cards
+        // crystal palette — cozy storybook "little journey" vibe.
+        // Warm inks on soft skies; terracotta + gold for chunky buttons.
+        // ── Light mode (day scene) ─────────────────────────────────
+        cream: "#FBF3E2",   // warm parchment background (fallback under scenes)
+        ink: "#2E2416",     // deep warm bark brown for primary text
+        muted: "#6B5B44",   // warm cocoa taupe for secondary text
+        accent: "#E97451",  // terracotta CTA
+        "accent-deep": "#B9502E", // terracotta button lip / pressed
+        gold: "#E9B54A",    // sunlit gold CTA
+        "gold-deep": "#B9862B",   // gold button lip
+        grape: "#995DA6",   // grape companion purple
+        "grape-deep": "#733F80",
+        bark: "#6B4A32",    // wooden brown for outlines / ghost buttons
+        leaf: "#5C8C48",    // hill / leaf green
+        surface: "#FFFDF6", // soft card surface
+        parchment: "#FFF6E3", // panel behind text on busy scenes
 
-        // ── Dark mode (warm, not cold) ─────────────────────────────
-        "cream-dark": "#1F1B16",     // very dark warm brown bg
-        "ink-dark": "#F0E8DA",       // warm off-white text
-        "muted-dark": "#9C9285",     // warm muted gray-taupe
-        "accent-dark": "#D89E80",    // brighter terracotta for contrast
-        "surface-dark": "#2A251E",   // warm dark surface for cards
-        "border-dark": "#3A332A"     // warm dark border
+        // ── Dark mode (dusk / night scene) ─────────────────────────
+        "cream-dark": "#221B2E",     // deep dusk plum bg
+        "ink-dark": "#F5ECDA",       // warm off-white text
+        "muted-dark": "#C9BBD4",     // soft lavender-taupe
+        "accent-dark": "#F08A63",    // brighter terracotta for contrast
+        "surface-dark": "#2E2740",   // dusk card surface
+        "border-dark": "#463C57"     // dusk border
       },
       borderRadius: {
-        tile: "28px",
+        tile: "22px",
+        chunk: "18px",
         chip: "999px"
       }
     }

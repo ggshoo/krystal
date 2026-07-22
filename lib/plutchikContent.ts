@@ -1,5 +1,5 @@
 /**
- * Krystal — educational content for each Plutchik intensity word.
+ * Crystal — educational content for each Plutchik intensity word.
  *
  * Keyed by intensity slug (not primary). Each entry provides:
  *  - the "About X" content boxed on the Journal screen

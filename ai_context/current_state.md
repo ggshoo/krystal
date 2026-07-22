@@ -5,8 +5,8 @@
 >
 > Every AI agent must read this file first and update it after meaningful work.
 
-**Last Updated By:** Claude (Cowork) · `Sonnet 4.6` (extended framework — AI Generalist + prompt library)
-**Last Updated Date:** 2026-06-12
+**Last Updated By:** Claude (Cowork) · `Sonnet 4.6` (v2.0 positioning shift — ICP locked, dual-mode Quick Capture, multi-surface roadmap, user-facing rename to "crystal")
+**Last Updated Date:** 2026-07-05
 
 ---
 
@@ -90,6 +90,19 @@ Detailed schema and folder map in `docs/ARCHITECTURE.md`.
 | Phase 3 reward items | designed | unscheduled | bow tie (day 10), scarf (day 21), glasses (day 30), crown (day 100) |
 | Home "today's entry" preview card | proposed | Gigi to decide | Show today's journal content on home so user doesn't have to navigate to history |
 
+### PM Portfolio track (parallel to product work)
+
+| Feature | Status | Owner | Notes |
+|---|---|---|---|
+| North star metric defined | ✓ done | Gigi | % of WAU hitting 5-day journal streak. See `docs/pm_portfolio/README.md` |
+| PostHog instrumentation | not started | next AI + Gigi | Wire up north star + 4 input metrics. ~90 min. P0 for portfolio track. |
+| User interview round 1 (5 participants) | not started | Gigi | Playbook in `docs/pm_portfolio/user_interviews.md`. Recruiting first. |
+| Day-2 grape A/B test | designed | Gigi to run | Design in `docs/pm_portfolio/ab_testing.md`. Blocked on PostHog. |
+| First case study (day-2 grape) skeleton | not started | Gigi | Frame the hypothesis + design BEFORE the experiment finishes |
+| Public `/roadmap` page on krystal-one.vercel.app | not started | next AI | Mirror `docs/ROADMAP.md` as a route |
+| Portfolio site `/process` page | not started | Gigi | Document the AI Generalist workflow as her unfair advantage |
+| Skills mapping tracker | ✓ initialized | Gigi maintains | `docs/pm_portfolio/skills.md` — update after each milestone |
+
 ---
 
 ## Known Issues
@@ -132,18 +145,13 @@ No feature branches active. All work happens on `main` with direct commits.
 
 These need a human decision before a future AI can confidently proceed.
 
-### D-001 · Streak rule: strict or lenient?
+### D-001 · Streak rule: strict or lenient? — RESOLVED 2026-07-05
 
-**Question:** Should the streak count days where the user wrote actual content in a journal prompt (strict, current behavior), or any day where they completed a daily check-in regardless of journal (lenient)?
+**Decision:** Lenient (any day with a check-in counts toward the "N days in a row" on home). Strict journal-content streak is retained as the north star measurement in PostHog. Two streaks now coexist: one for user motivation (lenient, on home), one for portfolio analytics (strict, in PostHog).
 
-**Trade-off:**
-- Strict: incentivizes deeper engagement; diverges from history view (confusing).
-- Lenient: matches history; weaker incentive to write.
+**Applied in:** `app/index.tsx` — now uses `computeStreak` for display; `computeJournalStreak` still available and fires alongside as `streak_snapshot.journal_streak`.
 
-**Recommendation in code:** Claude proposed lenient, with a separate "journal write count" stat for depth. Awaiting Gigi's decision.
-
-**Decided by:** _open_
-**Action when decided:** swap `computeJournalStreak` for `computeStreak` in `app/index.tsx` (or keep current).
+**Reversible by:** swap `computeStreak` back to `computeJournalStreak` in `app/index.tsx` if user data shows motivation drops when the strict rule is applied.
 
 ### D-002 · Grape rendering: SVG-only, PNG-only, or hybrid?
 
@@ -189,6 +197,9 @@ Newest first. See `ai_context/session_log.md` for full history.
 
 | Date | Change | Files |
 |---|---|---|
+| 2026-07-05 | v2.0 positioning: ICP locked (busy early-career, therapy-adjacent), dual-mode capture (Quick + Deep), multi-surface roadmap (PWA → SMS → iOS → Watch), reminders framework, user-facing rename to "crystal" | `docs/PRD.md`, `app.json`, `app/index.tsx` (wordmark + grape message) |
+| 2026-07-05 | Post-hiatus reboot: PostHog wired end-to-end; interview recruit copy drafted; grape generation checklist drafted; D-001 resolved (lenient) | `lib/analytics.ts`, `app/_layout.tsx`, `app/(flow)/done.tsx`, `app/(flow)/journal.tsx`, `app/index.tsx`, `app/backpack.tsx`, `package.json`, `.env.example`, `docs/pm_portfolio/recruit_copy.md`, `docs/pm_portfolio/grape_generation_checklist.md` |
+| 2026-06-12 | PM portfolio track stood up: north star metric, user interview playbook, A/B testing guide, skills tracker | `docs/pm_portfolio/*` (4 files) |
 | 2026-06-12 | AI Generalist extension: prompt library (`ai_prompts.md`) + constitution-style START_HERE | `ai_context/ai_prompts.md`, `ai_context/START_HERE.md`, `ai_context/communication_protocol.md` |
 | 2026-06-12 | AI collaboration framework scaffolded (`ai_context/`, `.ai/`, this file) | `ai_context/*`, `.ai/*`, `README.md` |
 | 2026-06-12 | Fixed infinite re-render in inventory store. Added `useEquippedSlugs` memoized hook. | `store/useInventoryStore.ts`, all GrapeCompanion consumers |

@@ -1,5 +1,5 @@
 /**
- * Krystal — Plutchik intensity ladders.
+ * Crystal — Plutchik intensity ladders.
  *
  * After picking a Roberts emotion (primary → secondary → tertiary), the user
  * is also asked to identify the intensity level on a Plutchik-style ladder.

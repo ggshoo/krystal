@@ -1,5 +1,5 @@
 /**
- * Krystal — rewards ladder.
+ * Crystal — rewards ladder.
  *
  * The single source of truth for what the user unlocks at which streak.
  * Read by the home page (special grape messages), the journal save flow

@@ -16,6 +16,14 @@ The home page streak counts only days with non-empty journal content, but the hi
 
 **Resolution path:** D-001 in `current_state.md → Open Decisions`. Gigi to choose strict vs lenient.
 
+### B-003 · Grape blends into light surfaces · low
+
+The grape companion's pastel purple loses contrast against cream/parchment backgrounds — most visible on the Journal overview card (grape sits on the `surface` card, not the sky scene), and anywhere else it renders on a light surface rather than the sky. On the scene backdrops it reads fine.
+
+**Where:** `components/GrapeCompanion.tsx` (body gradient `#D3B2DE → #995DA6 → #733F80`) against `bg-surface` (`#FFFDF6`) in `app/(flow)/journal.tsx` overview card, `app/history.tsx`, etc.
+
+**Resolution path (later):** give the grape a subtle outline/halo (thin stroke or soft shadow ring) so it separates from any background, or sit it on a small tinted disc when placed on light surfaces. Deferred — not a priority (Gigi, backburner).
+
 ### B-002 · Sandbox leaves `.git/index.lock` behind · low (infra)
 
 When AI agents run `git add` in the sandbox, the index.lock file sometimes persists with wrong permissions. Subsequent commits fail with "Unable to create '...index.lock': File exists."
