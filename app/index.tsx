@@ -209,6 +209,13 @@ export default function Home() {
       {/* ── Top corners ── */}
       <View className="absolute left-0 right-0 top-0 z-10 flex-row justify-between px-5 pt-3">
         <View className="flex-row gap-2">
+          <FadeIn delay={550} duration={500}>
+            <CornerButton
+              label="Reminders"
+              glyph="🔔"
+              onPress={() => router.push("/reminders")}
+            />
+          </FadeIn>
           {hasJournaledToday && (
             <FadeIn delay={600} duration={500}>
               <CornerButton

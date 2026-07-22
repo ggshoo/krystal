@@ -119,6 +119,12 @@ The Supabase session is in localStorage. If they clear cookies/localStorage, the
 
 **When to address:** When email upgrade conversion is measurable (post-PostHog integration).
 
+### I-005 · Second companion "Bo" (mermaid cat) — unlockable · parked
+
+A second character (Bo, a mermaid cat, from a friend's drawing) to unlock at a ~6-day streak, above the day-5 hat. Original digital art drafted (pastel-blue cat + multi-colored scale tail). Parked by Gigi — the animation/motion isn't right yet. Needs: finalized art + a companion-picker (choose which buddy is on Home) + the day-6 unlock. Also add an "art by [friend]" credit.
+
+**When to address:** After the art + animation feel right; low priority.
+
 ---
 
 ## Maintenance

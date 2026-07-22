@@ -475,11 +475,9 @@ export default function JournalScreen() {
 }
 
 // ── Reusable prompt block ─────────────────────────────────────────────────
-// When a hint is provided (dynamic follow-up question), it becomes the
-// VISUALLY DOMINANT line: larger and bold ink. The static base question
-// ("What's coming up?") gets demoted to a smaller muted label above it.
-//
-// When no hint is provided, the base label is the headline as usual.
+// One question per prompt. When a dynamic follow-up (`hint`) exists it's the
+// question; otherwise the base `label` is. We deliberately DON'T show both —
+// a single, clear bolded question keeps the screen calm and uncluttered.
 function Prompt({
   delay,
   label,
@@ -493,25 +491,23 @@ function Prompt({
   value?: string;
   onChange: (v: string) => void;
 }) {
+  const scene = currentScene();
+  const question = hint ?? label;
   return (
     <FadeIn delay={delay}>
       <View className="mb-6">
-        {hint ? (
-          // Hint present → flip hierarchy: base label small/muted, hint big/bold
-          <>
-            <Text className="mb-1 text-sm text-muted dark:text-muted-dark">{label}</Text>
-            <Text className="mb-3 text-lg font-semibold text-ink dark:text-ink-dark">{hint}</Text>
-          </>
-        ) : (
-          // No hint → base label is the headline
-          <Text className="mb-2 text-base font-medium text-ink dark:text-ink-dark">{label}</Text>
-        )}
+        <Text
+          className="mb-3 font-display text-lg font-bold"
+          style={{ color: scene.ink }}
+        >
+          {question}
+        </Text>
         <TextInput
           multiline
           numberOfLines={3}
           textAlignVertical="top"
           placeholder="Write here..."
-          placeholderTextColor="#B8AC9B"
+          placeholderTextColor="#9A8B76"
           value={value ?? ""}
           onChangeText={onChange}
           className="min-h-[80px] rounded-tile bg-surface dark:bg-surface-dark px-4 py-3 text-base leading-relaxed text-ink dark:text-ink-dark"

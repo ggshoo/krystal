@@ -10,10 +10,23 @@ import {
 
 import { FadeIn } from "@/components/FadeIn";
 import { Scene } from "@/components/Scene";
+import { shadeHex, tintOnWhite } from "@/lib/color";
 import { findPrimary } from "@/lib/emotions";
 import { fetchAllEntries, formatEntryDate, HistoryEntry } from "@/lib/history";
-import { currentScene } from "@/lib/scene";
+import { currentScene, Scene as SceneData } from "@/lib/scene";
 import { useAuthStore } from "@/store/useAuthStore";
+
+/** The mood color for an entry (deep uses its emotion color; quick maps its
+ *  primary; "just checking in" quicks have no color). */
+function entryColor(entry: HistoryEntry): string | null {
+  if (entry.emotion?.primary_color) return entry.emotion.primary_color;
+  if (entry.quick_emotion_primary) {
+    return findPrimary(entry.quick_emotion_primary)?.color ?? null;
+  }
+  return null;
+}
+
+const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 /**
  * History — list of past daily reflections.
@@ -78,12 +91,18 @@ export default function HistoryScreen() {
         </FadeIn>
         <FadeIn delay={160}>
           <Text
-            className="mb-10 font-body text-base font-semibold leading-relaxed"
+            className="mb-6 font-body text-base font-semibold leading-relaxed"
             style={{ color: scene.subInk }}
           >
             Every day you've checked in.
           </Text>
         </FadeIn>
+
+        {entries !== null && entries.length > 0 && (
+          <FadeIn delay={220}>
+            <MoodGrid entries={entries} scene={scene} />
+          </FadeIn>
+        )}
 
         {entries === null && (
           <FadeIn delay={300}>
@@ -129,6 +148,107 @@ export default function HistoryScreen() {
   );
 }
 
+// ── Mood calendar ─────────────────────────────────────────────────────────
+// A GitHub-contributions-style grid of the last few weeks. Each square is a
+// day, filled with that day's mood color — so the user sees their emotional
+// weather at a glance and, implicitly, how consistently they've shown up.
+function MoodGrid({
+  entries,
+  scene,
+}: {
+  entries: HistoryEntry[];
+  scene: SceneData;
+}) {
+  const WEEKS = 5;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayK = dayKey(today);
+
+  // One daily_checkin per day, so last-write-wins is fine here.
+  const colorByDay = new Map<string, string | null>();
+  for (const e of entries) {
+    const d = new Date(e.occurred_at);
+    d.setHours(0, 0, 0, 0);
+    colorByDay.set(dayKey(d), entryColor(e));
+  }
+
+  // Align to whole weeks (Sunday start), ending with the current week.
+  const thisWeekSun = new Date(today);
+  thisWeekSun.setDate(today.getDate() - today.getDay());
+  const start = new Date(thisWeekSun);
+  start.setDate(thisWeekSun.getDate() - (WEEKS - 1) * 7);
+
+  const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+
+  return (
+    <View className="mb-8">
+      <View className="mb-1 flex-row">
+        {weekdays.map((w, i) => (
+          <View key={i} className="flex-1 items-center">
+            <Text
+              className="font-body text-[10px] font-bold"
+              style={{ color: scene.subInk }}
+            >
+              {w}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {Array.from({ length: WEEKS }, (_, w) => (
+        <View key={w} className="flex-row">
+          {Array.from({ length: 7 }, (_, d) => {
+            const cur = new Date(start);
+            cur.setDate(start.getDate() + w * 7 + d);
+            const k = dayKey(cur);
+            const isFuture = cur.getTime() > today.getTime();
+            const has = colorByDay.has(k);
+            const color = has ? colorByDay.get(k) : null;
+            const isToday = k === todayK;
+
+            // Fill: mood color if any; "showed up, no mood" = solid white;
+            // missed day = faint white; future = invisible placeholder.
+            const fill = isFuture
+              ? "transparent"
+              : color
+                ? color
+                : has
+                  ? "rgba(255,255,255,0.72)"
+                  : "rgba(255,255,255,0.22)";
+            const border = isToday
+              ? scene.ink
+              : color
+                ? shadeHex(color, 28)
+                : "rgba(255,255,255,0.4)";
+
+            return (
+              <View key={k} className="flex-1 p-0.5">
+                <View
+                  style={{
+                    aspectRatio: 1,
+                    borderRadius: 7,
+                    backgroundColor: fill,
+                    borderWidth: isToday ? 2 : 1,
+                    borderColor: border,
+                    opacity: isFuture ? 0 : 1,
+                  }}
+                />
+              </View>
+            );
+          })}
+        </View>
+      ))}
+
+      <Text
+        className="mt-2 font-body text-[11px] font-semibold"
+        style={{ color: scene.subInk }}
+      >
+        Last {WEEKS} weeks · each square is a day's mood
+      </Text>
+    </View>
+  );
+}
+
 function EntryCard({
   entry,
   expanded,
@@ -142,17 +262,25 @@ function EntryCard({
   const quickEmotion = isQuick
     ? findPrimary(entry.quick_emotion_primary ?? undefined)
     : undefined;
-  const themeColor =
-    entry.emotion?.primary_color ?? quickEmotion?.color ?? "#E97451";
+  // The actual mood color (null for a "just checking in" quick with no
+  // emotion). Drives the color-forward card tint.
+  const moodColor =
+    entry.emotion?.primary_color ?? quickEmotion?.color ?? null;
+  const themeColor = moodColor ?? "#E97451";
+  const cardBg = moodColor ? tintOnWhite(moodColor, 0.2) : "#FFFDF6";
+  const cardBorder = moodColor ? moodColor + "66" : "#EFE3CC";
   const dateLabel = formatEntryDate(entry.occurred_at);
 
   return (
     <Pressable
       onPress={onToggle}
-      className="mb-3 rounded-tile bg-surface dark:bg-surface-dark p-5 transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl"
+      className="mb-3 rounded-tile p-5 transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl"
       style={{
+        backgroundColor: cardBg,
+        borderWidth: 1,
+        borderColor: cardBorder,
         shadowColor: "#2D2520",
-        shadowOpacity: 0.04,
+        shadowOpacity: 0.06,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 2 },
       }}
