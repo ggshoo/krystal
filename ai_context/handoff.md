@@ -55,7 +55,7 @@ While there, check Table Editor for `user_inventory`. If absent, run `supabase/0
 ### 2. Install the new dependency
 
 ```
-cd ~/code/krystal
+cd ~/code/crystal
 npm install
 ```
 
@@ -64,7 +64,7 @@ Resolves the `posthog-js` TypeScript error and updates `package-lock.json`.
 ### 3. Create PostHog project + paste API key
 
 - Sign up at https://app.posthog.com (free tier is fine)
-- Create a project called "krystal"
+- Create a project called "crystal"
 - Copy the Project API Key from Settings → Project
 - Paste into `.env`:
   ```
@@ -77,8 +77,8 @@ Analytics silently no-ops if the key is blank (dev/preview builds keep working),
 ### 4. Push the pending changes
 
 ```
-rm -f ~/code/krystal/.git/index.lock
-cd ~/code/krystal
+rm -f ~/code/crystal/.git/index.lock
+cd ~/code/crystal
 git add .
 git commit -m "feat: PostHog analytics + D-001 lenient streak + PM portfolio prep"
 git push
@@ -86,7 +86,7 @@ git push
 
 ### 5. Verify the live site
 
-After Vercel deploys (~2 min), hard-refresh https://krystal-one.vercel.app with Cmd+Shift+R. Do one full pass through the reflection flow. Confirm nothing regressed.
+After Vercel deploys (~2 min), hard-refresh https://crystal.gigihsu.com with Cmd+Shift+R. Do one full pass through the reflection flow. Confirm nothing regressed.
 
 ### 6. Build the PostHog dashboard (10 min in the PostHog UI)
 
@@ -98,11 +98,11 @@ Once events start flowing (fire a couple manually by using the site), create the
 - **Journal completion rate (trend):** % of `journal_saved` events with `has_content = true`.
 - **Hat unlock rate (funnel):** users who reach `streak_snapshot.journal_streak >= 5`.
 
-All five feed the north star. Pin them to a dashboard called "Krystal North Star".
+All five feed the north star. Pin them to a dashboard called "Crystal North Star".
 
 ### 7. Run the grape generation checklist (20 min external)
 
-Open `docs/pm_portfolio/grape_generation_checklist.md` and follow it step-by-step in Google AI Studio. Save the 10 PNGs to `~/code/krystal/assets/grape/`.
+Open `docs/pm_portfolio/grape_generation_checklist.md` and follow it step-by-step in Google AI Studio. Save the 10 PNGs to `~/code/crystal/assets/grape/`.
 
 ### 8. Kick off user interview recruiting
 
@@ -127,7 +127,7 @@ None of these are dev-blocked. All are awaiting human action.
 
 - **Two streaks now coexist.** `computeStreak` (lenient — any check-in) drives home display and grape gating. `computeJournalStreak` (strict — journal content) drives the north-star cohort in PostHog. Don't remove either.
 - **Analytics fails open.** If the PostHog key is missing, `initAnalytics` logs a warning and every `track*` function no-ops. Dev builds don't need a key.
-- **PostHog SDK choice.** I picked `posthog-js` (web) not `posthog-react-native`. Krystal is web-only right now. If Gigi ships native later, swap `lib/analytics.ts` — the public interface (named `track*` functions) stays the same.
+- **PostHog SDK choice.** I picked `posthog-js` (web) not `posthog-react-native`. Crystal is web-only right now. If Gigi ships native later, swap `lib/analytics.ts` — the public interface (named `track*` functions) stays the same.
 - **Free-tier Supabase auto-pause is a persistent risk.** If Gigi steps away for another 7+ days, the site goes down until restored. Consider upgrading to a paid tier before the portfolio site drives traffic, OR add a scheduled task that pings the project.
 - **The framework survived first contact.** Gigi came back after a break and I reconstituted full state from `current_state.md` + `handoff.md` without asking her to re-explain anything. Preserve this — it's the whole point of the AI Generalist system.
 

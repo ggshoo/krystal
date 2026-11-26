@@ -27,7 +27,7 @@
 | **Experimentation** | "Designed and ran an A/B test on the day-2 grape unlock; paired quant signal with qualitative interview data." | `docs/pm_portfolio/ab_testing.md`, planned `case_studies/day2_grape.md` | 🟡 |
 | **Data analysis** | "Defined product metrics, instrumented with PostHog, built dashboards for north star + input metrics." | PostHog dashboards (not yet built) | 🔴 |
 | **Behavior change / growth design** | "Designed a streak system + reward unlock cadence (grape at day 2, hat at day 5) based on habit-formation theory." | `lib/inventory.ts`, `docs/DECISIONS.md`, planned case study | 🟡 |
-| **Technical depth** | "Shipped a React Native + Supabase web app solo. Wrote all the code, deployed via GitHub Actions to Vercel." | This entire repo, live at krystal-one.vercel.app | 🟢 |
+| **Technical depth** | "Shipped a React Native + Supabase web app solo. Wrote all the code, deployed via GitHub Actions to Vercel." | This entire repo, live at crystal.gigihsu.com | 🟢 |
 | **AI fluency / AI-augmented PM** | "Built a multi-AI collaboration framework with persistent project memory, prompt library, and inter-agent handoff protocol." | `ai_context/`, `.ai/`, `docs/grape_image_prompts.md` | 🟢 |
 | **Communication / writing** | "Wrote PRD, architecture doc, decision records, and case studies for the project." | `docs/PRD.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, planned case studies | 🟡 |
 
@@ -55,7 +55,7 @@
 
 **Lead with 🟢 evidence-backed skills.** Don't volunteer 🔴 claims. If they ask about a 🔴 skill, be honest: "I haven't done that yet on this project, but here's how I'd approach it."
 
-**Frame everything around the project.** Don't say "I have product strategy skills." Say: "When I had to decide what to measure for krystal, I defined a north star — % of WAU hitting a 5-day journal streak — because it captured both depth and consistency, the two things I believed mattered most to long-term retention."
+**Frame everything around the project.** Don't say "I have product strategy skills." Say: "When I had to decide what to measure for crystal, I defined a north star — % of WAU hitting a 5-day journal streak — because it captured both depth and consistency, the two things I believed mattered most to long-term retention."
 
 **Have one rich story per top skill.** For each 🟢 row, have a 90-second STAR-format answer ready (Situation, Task, Action, Result).
 

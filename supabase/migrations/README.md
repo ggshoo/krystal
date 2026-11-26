@@ -1,4 +1,4 @@
-# Krystal — Supabase migrations
+# Crystal — Supabase migrations
 
 These SQL files set up the database schema, Row Level Security, and a smoke-test seed.
 
@@ -6,7 +6,7 @@ These SQL files set up the database schema, Row Level Security, and a smoke-test
 
 Until we adopt the Supabase CLI (`supabase db push`), run them by hand in your project's SQL Editor:
 
-1. Open https://supabase.com/dashboard → your `krystal` project.
+1. Open https://supabase.com/dashboard → your `crystal` project.
 2. Sidebar → **SQL Editor**.
 3. Click **New query**.
 4. Paste the contents of each file **in order**, hit **Run**.

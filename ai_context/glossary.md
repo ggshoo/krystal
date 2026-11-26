@@ -26,7 +26,7 @@ Vocabulary specific to this project. If a new agent sees one of these terms and 
 
 ## App-specific concepts
 
-**Grape companion / Krystal** — The purple grape character with a brown twiggy stem and two leaves. Lives in `components/GrapeCompanion.tsx`. Has per-emotion face variations.
+**Grape companion / Crystal** — The purple grape character with a brown twiggy stem and two leaves. Lives in `components/GrapeCompanion.tsx`. Has per-emotion face variations.
 
 **Backpack** — Persistent inventory of items the user has earned by hitting streak milestones. Lives in `user_inventory` table (migration 007).
 

@@ -11,7 +11,7 @@ The master prompts are in `docs/grape_image_prompts.md`. This file is the run-of
 - [ ] Sign in to https://aistudio.google.com with your Google account.
 - [ ] Confirm the model dropdown shows **Gemini 2.5 Flash Image** (the "Nano Banana" nickname). If not, pick it.
 - [ ] Have `docs/grape_image_prompts.md` open in a second tab for copy-paste.
-- [ ] Create the assets folder if you haven't: `mkdir -p ~/code/krystal/assets/grape`
+- [ ] Create the assets folder if you haven't: `mkdir -p ~/code/crystal/assets/grape`
 
 ---
 
@@ -23,7 +23,7 @@ The master prompts are in `docs/grape_image_prompts.md`. This file is the run-of
   - If it feels 80% right: keep it. Save as `default.png`.
   - If it's off (wrong color, wrong stem, wrong eye vibe): reply "regenerate, but keep the same style. Make the eyes bigger and rounder" (or whatever specific tweak). Iterate up to 3 times max.
   - If after 3 tries it still isn't landing: try adding "in the style of a Pixar or Ghibli character" or "reference: kawaii mascot design" to the prompt.
-- [ ] Right-click the final image → Save image as → `default.png` in `~/code/krystal/assets/grape/`.
+- [ ] Right-click the final image → Save image as → `default.png` in `~/code/crystal/assets/grape/`.
 
 ---
 
@@ -88,8 +88,8 @@ Look at all 10 side-by-side (open the folder in Finder with Column view).
 
 ## Step 5 — Drop into the repo
 
-- [ ] All 10 files sitting in `~/code/krystal/assets/grape/`?
-- [ ] `ls ~/code/krystal/assets/grape/` shows exactly: `anger.png bad.png default.png disgust.png fear.png happy.png sad-high.png sad-low.png sad-mid.png surprise.png`
+- [ ] All 10 files sitting in `~/code/crystal/assets/grape/`?
+- [ ] `ls ~/code/crystal/assets/grape/` shows exactly: `anger.png bad.png default.png disgust.png fear.png happy.png sad-high.png sad-low.png sad-mid.png surprise.png`
 - [ ] Report back to your AI agent: "grape assets are in `assets/grape/`, ready for the hybrid PNG/SVG refactor."
 
 The next AI (or Claude in the next session) picks up from there and rewires `components/GrapeCompanion.tsx` to load PNGs on large sizes and keep SVG on small ones.

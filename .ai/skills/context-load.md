@@ -4,7 +4,7 @@
 
 ## Purpose
 
-A new agent (or the same agent after a compaction) needs to rebuild a working understanding of Krystal fast. This skill defines the minimal-read path.
+A new agent (or the same agent after a compaction) needs to rebuild a working understanding of Crystal fast. This skill defines the minimal-read path.
 
 ## When to invoke
 

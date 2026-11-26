@@ -1,4 +1,4 @@
-# Where I am with krystal
+# Where I am with crystal
 
 > **ARCHIVAL — frozen 2026-06-12.** This file is superseded by [`ai_context/current_state.md`](./ai_context/current_state.md). The new file is the source of truth. Do not update this file. Read it only for historical context.
 
@@ -8,9 +8,9 @@ A living snapshot so any future session can pick up. Update this as things chang
 
 ## The big picture
 
-I'm building **krystal**, a daily emotional reflection app, as the headline portfolio piece for my job search. Goal: ship + polish a public web app, then build a portfolio site around it.
+I'm building **crystal**, a daily emotional reflection app, as the headline portfolio piece for my job search. Goal: ship + polish a public web app, then build a portfolio site around it.
 
-**Live at:** `https://krystal-one.vercel.app`
+**Live at:** `https://crystal.gigihsu.com`
 
 ## What's done ✅
 
@@ -20,7 +20,7 @@ I'm building **krystal**, a daily emotional reflection app, as the headline port
 - **Phase 5.1–5.3** — Full v0.1 flow: Check-in → Picker → Save, with anonymous auth
 
 ### v0.1 shipped
-- Web build deployed to Vercel at `krystal-one.vercel.app`
+- Web build deployed to Vercel at `crystal.gigihsu.com`
 - **Auto-deploy wired**: every `git push` to `main` triggers a Vercel rebuild + redeploy automatically. Env vars set on Vercel project.
 
 ### v0.2 polish in progress
@@ -50,8 +50,8 @@ I'm building **krystal**, a daily emotional reflection app, as the headline port
 
 Two checks before doing more code:
 
-1. **Vercel dashboard** — visit https://vercel.com/dashboard → click krystal → Deployments. Latest deploy should be **Ready** (green). If Failed, paste the error log.
-2. **Browser** — hard-reload `https://krystal-one.vercel.app` (⌘+Shift+R). You should see all the v0.2 changes: huge "Mind" hero text, bolded "thoughts" in the question, descriptive anchors, the Plutchik wheel as the primary picker, intensity-ordered secondary picker.
+1. **Vercel dashboard** — visit https://vercel.com/dashboard → click crystal → Deployments. Latest deploy should be **Ready** (green). If Failed, paste the error log.
+2. **Browser** — hard-reload `https://crystal.gigihsu.com` (⌘+Shift+R). You should see all the v0.2 changes: huge "Mind" hero text, bolded "thoughts" in the question, descriptive anchors, the Plutchik wheel as the primary picker, intensity-ordered secondary picker.
 
 If everything looks right, pick the next direction below.
 
@@ -85,6 +85,6 @@ If everything looks right, pick the next direction below.
 
 ## Opener for next Cowork session
 
-> "Working on krystal. Folder is `~/code/krystal`. Read `STATUS.md`. Today I want to [whatever]."
+> "Working on crystal. Folder is `~/code/crystal`. Read `STATUS.md`. Today I want to [whatever]."
 
 That message bootstraps any fresh chat instantly.

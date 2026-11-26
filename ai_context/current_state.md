@@ -1,4 +1,4 @@
-# Krystal — Current State (Source of Truth)
+# Crystal — Current State (Source of Truth)
 
 > **This file is the authoritative source of truth for the project.**
 > If anything in `README.md`, `docs/`, `STATUS.md`, or `LOVABLE.md` contradicts this file, **this file is correct**. Note the discrepancy and surface it in the next session.
@@ -12,9 +12,9 @@
 
 ## Project Summary
 
-**Krystal** is a daily emotional reflection web/mobile app. It guides users through a quick mind/body/heart check-in, then a Roberts wheel emotion picker, then a Plutchik intensity ladder, then optional journal prompts. Over time, users build a personal history of reflections and a "streak" relationship with a grape companion character.
+**Crystal** is a daily emotional reflection web/mobile app. It guides users through a quick mind/body/heart check-in, then a Roberts wheel emotion picker, then a Plutchik intensity ladder, then optional journal prompts. Over time, users build a personal history of reflections and a "streak" relationship with a grape companion character.
 
-**Live URL:** https://krystal-one.vercel.app
+**Live URL:** https://crystal.gigihsu.com
 **Owner:** Gigi Hsu (`gigi.hsu@yale.edu`)
 **Purpose:** Portfolio headline piece for job search + a personal reflection practice tool.
 
@@ -99,7 +99,7 @@ Detailed schema and folder map in `docs/ARCHITECTURE.md`.
 | User interview round 1 (5 participants) | not started | Gigi | Playbook in `docs/pm_portfolio/user_interviews.md`. Recruiting first. |
 | Day-2 grape A/B test | designed | Gigi to run | Design in `docs/pm_portfolio/ab_testing.md`. Blocked on PostHog. |
 | First case study (day-2 grape) skeleton | not started | Gigi | Frame the hypothesis + design BEFORE the experiment finishes |
-| Public `/roadmap` page on krystal-one.vercel.app | not started | next AI | Mirror `docs/ROADMAP.md` as a route |
+| Public `/roadmap` page on crystal.gigihsu.com | not started | next AI | Mirror `docs/ROADMAP.md` as a route |
 | Portfolio site `/process` page | not started | Gigi | Document the AI Generalist workflow as her unfair advantage |
 | Skills mapping tracker | ✓ initialized | Gigi maintains | `docs/pm_portfolio/skills.md` — update after each milestone |
 

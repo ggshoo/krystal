@@ -3,7 +3,7 @@
 **Visual source of truth:** `Gemini_Generated_Image_8i59q8i59q8i59q8.png` (repo root) —
 _"76 Emotions: The Grape Edition"_.
 
-This doc canonicalizes the 76 tertiary ("end") emotions used across Krystal. It
+This doc canonicalizes the 76 tertiary ("end") emotions used across Crystal. It
 must stay in sync with:
 
 - `lib/emotions.ts` — the in-app taxonomy (`EMOTIONS`)

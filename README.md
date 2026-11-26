@@ -2,7 +2,7 @@
 
 A daily emotional reflection app — mind/body/heart check-in, emotion identification via the Roberts wheel, intensity laddering via Plutchik, optional journaling, and a streak-based relationship with a grape companion character.
 
-**Live:** https://krystal-one.vercel.app
+**Live:** https://crystal.gigihsu.com
 
 ## For AI agents entering this project
 
@@ -52,7 +52,7 @@ Scan the QR with the **Expo Go** app on your phone, or press `w` for web.
 ## Project structure
 
 ```
-krystal/
+crystal/
 ├── ai_context/           # AI memory + multi-agent collaboration
 │   ├── current_state.md  # ⭐ source of truth
 │   ├── START_HERE.md     # onboarding
@@ -92,11 +92,11 @@ krystal/
 ## Deploying
 
 ```bash
-rm -f ~/code/krystal/.git/index.lock
+rm -f ~/code/crystal/.git/index.lock
 git add . && git commit -m "feat: ..." && git push
 ```
 
-GitHub Actions builds and deploys to Vercel on push to `main`. Wait ~2 min, then hard-refresh https://krystal-one.vercel.app with Cmd+Shift+R.
+GitHub Actions builds and deploys to Vercel on push to `main`. Wait ~2 min, then hard-refresh https://crystal.gigihsu.com with Cmd+Shift+R.
 
 Migrations in `supabase/00N_*.sql` must be run manually in the Supabase SQL editor before any code that depends on them goes live.
 

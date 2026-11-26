@@ -43,7 +43,7 @@ Once approved, use this:
 
 ## X / Twitter post
 
-Shorter, punchier. Attach a screenshot of krystal (the home page with the grape) as bait — it makes the post stand out in the feed.
+Shorter, punchier. Attach a screenshot of crystal (the home page with the grape) as bait — it makes the post stand out in the feed.
 
 > looking for 5 people to talk to about how you process hard emotions. 30 min zoom, this week. building a daily reflection app + want to hear from real people before I keep building. dm if in.
 

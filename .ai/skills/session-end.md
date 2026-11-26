@@ -40,8 +40,8 @@ Updates to four files (in this exact order):
 7. Run `npx tsc --noEmit` to confirm no new TS errors before logging off.
 8. Tell the human the exact git commands to push (do NOT push yourself):
 
-   rm -f ~/code/krystal/.git/index.lock
-   cd ~/code/krystal && git add . && git commit -m "<concise message>" && git push
+   rm -f ~/code/crystal/.git/index.lock
+   cd ~/code/crystal && git add . && git commit -m "<concise message>" && git push
 ```
 
 ## Example usage
@@ -59,8 +59,8 @@ AI: Running session-end skill.
 
 Done. Four mandatory files updated. To ship:
 
-   rm -f ~/code/krystal/.git/index.lock
-   cd ~/code/krystal && git add . && git commit -m "feat: backpack system" && git push
+   rm -f ~/code/crystal/.git/index.lock
+   cd ~/code/crystal && git add . && git commit -m "feat: backpack system" && git push
 ```
 
 ## Failure modes

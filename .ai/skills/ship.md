@@ -28,8 +28,8 @@ Standardize the deploy flow. Push to `main` → GitHub Action → Vercel → liv
 3. Produce a single shell block the user can paste:
 
 ```bash
-rm -f ~/code/krystal/.git/index.lock
-cd ~/code/krystal
+rm -f ~/code/crystal/.git/index.lock
+cd ~/code/crystal
 git add .
 git commit -m "<message>"
 git push
@@ -37,7 +37,7 @@ git push
 
 4. After they push, tell them:
    - Wait ~2 minutes for the GitHub Action → Vercel.
-   - Hard-refresh https://krystal-one.vercel.app with Cmd+Shift+R (bypass browser cache).
+   - Hard-refresh https://crystal.gigihsu.com with Cmd+Shift+R (bypass browser cache).
    - If the build fails, check GitHub Actions tab on the repo for the error.
 
 5. If there's an unrun Supabase migration (e.g. `007_inventory.sql`), remind the user to:
@@ -58,13 +58,13 @@ AI: Running ship skill.
 
 Ship steps:
 
-  rm -f ~/code/krystal/.git/index.lock
-  cd ~/code/krystal
+  rm -f ~/code/crystal/.git/index.lock
+  cd ~/code/crystal
   git add .
   git commit -m "feat: pleasant default grape + dark mode"
   git push
 
-Wait ~2 min, then hard-refresh https://krystal-one.vercel.app (Cmd+Shift+R).
+Wait ~2 min, then hard-refresh https://crystal.gigihsu.com (Cmd+Shift+R).
 
 Note: migration 007 should be run in Supabase BEFORE this deploy lands so the
 backpack feature works on the first load. Want me to walk through that?

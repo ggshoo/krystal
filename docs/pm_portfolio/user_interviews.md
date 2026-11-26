@@ -8,7 +8,7 @@ You've never done user research interviews before. This file teaches you the bas
 
 You're not asking people what they want — you're asking them what they did, what hurt, and what they tried. People are terrible at predicting their own behavior, great at remembering specific past experiences.
 
-**Bad question:** "Would you use an app like krystal?"
+**Bad question:** "Would you use an app like crystal?"
 **Good question:** "Tell me about the last time you tried to process a difficult emotion."
 
 ## How many you need
@@ -52,7 +52,7 @@ You don't have a budget. Use these channels in order:
 - If a friend asked you for advice on emotional self-reflection, what would you say?
 
 **Probing the future (5 min) — careful here**
-- Don't ask "would you use krystal?" That gets you polite lies.
+- Don't ask "would you use crystal?" That gets you polite lies.
 - Ask: "If you had a tool that did X (the one specific feature you want to test), what would have to be true for you to actually open it daily?"
 
 **Close**
@@ -61,7 +61,7 @@ You don't have a budget. Use these channels in order:
 
 ## What NOT to do
 
-- **Don't pitch your product.** You're a researcher, not a salesperson. They should leave knowing almost nothing about krystal's actual features.
+- **Don't pitch your product.** You're a researcher, not a salesperson. They should leave knowing almost nothing about crystal's actual features.
 - **Don't ask "would you" or "do you think you would".** These predict zero behavior.
 - **Don't lead.** "Don't you think reflection is important?" → throw out.
 - **Don't fill silence.** When they pause, wait. Most of the gold comes after the awkward 4-second pause when they keep going on their own.
@@ -78,7 +78,7 @@ After all 5 are done, in one sitting:
 5. **Write up 3 things:**
    - The biggest pattern you saw (1 paragraph)
    - The most surprising thing someone said (1 quote + context)
-   - One specific change to krystal you'd make based on what you heard (1 paragraph)
+   - One specific change to crystal you'd make based on what you heard (1 paragraph)
 
 That writeup IS the portfolio case study. Aim for 600–800 words. Show the work, not just the conclusion.
 

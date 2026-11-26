@@ -1,6 +1,6 @@
 # PM Portfolio Track
 
-> Krystal is Gigi's headline PM portfolio piece. This directory captures the **portfolio-facing work** that runs parallel to product development: metrics, research, experiments, and the skills evidence trail.
+> Crystal is Gigi's headline PM portfolio piece. This directory captures the **portfolio-facing work** that runs parallel to product development: metrics, research, experiments, and the skills evidence trail.
 >
 > If you're an AI agent and the human asks about PM positioning, interview prep, case studies, or what to put on the portfolio site, start here.
 
@@ -56,7 +56,7 @@ These feed the north star. Track all four on the dashboard.
 | A/B testing playbook | ✓ written | Design + run the day-2 grape experiment |
 | Skills mapping tracker | ✓ initialized | Update after each portfolio milestone |
 | First case study (D-001 streak rule) | not started | After streak rule decision + data |
-| Public roadmap page on krystal-one.vercel.app | not started | Build `/roadmap` route |
+| Public roadmap page on crystal.gigihsu.com | not started | Build `/roadmap` route |
 | `/process` page on portfolio site | not started | Document the AI Generalist workflow |
 
 ## Two moves for this week

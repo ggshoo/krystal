@@ -4,7 +4,7 @@ The live site is broken. Get back to a known-good state fast, then debug.
 
 ## When to use
 
-- User reports "nothing loads" or a clearly broken behavior on https://krystal-one.vercel.app.
+- User reports "nothing loads" or a clearly broken behavior on https://crystal.gigihsu.com.
 - The latest deploy on Vercel shows a build failure that the user needs out of immediately.
 - You discover a recent commit introduced a regression.
 
@@ -29,7 +29,7 @@ If it's a cache issue (the deploy is fine, browser is showing old code), Cmd+Shi
 
 Tell the user:
 
-1. Open https://vercel.com/ → krystal project → Deployments tab.
+1. Open https://vercel.com/ → crystal project → Deployments tab.
 2. Find the most recent deploy with a green checkmark *before* the broken one.
 3. Click the `...` menu on that deploy → **Promote to Production**.
 4. Confirm.
@@ -43,7 +43,7 @@ This is the fastest path to restore service. Use it before debugging.
 If the rollback needs to also revert the code (e.g. the broken commit is on `main`):
 
 ```bash
-cd ~/code/krystal
+cd ~/code/crystal
 git log --oneline -10                 # find the last good commit hash
 git revert <bad-commit-hash>          # creates a new commit that undoes the bad one
 git push                              # triggers a fresh GitHub Action → Vercel deploy
@@ -74,7 +74,7 @@ Add the regression + fix to `docs/known_issues.md` so the next agent learns from
 
 ## Verification
 
-- https://krystal-one.vercel.app loads in incognito (rules out cache).
+- https://crystal.gigihsu.com loads in incognito (rules out cache).
 - The reflection flow (Welcome → Check-in → Wheel → Done → Journal) works end-to-end.
 - The home page renders the grape (if user has a streak ≥ 2).
 - No console errors in dev tools.
