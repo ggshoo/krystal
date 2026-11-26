@@ -1,4 +1,4 @@
-# Krystal — Architecture
+# Crystal — Architecture
 
 **Status:** Living doc · v1.0 · 2026-06-02
 
@@ -9,7 +9,7 @@
 ```mermaid
 flowchart TB
   User([User]) --> App
-  subgraph App[Krystal Mobile App · Expo + React Native]
+  subgraph App[Crystal Mobile App · Expo + React Native]
     Screens[Screens / Expo Router]
     Store[Zustand stores · in-memory draft state]
     SyncQ[Sync Queue · AsyncStorage]
@@ -47,7 +47,7 @@ Versions are pinned in `package.json`; align with `npx expo install --fix` whene
 ## 3. Folder structure
 
 ```
-krystal/
+crystal/
 ├── app/                          # Expo Router — file-based routes
 │   ├── _layout.tsx               # Root: providers, theme, status bar, init
 │   ├── index.tsx                 # Home (CTA to start reflection)
@@ -182,7 +182,7 @@ Insights computation needs internet in v1 (queries Supabase for the user's histo
 ```mermaid
 sequenceDiagram
   participant U as User
-  participant App as Krystal
+  participant App as Crystal
   participant SB as Supabase Auth
   participant Mail as Email
   U->>App: Tap "Sign in"
@@ -190,13 +190,13 @@ sequenceDiagram
   App->>SB: signInWithOtp({ email })
   SB->>Mail: Send magic link
   U->>Mail: Tap link
-  Mail->>App: Deep link with token (krystal://auth/callback)
+  Mail->>App: Deep link with token (crystal://auth/callback)
   App->>SB: Verify token
   SB-->>App: Session
   App->>U: Land on Home
 ```
 
-- Custom URL scheme `krystal://` is already configured in `app.json`.
+- Custom URL scheme `crystal://` is already configured in `app.json`.
 - Session persists via Supabase's built-in AsyncStorage adapter.
 - Sign-out clears session + zeroes all Zustand stores.
 
@@ -294,7 +294,7 @@ Motion: prefer 200–400ms durations, ease-in-out. Avoid bounces, spring oversho
 - No GraphQL layer (Supabase REST + RPC is enough)
 - No microservices (one Supabase project, one app)
 - No custom backend (no Node/Bun/Go server)
-- No real-time subscriptions (no `supabase.channel`) — Krystal isn't collaborative
+- No real-time subscriptions (no `supabase.channel`) — Crystal isn't collaborative
 - No ML pipeline
 - No custom auth (Supabase's is fine)
 

@@ -1,6 +1,6 @@
 # START HERE — AI Agent Constitution
 
-You are an AI coding assistant entering the Krystal project. Read this entire file before doing anything. It defines what is expected of you and what every other agent who came before or comes after will do.
+You are an AI coding assistant entering the Crystal project. Read this entire file before doing anything. It defines what is expected of you and what every other agent who came before or comes after will do.
 
 ---
 
@@ -49,7 +49,7 @@ This is the most important principle. Every prompt you write to the next agent m
 
 ## What this project is
 
-Krystal — a daily emotional reflection web/mobile app. Expo + React Native + TypeScript + Supabase, deployed as web to Vercel. Live at https://krystal-one.vercel.app. One human owner: Gigi Hsu.
+Crystal — a daily emotional reflection web/mobile app. Expo + React Native + TypeScript + Supabase, deployed as web to Vercel. Live at https://crystal.gigihsu.com. One human owner: Gigi Hsu.
 
 Full project summary in `ai_context/current_state.md → Project Summary`.
 

@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# krystal — one-liner ship
+# crystal — one-liner ship
 #
 # Usage:
 #   ./ship.sh                    # commits as "update", pushes, auto-deploys
 #   ./ship.sh "what changed"     # commits with your message, pushes, auto-deploys
 #
 # GitHub Actions picks up the push and deploys to Vercel within ~2 minutes.
-# Watch progress at https://github.com/ggshoo/krystal/actions
+# Watch progress at https://github.com/ggshoo/crystal/actions
 
 set -e
 
@@ -27,5 +27,5 @@ git push
 
 echo ""
 echo "✓ Pushed. GitHub Actions is deploying."
-echo "  Watch: https://github.com/ggshoo/krystal/actions"
-echo "  Live in ~2 min: https://krystal-one.vercel.app"
+echo "  Watch: https://github.com/ggshoo/crystal/actions"
+echo "  Live in ~2 min: https://crystal.gigihsu.com"

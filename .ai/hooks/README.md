@@ -1,6 +1,6 @@
 # Hooks
 
-Hooks are AI-runtime triggers that fire on specific events (session start, file edit, etc.). This folder documents which hooks would be valuable for Krystal so any AI runtime can be configured consistently.
+Hooks are AI-runtime triggers that fire on specific events (session start, file edit, etc.). This folder documents which hooks would be valuable for Crystal so any AI runtime can be configured consistently.
 
 ## Recommended hooks
 

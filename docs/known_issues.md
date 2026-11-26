@@ -30,7 +30,7 @@ When AI agents run `git add` in the sandbox, the index.lock file sometimes persi
 
 **Where:** Sandbox runtime, not project code.
 
-**Workaround:** Document in `ship` skill — every deploy block starts with `rm -f ~/code/krystal/.git/index.lock`.
+**Workaround:** Document in `ship` skill — every deploy block starts with `rm -f ~/code/crystal/.git/index.lock`.
 
 **Real fix:** None possible at this layer. Live with it.
 

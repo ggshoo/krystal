@@ -35,7 +35,7 @@ Prioritized backlog. Newest items go in their priority bucket, not at the bottom
 | PM-005 | Synthesize interview findings into `case_studies/5_interviews.md` | `todo` | Gigi | PM-004 |
 | PM-006 | Run day-2 grape A/B test (6 weeks) | `blocked` | Gigi | PM-001a |
 | PM-007 | Update day-2 case study with experiment results | `blocked` | Gigi | PM-006 |
-| PM-008 | Build `/roadmap` public page on krystal-one.vercel.app | `todo` | next AI | None |
+| PM-008 | Build `/roadmap` public page on crystal.gigihsu.com | `todo` | next AI | None |
 | PM-009 | Build `/process` page on portfolio site documenting AI Generalist workflow | `todo` | Gigi | gigihsu.com being live |
 | PM-010 | Generate 10 AI grape PNG assets via Nano Banana | `in-progress` | Gigi | checklist ready in `docs/pm_portfolio/grape_generation_checklist.md` |
 | PM-011 | Refactor `GrapeCompanion.tsx` for hybrid PNG (home) / SVG (corner) once PM-010 lands | `blocked` | next AI | PM-010 |

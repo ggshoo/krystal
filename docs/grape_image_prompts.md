@@ -58,7 +58,7 @@ Body shape, cheeks, sparkle highlights, and pose stay identical.
 2. Paste the **master prompt**. Iterate (regenerate, refine wording) until the default grape looks right.
 3. Stay in the same conversation. Send the variant follow-up with each emotion descriptor.
 4. Download each image. Rename per the table.
-5. Drop all files into `~/code/krystal/assets/grape/`.
+5. Drop all files into `~/code/crystal/assets/grape/`.
 6. Tell the next AI: "assets are in `assets/grape/`, refactor `GrapeCompanion.tsx` for hybrid PNG/SVG."
 
 ## Naming convention

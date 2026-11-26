@@ -1,4 +1,4 @@
-# Krystal — Build Roadmap
+# Crystal — Build Roadmap
 
 **Status:** Living doc · v1.1 · 2026-06-02
 
@@ -125,7 +125,7 @@ Sub-phases done in order:
 ### 6.1 Auth
 - [ ] `app/(auth)/sign-in.tsx` — email magic-link UI
 - [ ] `lib/auth.ts` — sign in / out / current user helpers
-- [ ] Deep-link callback handling (`krystal://auth/callback`)
+- [ ] Deep-link callback handling (`crystal://auth/callback`)
 - [ ] Protected `(flow)` group — redirect to sign-in if no session
 
 ### 6.2 Persistence
@@ -181,7 +181,7 @@ Deliverables:
 - [ ] PostHog wired up (post-launch — only after we know what we want to measure)
 
 Definition of done:
-- Krystal is installable from TestFlight
+- Crystal is installable from TestFlight
 - A tester completes a full reflection on a TestFlight build
 
 ---

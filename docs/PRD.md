@@ -2,7 +2,7 @@
 
 **Status:** Living doc · v2.0 · 2026-07-05
 **Owner:** Gigi Hsu
-**Codebase name:** `krystal` (internal). **Product name:** `crystal` (user-facing).
+**Name:** `crystal` (codebase and product).
 
 > **What changed in v2.0.** The v1.0 PRD (2026-06-02) was written for a broad "anyone with 3 minutes" audience and explicitly excluded reminders, watch integration, and multiple surfaces. v2.0 sharpens the target user, embraces multi-surface presence, and admits reminders back into scope — carefully. It also documents the streak / backpack reward system that shipped between v1 and v2. Anti-patterns and product philosophy are preserved.
 
@@ -72,7 +72,7 @@ Crystal is present wherever the user already is. Phased rollout:
 
 | Surface | Mechanism | Phase |
 |---|---|---|
-| **Web (mobile + desktop)** | Live at krystal-one.vercel.app | ✓ shipped |
+| **Web (mobile + desktop)** | Live at crystal.gigihsu.com | ✓ shipped |
 | **Progressive Web App** | Add manifest + service worker; installs to phone home screen. iOS 16.4+ supports web push. | Next |
 | **iOS native** | Expo build → TestFlight → App Store. | Phase B |
 | **iOS home screen widget** | WidgetKit extension. One tap opens Quick Capture. | Phase B |
@@ -188,7 +188,7 @@ Full definition + PostHog wiring in `docs/pm_portfolio/README.md`.
 - Backpack + hat unlock at day 5
 - Grape companion with per-emotion face variations
 - Dark mode (system-following)
-- Web build at krystal-one.vercel.app
+- Web build at crystal.gigihsu.com
 - PostHog analytics (queued — needs account setup)
 
 ## 11. What's next (v0.4 build order)

@@ -21,7 +21,7 @@ Supabase's default AES-256 at rest plus per-row RLS scoped to `auth.uid()`. End-
 Daily reflections can be completed without internet; submissions queue in AsyncStorage and flush on reconnect. Matches mindfulness use cases (planes, retreats, transit dead zones). Idempotency via client-generated UUIDv4.
 
 ### 2026-06-02 — Auth: Email magic link only
-Passwordless via Supabase Auth `signInWithOtp`. Lowest UX surface, no password management, no social-login App Store mandates (Apple requires Sign in with Apple only if other social logins are present — we have none). Deep link `krystal://auth/callback` returns user to the app.
+Passwordless via Supabase Auth `signInWithOtp`. Lowest UX surface, no password management, no social-login App Store mandates (Apple requires Sign in with Apple only if other social logins are present — we have none). Deep link `crystal://auth/callback` returns user to the app.
 
 ### 2026-06-02 — Auth (revised for v0.1): anonymous sessions on first launch
 Reversed earlier decision for ship-first reasons. v0.1 silently creates an anonymous Supabase session on app launch — no sign-in screen, no email step, friends can use the app immediately. Data persists on-device. v0.2 will add an "upgrade to email" flow in settings that converts the anonymous session to a real one via `supabase.auth.linkIdentity`, preserving existing reflections. The original magic-link decision is the long-term destination — anonymous is the on-ramp.
@@ -45,7 +45,7 @@ Reframed from "adults seeking structured emotional self-awareness" to **anyone w
 Visual direction is warm, hand-drawn, slightly playful — picture a quieter *Animal Crossing* or *Untitled Goose Game*. Anchored in the belief that emotional awareness is partly about reconnecting with your kid-self. The aesthetic invites that openness without being a kids' app.
 
 ### 2026-06-02 — Companion character: a quiet purple grape
-Krystal has a small cute purple grape companion that's present through the daily flow. Quiet by default, reactive (not proactive), never judging, never gamified. No variants, no evolutions, no shop. One character, just present.
+Crystal has a small cute purple grape companion that's present through the daily flow. Quiet by default, reactive (not proactive), never judging, never gamified. No variants, no evolutions, no shop. One character, just present.
 
 ### 2026-06-02 — Grape is nameless
 Some companion characters have names (Duo, Mira, Clippy). The grape doesn't. Keeps the focus on the user's relationship with themselves, not with the character.
@@ -98,7 +98,7 @@ Original PRD §3 listed "No streak pressure" as an anti-pattern. Gigi reversed t
 ### 2026-06-09 — Email upgrade flow (anonymous → linked account)
 Added `/sign-in` route that takes the user's anonymous Supabase session and attaches an email via `supabase.auth.updateUser({ email })`. Supabase sends a confirmation link; on click the user lands back at the app where `detectSessionInUrl` (enabled on web) auto-processes the verification. The `user_id` stays the same throughout, so all the user's existing reflections remain attached. Home shows "Save your reflections across devices" link while anonymous, and "Signed in as [email]" once linked.
 
-**Supabase config required (manual):** dashboard → Authentication → URL Configuration → set Site URL to `https://krystal-one.vercel.app`. Email change is enabled by default. (Optional: customize the email template under Authentication → Email Templates.)
+**Supabase config required (manual):** dashboard → Authentication → URL Configuration → set Site URL to `https://crystal.gigihsu.com`. Email change is enabled by default. (Optional: customize the email template under Authentication → Email Templates.)
 
 ### 2026-06-09 — History view + journal-gating (this session)
 Built `/history` route that lists past daily_checkins with inline-expandable journal answers. Today's entry sits at top. Home screen detects today's entry via `lib/history.fetchTodaysEntry` and shows a **"View history" link only after today's journal_entries row exists** (per Gigi's gating rule). If daily_checkin exists but journal doesn't, Home shows "Continue today's journal" instead. Journal screen now hydrates from Supabase if a user returns mid-flow in a fresh session (draft state empty but daily_checkin row exists). **Edit mode for today's entry is still pending** — deferred to next iteration.

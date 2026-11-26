@@ -23,7 +23,7 @@ A good hypothesis has a cause, an effect, and a reason. Use this template:
 
 > **Because** [insight about user behavior], **if we** [change], **then** [metric] **will** [increase/decrease] **by at least** [X%].
 
-Example for krystal:
+Example for crystal:
 
 > **Because** users describe needing "proof the practice is working" within the first week, **if we** reveal the grape companion at day 2 instead of day 1, **then** day-2 retention **will increase by at least** 10%.
 
@@ -59,7 +59,7 @@ The intuition you need:
 - **More users per side = more confidence.** With infinite users, you'd detect a 0.01% lift. With 50 users, you basically can't detect anything below ~30%.
 - **Time matters because users accumulate.** If you get 30 signups per week, an experiment needing 1,000 users per side takes ~14 months. Plan accordingly.
 
-For krystal specifically, you don't have huge traffic. **You're going to need to either**:
+For crystal specifically, you don't have huge traffic. **You're going to need to either**:
 
 1. **Accept smaller experiments with larger expected effects** (test things you expect to move the needle 20%+).
 2. **Run experiments longer** (4–8 weeks instead of 1–2).

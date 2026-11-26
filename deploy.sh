@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# krystal — manual one-command deploy
+# crystal — manual one-command deploy
 #
 # Usage:
 #   ./deploy.sh                  # default commit message
@@ -30,7 +30,7 @@ echo "→ Pushing to GitHub…"
 git push
 
 # Use the official Vercel CLI pattern: pull → build → deploy --prebuilt.
-# This pattern automatically links to the correct krystal project rather
+# This pattern automatically links to the correct crystal project rather
 # than creating one named after the working directory.
 
 echo "→ Pulling Vercel project config…"
@@ -43,4 +43,4 @@ echo "→ Deploying pre-built output…"
 vercel deploy --prebuilt --prod
 
 echo ""
-echo "✓ Done. Hard-reload krystal-one.vercel.app to see the new build."
+echo "✓ Done. Hard-reload crystal.gigihsu.com to see the new build."

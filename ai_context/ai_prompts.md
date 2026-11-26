@@ -11,7 +11,7 @@ These prompts assume the AI has filesystem access to this repo. If your tool doe
 > Use when an AI joins this project for the first time, or starts a new session on it.
 
 ```
-You are joining the Krystal project as a generalist AI agent. You are
+You are joining the Crystal project as a generalist AI agent. You are
 responsible for planning, architecture, coding, testing, documentation,
 debugging, and the handoff to the next AI. Do not assume another agent
 will do any of these — you own all of it for this session.
@@ -51,7 +51,7 @@ Begin with Step 1.
 > Use when switching from one AI system to another (Claude → Codex, Codex → ChatGPT, ChatGPT → Claude, etc.). Forces the new agent to *verify* what the prior agent left rather than trust it.
 
 ```
-You are taking over the Krystal project from a different AI system. The
+You are taking over the Crystal project from a different AI system. The
 previous agent's notes may be incomplete, outdated, or wrong. Your job
 is to verify before you continue.
 
@@ -164,7 +164,7 @@ Variants the AI should treat the same way:
 > Use when you want a critical pass over the project, not new code. Output is a report, not changes.
 
 ```
-You are auditing the Krystal project. Do NOT write new feature code.
+You are auditing the Crystal project. Do NOT write new feature code.
 Your output is a written report.
 
 Step 1 — Read context:
