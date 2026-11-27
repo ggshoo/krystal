@@ -14,6 +14,7 @@ import { useColorScheme, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { identifyUser, initAnalytics } from "@/lib/analytics";
+import { useRefreshPendingEmail } from "@/lib/authLinking";
 import { currentScene } from "@/lib/scene";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -42,6 +43,10 @@ export default function RootLayout() {
   useEffect(() => {
     if (user) identifyUser(user.id, !user.email);
   }, [user]);
+
+  // iOS/Android: pick up a confirmed email upgrade when the app returns to
+  // the foreground (fallback for when the email link doesn't open the app).
+  useRefreshPendingEmail();
 
   // The time-of-day scene drives the status bar tint and the flash color
   // shown behind screens during transitions, so it matches the sky the user

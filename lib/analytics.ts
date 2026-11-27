@@ -1,4 +1,4 @@
-import posthog from "posthog-js";
+import { AnalyticsClient, startPostHog } from "./posthogClient";
 
 /**
  * Crystal — analytics wrapper around PostHog.
@@ -15,7 +15,7 @@ import posthog from "posthog-js";
  *      just this file.
  *
  * If you're wiring in a new event: add a named function here first, then call
- * it from the screen. Never `posthog.capture` outside this file.
+ * it from the screen. Never call PostHog directly outside this file.
  *
  * Metrics dashboard reference (docs/pm_portfolio/README.md):
  *   - North star: % of WAU hitting 5-day journal streak
@@ -26,6 +26,7 @@ import posthog from "posthog-js";
  */
 
 let initialized = false;
+let client: AnalyticsClient | null = null;
 
 // ─── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -50,18 +51,11 @@ export function initAnalytics(): void {
     return;
   }
 
-  // Only works on web; posthog-js is a browser SDK. If we ever ship native,
-  // swap this file for posthog-react-native (same public interface).
-  if (typeof window === "undefined") return;
+  // Web uses posthog-js, iOS/Android use posthog-react-native. Metro picks
+  // the right file (posthogClient.ts vs posthogClient.native.ts).
+  client = startPostHog(key, host);
+  if (!client) return;
 
-  posthog.init(key, {
-    api_host: host,
-    capture_pageview: true,
-    persistence: "localStorage",
-    // Anonymous users share IDs across sessions via posthog's own storage —
-    // once we call identify() with the Supabase user.id below, they'll be
-    // merged into that identity for reporting.
-  });
   initialized = true;
 }
 
@@ -71,7 +65,7 @@ export function initAnalytics(): void {
  */
 export function identifyUser(userId: string, isAnonymous: boolean): void {
   if (!initialized) return;
-  posthog.identify(userId, { anonymous: isAnonymous });
+  client!.identify(userId, { anonymous: isAnonymous });
 }
 
 /**
@@ -79,7 +73,7 @@ export function identifyUser(userId: string, isAnonymous: boolean): void {
  */
 export function resetAnalytics(): void {
   if (!initialized) return;
-  posthog.reset();
+  client!.reset();
 }
 
 // ─── Domain events ──────────────────────────────────────────────────────────
@@ -100,7 +94,7 @@ export function trackCheckinSaved(props: {
   is_edit: boolean;
 }): void {
   if (!initialized) return;
-  posthog.capture("checkin_saved", props);
+  client!.capture("checkin_saved", props);
 }
 
 /** Fired every time a journal_entries row is saved (insert OR update). */
@@ -110,7 +104,7 @@ export function trackJournalSaved(props: {
   is_edit: boolean;
 }): void {
   if (!initialized) return;
-  posthog.capture("journal_saved", props);
+  client!.capture("journal_saved", props);
 }
 
 /**
@@ -127,7 +121,7 @@ export function trackStreakSnapshot(props: {
   is_returning: boolean;
 }): void {
   if (!initialized) return;
-  posthog.capture("streak_snapshot", props);
+  client!.capture("streak_snapshot", props);
 }
 
 /**
@@ -140,7 +134,7 @@ export function trackMilestoneReached(props: {
   streak_at_unlock: number;
 }): void {
   if (!initialized) return;
-  posthog.capture("milestone_reached", props);
+  client!.capture("milestone_reached", props);
 }
 
 /** Fired when a backpack item is equipped or unequipped. */
@@ -149,5 +143,5 @@ export function trackItemToggled(props: {
   equipped: boolean;
 }): void {
   if (!initialized) return;
-  posthog.capture("item_toggled", props);
+  client!.capture("item_toggled", props);
 }

@@ -12,6 +12,7 @@ import {
 import { ChunkyButton } from "@/components/ChunkyButton";
 import { FadeIn } from "@/components/FadeIn";
 import { Scene } from "@/components/Scene";
+import { emailRedirectUrl } from "@/lib/authLinking";
 import { currentScene } from "@/lib/scene";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -24,7 +25,8 @@ import { useAuthStore } from "@/store/useAuthStore";
  * user_id is the same before and after, the email is just attached.
  *
  * Flow: user types email → updateUser sends confirmation link → user opens
- * link in inbox → Supabase verifies → app picks it up via detectSessionInUrl.
+ * link in inbox → Supabase verifies → web picks it up via detectSessionInUrl;
+ * iOS/Android come back through app/auth-callback.tsx (see lib/authLinking.ts).
  */
 export default function SignIn() {
   const router = useRouter();
@@ -44,9 +46,10 @@ export default function SignIn() {
     setSending(true);
     setError(null);
 
-    const { error: updateError } = await supabase.auth.updateUser({
-      email: trimmed,
-    });
+    const { error: updateError } = await supabase.auth.updateUser(
+      { email: trimmed },
+      { emailRedirectTo: emailRedirectUrl() }
+    );
 
     if (updateError) {
       setError(updateError.message);
