@@ -38,7 +38,7 @@ export function initAnalytics(): void {
   if (initialized) return;
   const key = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
   const host =
-    process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+    process.env.EXPO_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
   if (!key) {
     // No key configured — silently no-op. All track functions below check
