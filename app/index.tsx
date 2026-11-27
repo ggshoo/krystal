@@ -22,6 +22,7 @@ import {
   useInventoryStore,
 } from "@/store/useInventoryStore";
 import { supabase } from "@/lib/supabase";
+import { TAGLINE } from "@/lib/copy";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const GREETINGS = [
@@ -301,7 +302,7 @@ export default function Home() {
                     className="mb-16 max-w-xs text-center font-body text-base font-semibold leading-relaxed"
                     style={{ color: scene.subInk }}
                   >
-                    A cozy daily check-in — see where today finds you.
+                    {TAGLINE}
                   </Text>
                 </FadeIn>
               </>

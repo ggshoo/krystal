@@ -7,7 +7,12 @@ import {
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import {
+  Stack,
+  useRootNavigationState,
+  useRouter,
+  useSegments,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useColorScheme, View } from "react-native";
@@ -16,7 +21,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { identifyUser, initAnalytics } from "@/lib/analytics";
 import { useRefreshPendingEmail } from "@/lib/authLinking";
 import { currentScene } from "@/lib/scene";
-import { useAuthStore } from "@/store/useAuthStore";
+import { isSignedIn, useAuthStore } from "@/store/useAuthStore";
 
 export default function RootLayout() {
   // Load Roboto. The registered family name "Roboto" matches the `font-display`
@@ -37,12 +42,26 @@ export default function RootLayout() {
     useAuthStore.getState().initialize();
   }, []);
 
-  // Attach the analytics identity as soon as the anonymous (or upgraded)
-  // Supabase user resolves. Same user_id across sessions.
+  // Attach the analytics identity as soon as the Supabase user resolves. Same user_id across sessions.
   const user = useAuthStore((s) => s.user);
   useEffect(() => {
     if (user) identifyUser(user.id, !user.email);
   }, [user]);
+
+  // Sign-in is required. Anyone without an email account goes to /sign-in;
+  // /auth-callback stays reachable so the email link can finish signing in.
+  const authInitialized = useAuthStore((s) => s.initialized);
+  const signedIn = isSignedIn(user);
+  const segments = useSegments();
+  const router = useRouter();
+  const onAuthScreen =
+    segments[0] === "sign-in" || segments[0] === "auth-callback";
+  // Navigating before the Stack is mounted throws, so wait for its key.
+  const navReady = !!useRootNavigationState()?.key;
+  useEffect(() => {
+    if (!navReady || !authInitialized || signedIn || onAuthScreen) return;
+    router.replace("/sign-in");
+  }, [navReady, authInitialized, signedIn, onAuthScreen, router]);
 
   // iOS/Android: pick up a confirmed email upgrade when the app returns to
   // the foreground (fallback for when the email link doesn't open the app).
@@ -55,9 +74,10 @@ export default function RootLayout() {
   // Keep the manual dark check available in case a screen still reads it.
   useColorScheme();
 
-  // Hold a plain sky-colored screen until the fonts are ready, so the UI
-  // doesn't flash in the system font and then reflow.
-  if (!fontsLoaded) {
+  // Hold a plain sky-colored screen until the fonts and auth are ready, so
+  // the UI doesn't flash in the system font, and a signed-out visitor never
+  // sees the home screen before the redirect.
+  if (!fontsLoaded || !authInitialized) {
     return (
       <SafeAreaProvider>
         <StatusBar style={scene.isDark ? "light" : "dark"} />
@@ -77,6 +97,21 @@ export default function RootLayout() {
           },
         }}
       />
+      {/* Cover whatever screen mounted first while a signed-out visitor is
+          being sent to /sign-in. The Stack must stay mounted for that. */}
+      {!signedIn && !onAuthScreen && (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: scene.sky[0],
+          }}
+        />
+      )}
     </SafeAreaProvider>
   );
 }

@@ -2,14 +2,19 @@ import type { Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
 import { supabase } from "@/lib/supabase";
+import { useInventoryStore } from "@/store/useInventoryStore";
+import { useReflectionStore } from "@/store/useReflectionStore";
 
 /**
- * Auth state. On first launch we silently sign the user in anonymously so
- * reflections can save without an email step (v0.1 ship-first strategy).
+ * Auth state.
  *
- * In v0.2 we'll add a Settings → "Save your account with email" flow that
- * upgrades the anonymous session to a real one via Supabase's
- * `linkIdentity` API, preserving all existing data.
+ * Crystal requires an email account (decided 2026-11-27). Nobody gets a new
+ * guest (anonymous) account any more; the root layout sends anyone who isn't
+ * signed in with an email to /sign-in.
+ *
+ * Older guest sessions are still loaded if a device has one, because they
+ * own real check-ins. The sign-in screen upgrades that guest account in place
+ * (same user_id, so the entries stay) when the email is new to Crystal.
  */
 type AuthState = {
   session: Session | null;
@@ -17,7 +22,15 @@ type AuthState = {
   initialized: boolean;
   error: string | null;
   initialize: () => Promise<void>;
+  signOut: () => Promise<void>;
 };
+
+/** True when the user has a real (email) account, not a guest one. */
+export function isSignedIn(user: User | null): boolean {
+  return !!user && !!user.email && !user.is_anonymous;
+}
+
+let subscribed = false;
 
 export const useAuthStore = create<AuthState>((set) => ({
   session: null,
@@ -27,22 +40,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initialize: async () => {
     try {
-      // Reuse an existing session if one was persisted to AsyncStorage
+      // Reuse a session persisted to AsyncStorage / localStorage, if any.
       const {
-        data: { session: existing },
+        data: { session },
       } = await supabase.auth.getSession();
-
-      let session = existing;
-
-      if (!session) {
-        // No session — create an anonymous one
-        const { data, error } = await supabase.auth.signInAnonymously();
-        if (error) {
-          set({ initialized: true, error: error.message });
-          return;
-        }
-        session = data.session;
-      }
 
       set({
         session,
@@ -51,18 +52,30 @@ export const useAuthStore = create<AuthState>((set) => ({
         error: null,
       });
 
-      // Subscribe to future auth changes (e.g. anonymous → email upgrade)
-      supabase.auth.onAuthStateChange((_event, newSession) => {
-        set({
-          session: newSession,
-          user: newSession?.user ?? null,
+      if (!subscribed) {
+        subscribed = true;
+        supabase.auth.onAuthStateChange((_event, newSession) => {
+          const prevId = useAuthStore.getState().user?.id;
+          const nextId = newSession?.user?.id;
+          // Different person (or signed out): drop anything cached in memory
+          // for the previous account.
+          if (prevId && prevId !== nextId) {
+            useInventoryStore.getState().reset();
+            useReflectionStore.getState().reset();
+          }
+          set({ session: newSession, user: newSession?.user ?? null });
         });
-      });
+      }
     } catch (e) {
       set({
         initialized: true,
         error: e instanceof Error ? e.message : String(e),
       });
     }
+  },
+
+  signOut: async () => {
+    await supabase.auth.signOut();
+    // onAuthStateChange clears session/user and cached data.
   },
 }));

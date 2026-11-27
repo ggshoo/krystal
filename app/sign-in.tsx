@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -13,55 +13,156 @@ import { ChunkyButton } from "@/components/ChunkyButton";
 import { FadeIn } from "@/components/FadeIn";
 import { Scene } from "@/components/Scene";
 import { emailRedirectUrl } from "@/lib/authLinking";
+import { TAGLINE } from "@/lib/copy";
 import { currentScene } from "@/lib/scene";
 import { supabase } from "@/lib/supabase";
-import { useAuthStore } from "@/store/useAuthStore";
+import { isSignedIn, useAuthStore } from "@/store/useAuthStore";
 
 /**
- * Sign-in / upgrade-account screen.
+ * Sign-in screen. Crystal requires an account, so the root layout sends
+ * every signed-out visitor here.
  *
- * Upgrades the user's anonymous Supabase session to an email-linked account
- * so their reflections persist across devices. Existing data stays — the
- * user_id is the same before and after, the email is just attached.
+ * One email box for everyone. Supabase emails a 6-digit code and a link
+ * (either one works), no password:
  *
- * Flow: user types email → updateUser sends confirmation link → user opens
- * link in inbox → Supabase verifies → web picks it up via detectSessionInUrl;
- * iOS/Android come back through app/auth-callback.tsx (see lib/authLinking.ts).
+ *   - New or returning person: signInWithOtp. Creates the account if the
+ *     email is new, otherwise signs into the existing one with its history.
+ *   - Device with an old guest (anonymous) session: first try to attach the
+ *     email to the guest account (updateUser), which keeps its entries under
+ *     the same user_id. If that email already has an account, fall back to a
+ *     normal sign-in; the guest's entries stay behind (decided 2026-11-27).
+ *
+ * The link lands on the web app (detectSessionInUrl) or on
+ * app/auth-callback.tsx on iOS/Android. The code works anywhere, which helps
+ * when the email is opened on a different device.
+ *
+ * Supabase setup: the "Magic Link", "Confirm signup" and "Change Email
+ * Address" email templates must include {{ .Token }} for the code to show.
  */
+
+type Step = "email" | "code";
+/** Which Supabase OTP type the emailed code belongs to. */
+type CodeKind = "email" | "email_change";
+
+function looksLikeTakenEmail(message: string, code?: string): boolean {
+  return (
+    code === "email_exists" ||
+    /already (been )?registered|already exists/i.test(message)
+  );
+}
+
 export default function SignIn() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
   const scene = currentScene();
 
+  const [step, setStep] = useState<Step>("email");
+  const [codeKind, setCodeKind] = useState<CodeKind>("email");
   const [email, setEmail] = useState("");
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const alreadyLinked = !!user?.email;
+  const signedIn = isSignedIn(user);
 
-  const handleSendLink = async () => {
-    const trimmed = email.trim().toLowerCase();
-    if (!trimmed) return;
-    setSending(true);
+  // The link in the email can sign this device in while the code step is
+  // open (web tab, or the app via auth-callback). Move on when it does.
+  useEffect(() => {
+    if (signedIn && step === "code") router.replace("/");
+  }, [signedIn, step, router]);
+
+  const trimmedEmail = email.trim().toLowerCase();
+  const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
+  const validCode = /^\d{6,10}$/.test(code.trim());
+
+  const sendCode = async () => {
+    if (!validEmail || busy) return;
+    setBusy(true);
     setError(null);
+    const redirect = emailRedirectUrl();
 
-    const { error: updateError } = await supabase.auth.updateUser(
-      { email: trimmed },
-      { emailRedirectTo: emailRedirectUrl() }
-    );
-
-    if (updateError) {
-      setError(updateError.message);
-      setSending(false);
-      return;
+    // Old guest session on this device: try to keep its entries.
+    if (user?.is_anonymous) {
+      const { error: upgradeError } = await supabase.auth.updateUser(
+        { email: trimmedEmail },
+        { emailRedirectTo: redirect }
+      );
+      if (!upgradeError) {
+        setCodeKind("email_change");
+        setStep("code");
+        setBusy(false);
+        return;
+      }
+      if (!looksLikeTakenEmail(upgradeError.message, upgradeError.code)) {
+        setError(upgradeError.message);
+        setBusy(false);
+        return;
+      }
+      // Email already has an account: sign into that one instead.
     }
 
-    setSent(true);
-    setSending(false);
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email: trimmedEmail,
+      options: { shouldCreateUser: true, emailRedirectTo: redirect },
+    });
+    if (otpError) {
+      setError(otpError.message);
+      setBusy(false);
+      return;
+    }
+    setCodeKind("email");
+    setStep("code");
+    setBusy(false);
   };
 
-  const valid = email.trim().includes("@");
+  const verifyCode = async () => {
+    if (!validCode || busy) return;
+    setBusy(true);
+    setError(null);
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: trimmedEmail,
+      token: code.trim(),
+      type: codeKind,
+    });
+    setBusy(false);
+    if (verifyError) {
+      setError(
+        /expired|invalid/i.test(verifyError.message)
+          ? "That code didn't work. Check it, or send a new one."
+          : verifyError.message
+      );
+      return;
+    }
+    router.replace("/");
+  };
+
+  const startOver = () => {
+    setStep("email");
+    setCode("");
+    setError(null);
+  };
+
+  const inputStyle = {
+    backgroundColor: "#FFFDF6",
+    borderWidth: 2,
+    borderColor: "#E4D6BC",
+    shadowColor: "#2E2416",
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 3 },
+  };
+
+  const errorLine = error && (
+    <FadeIn delay={0} duration={400}>
+      <Text
+        className="mt-4 max-w-sm text-center font-body text-xs font-semibold"
+        style={{ color: scene.subInk }}
+      >
+        {error}
+      </Text>
+    </FadeIn>
+  );
 
   return (
     <Scene edges={["top", "bottom"]}>
@@ -69,22 +170,24 @@ export default function SignIn() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <View className="px-6 pt-6">
-          <Pressable
-            onPress={() => router.push("/")}
-            className="px-2 py-2 transition-all duration-300 hover:opacity-70"
-          >
-            <Text
-              className="font-body text-sm font-bold"
-              style={{ color: scene.subInk }}
+        {signedIn && (
+          <View className="px-6 pt-6">
+            <Pressable
+              onPress={() => router.replace("/")}
+              className="px-2 py-2 transition-all duration-300 hover:opacity-70"
             >
-              ← Home
-            </Text>
-          </Pressable>
-        </View>
+              <Text
+                className="font-body text-sm font-bold"
+                style={{ color: scene.subInk }}
+              >
+                ← Home
+              </Text>
+            </Pressable>
+          </View>
+        )}
 
         <View className="flex-1 items-center justify-center px-8">
-          {alreadyLinked ? (
+          {signedIn ? (
             <>
               <FadeIn delay={0} duration={650}>
                 <Text
@@ -103,18 +206,28 @@ export default function SignIn() {
                   <Text className="font-display font-extrabold" style={{ color: scene.ink }}>
                     {user?.email}
                   </Text>
-                  . You can open crystal on any device and they'll be here.
+                  . Sign in with the same email on any device and they'll be
+                  there.
                 </Text>
               </FadeIn>
               <FadeIn delay={500} duration={500}>
                 <ChunkyButton
                   label="Back home"
                   variant="primary"
-                  onPress={() => router.push("/")}
+                  onPress={() => router.replace("/")}
                 />
               </FadeIn>
+              <FadeIn delay={650} duration={500}>
+                <View className="mt-4">
+                  <ChunkyButton
+                    label="Sign out"
+                    variant="ghost"
+                    onPress={signOut}
+                  />
+                </View>
+              </FadeIn>
             </>
-          ) : sent ? (
+          ) : step === "code" ? (
             <>
               <FadeIn delay={0} duration={650}>
                 <Text
@@ -126,92 +239,130 @@ export default function SignIn() {
               </FadeIn>
               <FadeIn delay={250} duration={650}>
                 <Text
-                  className="mb-12 max-w-sm text-center font-body text-base font-semibold leading-relaxed"
-                  style={{ color: scene.subInk }}
-                >
-                  We sent a confirmation link to{" "}
-                  <Text className="font-display font-extrabold" style={{ color: scene.ink }}>
-                    {email}
-                  </Text>
-                  . Open the email and tap the link to finish signing in. Your
-                  existing reflections will stay attached.
-                </Text>
-              </FadeIn>
-              <FadeIn delay={500} duration={500}>
-                <ChunkyButton
-                  label="Back home"
-                  variant="primary"
-                  onPress={() => router.push("/")}
-                />
-              </FadeIn>
-            </>
-          ) : (
-            <>
-              <FadeIn delay={0} duration={650}>
-                <Text
-                  className="mb-3 text-center font-display text-4xl font-extrabold tracking-tight"
-                  style={{ color: scene.ink }}
-                >
-                  Save your reflections
-                </Text>
-              </FadeIn>
-              <FadeIn delay={250} duration={650}>
-                <Text
                   className="mb-10 max-w-sm text-center font-body text-base font-semibold leading-relaxed"
                   style={{ color: scene.subInk }}
                 >
-                  Add your email so your reflections follow you across devices.
-                  We'll send you a confirmation link — no password to remember.
+                  We sent a code to{" "}
+                  <Text className="font-display font-extrabold" style={{ color: scene.ink }}>
+                    {trimmedEmail}
+                  </Text>
+                  . Type it here, or tap the link in the email.
                 </Text>
               </FadeIn>
 
               <FadeIn delay={450} duration={500}>
                 <TextInput
                   autoFocus
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  placeholder="your@email.com"
+                  keyboardType="number-pad"
+                  textContentType="oneTimeCode"
+                  autoComplete="one-time-code"
+                  maxLength={10}
+                  placeholder="123456"
                   placeholderTextColor="#9A8B76"
-                  value={email}
-                  onChangeText={setEmail}
-                  onSubmitEditing={handleSendLink}
-                  returnKeyType="send"
-                  className="w-72 rounded-tile px-6 py-4 text-center font-body text-base text-ink"
-                  style={{
-                    backgroundColor: "#FFFDF6",
-                    borderWidth: 2,
-                    borderColor: "#E4D6BC",
-                    shadowColor: "#2E2416",
-                    shadowOpacity: 0.06,
-                    shadowRadius: 12,
-                    shadowOffset: { width: 0, height: 3 },
-                  }}
+                  value={code}
+                  onChangeText={(t) => setCode(t.replace(/\D/g, ""))}
+                  onSubmitEditing={verifyCode}
+                  returnKeyType="done"
+                  className="w-56 rounded-tile px-6 py-4 text-center font-display text-2xl tracking-widest text-ink"
+                  style={inputStyle}
                 />
               </FadeIn>
 
               <FadeIn delay={600} duration={500}>
                 <View className="mt-6">
                   <ChunkyButton
-                    label={sending ? "Sending…" : "Send link"}
+                    label={busy ? "Checking…" : "Sign in"}
                     variant="primary"
-                    disabled={!valid || sending}
-                    loading={sending}
-                    onPress={handleSendLink}
+                    disabled={!validCode || busy}
+                    loading={busy}
+                    onPress={verifyCode}
                   />
                 </View>
               </FadeIn>
 
-              {error && (
-                <FadeIn delay={0} duration={400}>
-                  <Text
-                    className="mt-4 max-w-sm text-center font-body text-xs font-semibold"
-                    style={{ color: scene.subInk }}
-                  >
-                    {error}
-                  </Text>
-                </FadeIn>
-              )}
+              {errorLine}
+
+              <FadeIn delay={750} duration={500}>
+                <View className="mt-6 flex-row gap-6">
+                  <Pressable onPress={sendCode} disabled={busy}>
+                    <Text
+                      className="font-body text-sm font-bold underline"
+                      style={{ color: scene.subInk }}
+                    >
+                      Send a new code
+                    </Text>
+                  </Pressable>
+                  <Pressable onPress={startOver} disabled={busy}>
+                    <Text
+                      className="font-body text-sm font-bold underline"
+                      style={{ color: scene.subInk }}
+                    >
+                      Use a different email
+                    </Text>
+                  </Pressable>
+                </View>
+              </FadeIn>
+            </>
+          ) : (
+            <>
+              <FadeIn delay={0} duration={650}>
+                <Text
+                  className="mb-3 text-center font-display text-6xl font-extrabold tracking-tight"
+                  style={{ color: scene.ink }}
+                >
+                  crystal
+                </Text>
+              </FadeIn>
+              <FadeIn delay={250} duration={650}>
+                <Text
+                  className="mb-10 max-w-xs text-center font-body text-base font-semibold leading-relaxed"
+                  style={{ color: scene.subInk }}
+                >
+                  {TAGLINE}
+                </Text>
+              </FadeIn>
+              <FadeIn delay={400} duration={650}>
+                <Text
+                  className="mb-4 max-w-sm text-center font-body text-sm font-semibold leading-relaxed"
+                  style={{ color: scene.subInk }}
+                >
+                  Sign in with your email to save your reflections. We'll send
+                  you a code, no password needed.
+                </Text>
+              </FadeIn>
+
+              <FadeIn delay={550} duration={500}>
+                <TextInput
+                  autoFocus
+                  keyboardType="email-address"
+                  textContentType="emailAddress"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholder="your@email.com"
+                  placeholderTextColor="#9A8B76"
+                  value={email}
+                  onChangeText={setEmail}
+                  onSubmitEditing={sendCode}
+                  returnKeyType="send"
+                  className="w-72 rounded-tile px-6 py-4 text-center font-body text-base text-ink"
+                  style={inputStyle}
+                />
+              </FadeIn>
+
+              <FadeIn delay={700} duration={500}>
+                <View className="mt-6">
+                  <ChunkyButton
+                    label={busy ? "Sending…" : "Send code"}
+                    variant="primary"
+                    disabled={!validEmail || busy}
+                    loading={busy}
+                    onPress={sendCode}
+                  />
+                </View>
+              </FadeIn>
+
+              {errorLine}
             </>
           )}
         </View>

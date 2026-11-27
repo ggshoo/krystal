@@ -70,12 +70,12 @@ export default function Done() {
 
   useEffect(() => {
     if (incomplete) return;
-    if (!authInitialized) return; // wait for anon session
+    if (!authInitialized) return; // wait for the session to load
     if (!user) {
       setState("error");
       setErrorMsg(
         authError ??
-          "Couldn't sign in anonymously. Anonymous sign-ins may not be enabled on this Supabase project."
+          "You're signed out. Sign in to save this check-in."
       );
       return;
     }
