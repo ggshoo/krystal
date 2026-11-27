@@ -21,7 +21,53 @@ still only deploys the website. Phone builds happen when you run `eas build`.
   (phone). Same events, same PostHog project. Filter by `$os` to split them.
 - Email upgrade on phones: `lib/authLinking.ts` + `app/auth-callback.tsx`.
 
-## One-time setup (Gigi)
+## Three ways to run it on an iPhone
+
+| | Cost | Needs | What you get |
+|---|---|---|---|
+| Expo Go | free | laptop running `npx expo start` | Crystal inside the Expo Go app. Fastest for fixing features. No grape icon or splash. |
+| Free Apple ID + Xcode | free | Mac with Xcode, phone plugged in | Crystal as its own app on your phone. Stops opening after 7 days; rebuild to renew. Only your own devices. |
+| Apple Developer Program + EAS | $99/year | any computer | TestFlight and App Store. Anyone you invite can install it. |
+
+### 1. Expo Go (day to day)
+
+```
+npx expo start          # add --tunnel if phone and laptop aren't on the same Wi-Fi
+```
+
+Scan the QR code with the iPhone camera. In Expo Go the app's link address
+starts with `exp://`, so the email confirmation link can't come back to
+Crystal. The refresh-on-foreground fallback still picks up the upgrade. To
+open the link straight in Expo Go, also add `exp://**` to Supabase's redirect
+URLs.
+
+### 2. Free Apple ID + Xcode (Crystal as its own app)
+
+One-time:
+1. Install Xcode from the Mac App Store (large download), open it once to
+   finish setup, then Xcode → Settings → Accounts → add your Apple ID.
+2. On the iPhone: Settings → Privacy & Security → Developer Mode → on
+   (the phone restarts).
+
+Each time (and every 7 days, when the app stops opening):
+```
+CRYSTAL_FREE_SIGNING=1 npx expo run:ios --device
+```
+Pick your iPhone and your "Personal Team" if asked. The first run takes a
+while. If the phone says "Untrusted Developer", go to Settings → General →
+VPN & Device Management → trust your Apple ID.
+
+`CRYSTAL_FREE_SIGNING=1` drops the Push Notifications capability, which a free
+Apple ID can't sign (see `plugins/withoutPushEntitlement.js`). Daily reminders
+are local notifications and still work without it. This command creates an
+`ios/` folder; it's in `.gitignore`, and if a later EAS build acts strange,
+delete it.
+
+### 3. Paid account + EAS (TestFlight, App Store)
+
+Everything below needs the Apple Developer Program.
+
+## One-time setup for TestFlight (Gigi)
 
 1. **Apple Developer Program**: enroll at developer.apple.com ($99/year).
    Approval can take a day or two.
