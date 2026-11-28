@@ -31,8 +31,8 @@ export default function PickIntensity() {
   );
 
   if (!primary) return <Redirect href="/emotion/primary" />;
-  if (!secondary) return <Redirect href="/emotion/secondary" />;
-  if (!tertiary) return <Redirect href="/emotion/specific" />;
+  if (!secondary) return <Redirect href="/emotion/primary" />;
+  if (!tertiary) return <Redirect href="/emotion/primary" />;
 
   const ladder = getPlutchikLadder(primary.slug, secondary.slug);
   const levels = plutchikLevels(ladder);
