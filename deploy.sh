@@ -6,9 +6,9 @@
 #   ./deploy.sh                  # default commit message
 #   ./deploy.sh "what changed"   # custom commit message
 #
-# This is the local fallback. Normally GitHub Actions handles deploys on
+# This is the local fallback. Normally Vercel's GitHub connection deploys
 # every push to main — use `./ship.sh` instead. This script forces a local
-# build + manual Vercel upload (slower, but works if Actions is broken).
+# build + manual Vercel upload (slower, but works if that connection is broken).
 
 set -e
 

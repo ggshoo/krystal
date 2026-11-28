@@ -6,8 +6,8 @@
 #   ./ship.sh                    # commits as "update", pushes, auto-deploys
 #   ./ship.sh "what changed"     # commits with your message, pushes, auto-deploys
 #
-# GitHub Actions picks up the push and deploys to Vercel within ~2 minutes.
-# Watch progress at https://github.com/ggshoo/krystal/actions
+# Vercel's GitHub connection picks up the push and deploys within ~2 minutes.
+# Watch progress at https://vercel.com/gigis-projects-65dc14fd/crystal/deployments
 
 set -e
 
@@ -26,6 +26,6 @@ git commit -m "$MESSAGE"
 git push
 
 echo ""
-echo "✓ Pushed. GitHub Actions is deploying."
-echo "  Watch: https://github.com/ggshoo/krystal/actions"
+echo "✓ Pushed. Vercel is deploying."
+echo "  Watch: https://vercel.com/gigis-projects-65dc14fd/crystal/deployments"
 echo "  Live in ~2 min: https://krystal-one.vercel.app"
