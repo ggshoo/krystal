@@ -22,6 +22,9 @@ import { isSignedIn, useAuthStore } from "@/store/useAuthStore";
  * Sign-in screen. Crystal requires an account, so the root layout sends
  * every signed-out visitor here.
  *
+ * A small "or try it without an account" link under the button starts a
+ * guest (anonymous) session; it's deliberately the quieter option.
+ *
  * One email box for everyone. Supabase emails a one-time code, no password.
  * The emails carry the code only, no link (decided 2026-11-27): the link and
  * code share one token, and email link scanners (Outlook Safe Links etc.)
@@ -66,6 +69,8 @@ export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
 
   const signedIn = isSignedIn(user);
+  // Using crystal without an account (anonymous session on this device).
+  const isGuest = !!user && !signedIn;
 
   // The link in the email can sign this device in while the code step is
   // open (web tab, or the app via auth-callback). Move on when it does.
@@ -138,6 +143,21 @@ export default function SignIn() {
     router.replace("/");
   };
 
+  // Quiet second option: start a guest session on this device. Entries carry
+  // over if they add an email later (same user_id via updateUser).
+  const tryAsGuest = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    const { error: guestError } = await supabase.auth.signInAnonymously();
+    setBusy(false);
+    if (guestError) {
+      setError(guestError.message);
+      return;
+    }
+    router.replace("/");
+  };
+
   const startOver = () => {
     setStep("email");
     setCode("");
@@ -171,7 +191,7 @@ export default function SignIn() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        {signedIn && (
+        {(signedIn || isGuest) && (
           <View className="px-6 pt-6">
             <Pressable
               onPress={() => router.replace("/")}
@@ -327,8 +347,9 @@ export default function SignIn() {
                   className="mb-4 max-w-sm text-center font-body text-sm font-semibold leading-relaxed"
                   style={{ color: scene.subInk }}
                 >
-                  Sign in with your email to save your reflections. We'll send
-                  you a code, no password needed.
+                  {isGuest
+                    ? "You're trying crystal without an account, so your reflections are only on this device. Add your email to keep them."
+                    : "Sign in with your email to save your reflections. We'll send you a code, no password needed."}
                 </Text>
               </FadeIn>
 
@@ -364,6 +385,23 @@ export default function SignIn() {
               </FadeIn>
 
               {errorLine}
+
+              {!user && (
+                <FadeIn delay={1100} duration={600}>
+                  <Pressable
+                    onPress={tryAsGuest}
+                    disabled={busy}
+                    className="mt-10 px-2 py-2 transition-all duration-300 hover:opacity-70"
+                  >
+                    <Text
+                      className="font-body text-xs font-semibold underline"
+                      style={{ color: scene.subInk, opacity: 0.75 }}
+                    >
+                      or try it without an account
+                    </Text>
+                  </Pressable>
+                </FadeIn>
+              )}
             </>
           )}
         </View>

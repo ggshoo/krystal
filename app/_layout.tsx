@@ -21,7 +21,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { identifyUser, initAnalytics } from "@/lib/analytics";
 import { useRefreshPendingEmail } from "@/lib/authLinking";
 import { currentScene } from "@/lib/scene";
-import { isSignedIn, useAuthStore } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function RootLayout() {
   // Load Roboto. The registered family name "Roboto" matches the `font-display`
@@ -48,10 +48,11 @@ export default function RootLayout() {
     if (user) identifyUser(user.id, !user.email);
   }, [user]);
 
-  // Sign-in is required. Anyone without an email account goes to /sign-in;
-  // /auth-callback stays reachable so the email link can finish signing in.
+  // Anyone with no session goes to /sign-in. Sign-in is the main path; a
+  // quiet "try it without an account" link there starts a guest session,
+  // which is allowed through. /auth-callback stays reachable for email links.
   const authInitialized = useAuthStore((s) => s.initialized);
-  const signedIn = isSignedIn(user);
+  const signedIn = !!user;
   const segments = useSegments();
   const router = useRouter();
   const onAuthScreen =

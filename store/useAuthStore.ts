@@ -8,13 +8,12 @@ import { useReflectionStore } from "@/store/useReflectionStore";
 /**
  * Auth state.
  *
- * Crystal requires an email account (decided 2026-11-27). Nobody gets a new
- * guest (anonymous) account any more; the root layout sends anyone who isn't
- * signed in with an email to /sign-in.
+ * Sign-in with email is the main path (decided 2026-11-27). The root layout
+ * sends anyone with no session to /sign-in. A quiet link there lets people
+ * try crystal as a guest (anonymous session, this device only).
  *
- * Older guest sessions are still loaded if a device has one, because they
- * own real check-ins. The sign-in screen upgrades that guest account in place
- * (same user_id, so the entries stay) when the email is new to Crystal.
+ * A guest who later adds an email is upgraded in place (same user_id, so the
+ * entries stay) when the email is new to Crystal.
  */
 type AuthState = {
   session: Session | null;
