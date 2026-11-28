@@ -50,7 +50,7 @@ export default function PickFeeling() {
   const subtitle = !P
     ? "Start in the middle. Tap the feeling closest to now."
     : !S
-      ? "Tap the one that fits best, or the center to go back."
+      ? "Tap the one that fits best."
       : T
         ? `${P.name} · ${S.name} · ${T.name}`
         : `${P.name} · ${S.name}`;
