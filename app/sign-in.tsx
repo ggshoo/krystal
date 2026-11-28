@@ -22,8 +22,10 @@ import { isSignedIn, useAuthStore } from "@/store/useAuthStore";
  * Sign-in screen. Crystal requires an account, so the root layout sends
  * every signed-out visitor here.
  *
- * One email box for everyone. Supabase emails a 6-digit code and a link
- * (either one works), no password:
+ * One email box for everyone. Supabase emails a one-time code, no password.
+ * The emails carry the code only, no link (decided 2026-11-27): the link and
+ * code share one token, and email link scanners (Outlook Safe Links etc.)
+ * were "clicking" the link on arrival, which used up the code.
  *
  *   - New or returning person: signInWithOtp. Creates the account if the
  *     email is new, otherwise signs into the existing one with its history.
@@ -32,12 +34,11 @@ import { isSignedIn, useAuthStore } from "@/store/useAuthStore";
  *     the same user_id. If that email already has an account, fall back to a
  *     normal sign-in; the guest's entries stay behind (decided 2026-11-27).
  *
- * The link lands on the web app (detectSessionInUrl) or on
- * app/auth-callback.tsx on iOS/Android. The code works anywhere, which helps
- * when the email is opened on a different device.
+ * The code works on any device. app/auth-callback.tsx and the link handling
+ * in lib/authLinking.ts stay in place in case a link is added back later.
  *
  * Supabase setup: the "Magic Link", "Confirm signup" and "Change Email
- * Address" email templates must include {{ .Token }} for the code to show.
+ * Address" email templates show {{ .Token }} and no {{ .ConfirmationURL }}.
  */
 
 type Step = "email" | "code";
@@ -246,7 +247,7 @@ export default function SignIn() {
                   <Text className="font-display font-extrabold" style={{ color: scene.ink }}>
                     {trimmedEmail}
                   </Text>
-                  . Type it here, or tap the link in the email.
+                  . Type it here to sign in.
                 </Text>
               </FadeIn>
 
