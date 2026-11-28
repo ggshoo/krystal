@@ -234,6 +234,8 @@ export function FeelingsWheel({
   const cellDeg = 360 / cells;
   const middleColor = tintOnWhite(P.color, 0.45);
   const outerColor = tintOnWhite(P.color, 0.85);
+  // Faded = a solid pale tint, so the sky behind never shows through.
+  const fadedColor = tintOnWhite(P.color, 0.22);
 
   const midOuterR = showOuter ? rMid : R;
   const middleFont = ringFont(
@@ -284,14 +286,8 @@ export function FeelingsWheel({
                 >
                   <Path
                     d={sector(c, rMid, R, t0, t1)}
-                    fill={chosen ? P.color : outerColor}
-                    opacity={
-                      pressed === `t:${s.slug}:${t.slug}`
-                        ? 0.75
-                        : inBranch
-                          ? 1
-                          : 0.35
-                    }
+                    fill={chosen ? P.color : inBranch ? outerColor : fadedColor}
+                    opacity={pressed === `t:${s.slug}:${t.slug}` ? 0.75 : 1}
                     stroke={chosen ? INK : "#FFFDF6"}
                     strokeWidth={chosen ? 3 : 1.5}
                   />
@@ -303,6 +299,7 @@ export function FeelingsWheel({
                     text={t.name}
                     font={outerFont}
                     bold={chosen}
+                    fill={inBranch ? INK : "#8A7D6B"}
                   />
                 </G>
               );
@@ -322,8 +319,8 @@ export function FeelingsWheel({
             >
               <Path
                 d={sector(c, rCenter, showOuter ? rMid : R, a0, a1)}
-                fill={chosen ? P.color : middleColor}
-                opacity={pressed === `s:${s.slug}` ? 0.75 : dim ? 0.45 : 1}
+                fill={chosen ? P.color : dim ? fadedColor : middleColor}
+                opacity={pressed === `s:${s.slug}` ? 0.75 : 1}
                 stroke="#FFFDF6"
                 strokeWidth={2}
               />
@@ -335,6 +332,7 @@ export function FeelingsWheel({
                 text={s.name}
                 font={middleFont}
                 bold={chosen}
+                fill={dim ? "#8A7D6B" : INK}
               />
             </G>
           );
